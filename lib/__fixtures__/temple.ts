@@ -11,8 +11,10 @@ export function makeTemple(overrides: Partial<Temple> = {}): Temple {
     religion: "Hinduism",
     deity: "Shiva",
     tagline: "A temple for tests.",
+    whyVisit: "It is a good temple to visit. The setting is memorable. Plan a full morning here.",
     heroImage: "",
     gallery: ["", ""],
+    media: [{ kind: "image", url: "https://example.com/test-temple.jpg", alt: "Test Temple" }],
     videoUrl: "",
     coordinates: { lat: 12.97, lng: 79.13 },
     overview: "An overview.",
@@ -26,6 +28,7 @@ export function makeTemple(overrides: Partial<Temple> = {}): Temple {
       architecturalStyle: "Dravidian",
       presidingDeity: "Shiva",
     },
+    architecturalStyleSlug: "dravidian",
     timings: { opening: "5:00 AM", closing: "9:00 PM" },
     entryFee: { indian: "Free" },
     bestTimeToVisit: {

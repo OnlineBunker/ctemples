@@ -43,6 +43,11 @@ export function formatDistance(km: number): string {
   return `${km.toLocaleString("en-IN")} km`;
 }
 
+/** "38 km away" — for Haversine-derived distances on "Within 100 km" style cards. */
+export function formatRelativeDistance(km: number): string {
+  return `${Math.round(km).toLocaleString("en-IN")} km away`;
+}
+
 /** One-decimal rating: 4.8. */
 export function formatRating(rating: number): string {
   return rating.toFixed(1);

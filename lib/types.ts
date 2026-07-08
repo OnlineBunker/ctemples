@@ -19,6 +19,21 @@ export interface NearbyAttraction {
   description: string;
 }
 
+/**
+ * A single gallery/hero media item. `kind: "video"` is schema-ready for future
+ * production video (none ships in the prototype yet — see components/home/hero-slide.tsx
+ * for the dormant video-slide branch). `poster` is the still shown before a video plays.
+ */
+export interface MediaItem {
+  kind: "image" | "video";
+  url: string;
+  poster?: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  durationSec?: number;
+}
+
 export type Region = "North" | "South" | "East" | "West" | "Northeast" | "Central";
 
 export interface Temple {
@@ -30,8 +45,14 @@ export interface Temple {
   religion: string;
   deity: string;
   tagline: string;
+  whyVisit: string; // 3-4 editorial sentences — not auto-generated from overview
   heroImage: string;
   gallery: string[];
+  // `media` is the refactor target for heroImage+gallery (locked schema addition, see
+  // CLAUDE.md "Schema additions"). heroImage/gallery are kept alongside it for backward
+  // compatibility with the not-yet-migrated Explore/detail-page consumers (Phase 5/7
+  // territory) — media[0] is always the hero image, per lib/media.ts's getHero().
+  media: MediaItem[];
   videoUrl: string; // "" placeholder - real videos added later
   coordinates: { lat: number; lng: number };
   overview: string;
@@ -45,6 +66,10 @@ export interface Temple {
     architecturalStyle: string;
     presidingDeity: string;
   };
+  // Derived slug of quickFacts.architecturalStyle, hand-curated to group temples that
+  // share a real architectural tradition (see data/temples.ts) rather than a mechanical
+  // per-record slug, which would make every temple its own singleton "style".
+  architecturalStyleSlug: string;
   timings: { opening: string; closing: string; notes?: string };
   entryFee: { indian: string; foreign?: string; cameraOrPhoneFee?: string };
   bestTimeToVisit: {
@@ -58,4 +83,6 @@ export interface Temple {
   tags: string[];
   rating: number;
   featured: boolean;
+  /** Optional "Plan around" summary line; populated for ~6 of 15 temples. */
+  tripDuration?: { temples: number; days: number; km: number };
 }

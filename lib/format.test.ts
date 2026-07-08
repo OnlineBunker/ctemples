@@ -4,6 +4,7 @@ import {
   parseRupeeRange,
   cheapestBudget,
   formatDistance,
+  formatRelativeDistance,
   formatRating,
   formatCoordinates,
   pluralize,
@@ -58,6 +59,16 @@ describe("formatDistance / formatRating", () => {
   it("formats rating to one decimal", () => {
     expect(formatRating(4.8)).toBe("4.8");
     expect(formatRating(5)).toBe("5.0");
+  });
+});
+
+describe("formatRelativeDistance", () => {
+  it("rounds and appends 'away'", () => {
+    expect(formatRelativeDistance(38.4)).toBe("38 km away");
+    expect(formatRelativeDistance(411.6)).toBe("412 km away");
+  });
+  it("uses Indian digit grouping for large distances", () => {
+    expect(formatRelativeDistance(1204)).toBe("1,204 km away");
   });
 });
 

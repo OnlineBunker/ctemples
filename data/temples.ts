@@ -17,6 +17,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Meenakshi (Parvati) and Sundareswarar (Shiva)",
     "tagline": "Madurai's towering gopurams where the fish-eyed goddess reigns supreme",
+    "whyVisit": "Few sights in India match the first glimpse of Meenakshi's fourteen soaring, sculpture-crusted gopurams rising over Madurai's rooftops. This is a living temple, not a monument — arrive for the pre-dawn or evening rituals and you'll stand shoulder to shoulder with pilgrims who have worshipped here for generations. The thousand-pillared hall alone rewards an unhurried hour, and the surrounding old city, laid out in concentric squares around the shrine, is worth a wander in its own right. Come for the architecture; stay for the sense that you've stepped into a still-beating heart of Tamil devotion.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/An_aerial_view_of_Madurai_city_from_atop_of_Meenakshi_Amman_temple.jpg/1280px-An_aerial_view_of_Madurai_city_from_atop_of_Meenakshi_Amman_temple.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/An_aerial_view_of_Madurai_city_from_atop_of_Meenakshi_Amman_temple.jpg/1280px-An_aerial_view_of_Madurai_city_from_atop_of_Meenakshi_Amman_temple.jpg",
@@ -27,6 +28,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/01MaduraiMeenakshiAmmanTemple%26IndoorCorridorView.jpg/1280px-01MaduraiMeenakshiAmmanTemple%26IndoorCorridorView.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/India_Meenakshi_Temple.jpg/1280px-India_Meenakshi_Temple.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/1895_print_of_Meenakshi_temple_1000_pillar_Airakkal_mandapa_choultry.jpg/1280px-1895_print_of_Meenakshi_temple_1000_pillar_Airakkal_mandapa_choultry.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/An_aerial_view_of_Madurai_city_from_atop_of_Meenakshi_Amman_temple.jpg/1280px-An_aerial_view_of_Madurai_city_from_atop_of_Meenakshi_Amman_temple.jpg", "alt": "Meenakshi Amman Temple, Madurai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Mariage_of_Shiva_and_Parvati_%28Meenakshi%29_witnessed_by_Vishnu%2C_Meenakshi_Temple%2C_Madurai_%282%29_%2836857653813%29.jpg/1280px-Mariage_of_Shiva_and_Parvati_%28Meenakshi%29_witnessed_by_Vishnu%2C_Meenakshi_Temple%2C_Madurai_%282%29_%2836857653813%29.jpg", "alt": "Meenakshi Amman Temple, Madurai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Madurai_Meenakshi_Temple_painting.JPG/1280px-Madurai_Meenakshi_Temple_painting.JPG", "alt": "Meenakshi Amman Temple, Madurai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Figures_with_Pigeons_-_Ivory_Sculpture_-_Sri_Meenakshi-Sundareshwarar_Temple_-_Madurai_-_India.JPG/1280px-Figures_with_Pigeons_-_Ivory_Sculpture_-_Sri_Meenakshi-Sundareshwarar_Temple_-_Madurai_-_India.JPG", "alt": "Meenakshi Amman Temple, Madurai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/1801_sketch_of_goddess_Meenakshi_and_her_shrine_in_the_Madurai_temple.jpg", "alt": "Meenakshi Amman Temple, Madurai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/01MaduraiMeenakshiAmmanTemple%26IndoorCorridorView.jpg/1280px-01MaduraiMeenakshiAmmanTemple%26IndoorCorridorView.jpg", "alt": "Meenakshi Amman Temple, Madurai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/India_Meenakshi_Temple.jpg/1280px-India_Meenakshi_Temple.jpg", "alt": "Meenakshi Amman Temple, Madurai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/1895_print_of_Meenakshi_temple_1000_pillar_Airakkal_mandapa_choultry.jpg/1280px-1895_print_of_Meenakshi_temple_1000_pillar_Airakkal_mandapa_choultry.jpg", "alt": "Meenakshi Amman Temple, Madurai" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -44,6 +55,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Dravidian",
       "presidingDeity": "Meenakshi (Parvati) with Sundareswarar (Shiva)"
     },
+    "architecturalStyleSlug": "dravidian",
     "timings": {
       "opening": "5:00 AM",
       "closing": "9:30 PM",
@@ -156,7 +168,8 @@ export const temples: Temple[] = [
       "Gopuram"
     ],
     "rating": 4.8,
-    "featured": true
+    "featured": true,
+    "tripDuration": { "temples": 3, "days": 4, "km": 350 }
   },
   {
     "id": "kashi-vishwanath-temple",
@@ -167,6 +180,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Vishwanath / Vishweshwara (Shiva), one of the twelve Jyotirlingas",
     "tagline": "The golden-spired heart of Kashi, where Shiva reigns beside the Ganga",
+    "whyVisit": "Varanasi is often called India's spiritual capital, and Kashi Vishwanath — one of the twelve Jyotirlingas — sits at its absolute center. A visit here is inseparable from the city around it: the temple, the ghats, and the Ganga form a single, continuous pilgrimage that most travelers spend days, not hours, absorbing. Time your visit around the evening Ganga Aarti at the nearby ghats for the fullest experience. Don't miss Sarnath, a short ride away, where the Buddha delivered his first sermon — proof that Varanasi's sacred geography stretches well beyond the temple gates.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Kashi_Vishwanath.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Kashi_Vishwanath.jpg/1280px-Kashi_Vishwanath.jpg",
@@ -176,6 +190,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/The_Prime_Minister%2C_Shri_Narendra_Modi_addressing_at_the_inauguration_of_Kashi_Vishwanath_Dham%2C_in_Varanasi%2C_Uttar_Pradesh_on_December_13%2C_2021_%28105966%29.jpg/1280px-The_Prime_Minister%2C_Shri_Narendra_Modi_addressing_at_the_inauguration_of_Kashi_Vishwanath_Dham%2C_in_Varanasi%2C_Uttar_Pradesh_on_December_13%2C_2021_%28105966%29.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Benares_well.jpg/1280px-Benares_well.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Annapurna_Entrance_of_kashi_vishwanath_temple.jpg/1280px-Annapurna_Entrance_of_kashi_vishwanath_temple.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Kashi_Vishwanath.jpg", "alt": "Kashi Vishwanath Temple, Varanasi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Kashi_Vishwanath.jpg/1280px-Kashi_Vishwanath.jpg", "alt": "Kashi Vishwanath Temple, Varanasi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Temple_Of_Vishveshwur_Benares_by_James_Prinsep_1834_%28cropped%29.jpg/1280px-Temple_Of_Vishveshwur_Benares_by_James_Prinsep_1834_%28cropped%29.jpg", "alt": "Kashi Vishwanath Temple, Varanasi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Plan_Of_The_Ancient_Temple_Of_Vishveshvur_by_James_Prinsep_1832_%28cropped%29.jpg/1280px-Plan_Of_The_Ancient_Temple_Of_Vishveshvur_by_James_Prinsep_1832_%28cropped%29.jpg", "alt": "Kashi Vishwanath Temple, Varanasi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Elevation_of_Kashi_Vishwanath_Temple_1891.jpg/1280px-Elevation_of_Kashi_Vishwanath_Temple_1891.jpg", "alt": "Kashi Vishwanath Temple, Varanasi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/The_Prime_Minister%2C_Shri_Narendra_Modi_addressing_at_the_inauguration_of_Kashi_Vishwanath_Dham%2C_in_Varanasi%2C_Uttar_Pradesh_on_December_13%2C_2021_%28105966%29.jpg/1280px-The_Prime_Minister%2C_Shri_Narendra_Modi_addressing_at_the_inauguration_of_Kashi_Vishwanath_Dham%2C_in_Varanasi%2C_Uttar_Pradesh_on_December_13%2C_2021_%28105966%29.jpg", "alt": "Kashi Vishwanath Temple, Varanasi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Benares_well.jpg/1280px-Benares_well.jpg", "alt": "Kashi Vishwanath Temple, Varanasi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Annapurna_Entrance_of_kashi_vishwanath_temple.jpg/1280px-Annapurna_Entrance_of_kashi_vishwanath_temple.jpg", "alt": "Kashi Vishwanath Temple, Varanasi" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -193,6 +217,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Nagara (North Indian)",
       "presidingDeity": "Shiva as Vishwanath (Jyotirlinga)"
     },
+    "architecturalStyleSlug": "nagara",
     "timings": {
       "opening": "3:00 AM",
       "closing": "11:00 PM",
@@ -316,6 +341,7 @@ export const temples: Temple[] = [
     "religion": "Sikh",
     "deity": "No presiding deity; the Guru Granth Sahib, the eternal Sikh scripture, is installed and revered",
     "tagline": "Sikhism's holiest gurdwara, a gilded sanctuary rising from a sacred pool",
+    "whyVisit": "The Golden Temple's gilded sanctum floating on its sacred pool is one of the most photographed sights in India, but the real reason to visit is what happens around it: the world's largest free community kitchen, serving tens of thousands of meals a day to anyone who arrives, regardless of faith. Walk the marble parikrama at night, when the reflection of the gold dome ripples across the water and the shabad kirtan drifts over the complex. Volunteering an hour in the langar hall — washing dishes, rolling chapatis — is, for many visitors, more memorable than the sightseeing itself. Come early or late to avoid the midday crowds and heat.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/The_Golden_Temple_of_Amrithsar_7.jpg/1280px-The_Golden_Temple_of_Amrithsar_7.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/The_Golden_Temple_of_Amrithsar_7.jpg/1280px-The_Golden_Temple_of_Amrithsar_7.jpg",
@@ -326,6 +352,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/The_Golden_Temple_in_1840.png/1280px-The_Golden_Temple_in_1840.png",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Golden_Temple%2C_Amritsar_03.jpg/1280px-Golden_Temple%2C_Amritsar_03.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/1880_photograph_of_the_Golden_Temple%2C_Darbar_Sahib%2C_sacred_pool_and_nearby_buildings%2C_Amritsar.jpg/1280px-1880_photograph_of_the_Golden_Temple%2C_Darbar_Sahib%2C_sacred_pool_and_nearby_buildings%2C_Amritsar.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/The_Golden_Temple_of_Amrithsar_7.jpg/1280px-The_Golden_Temple_of_Amrithsar_7.jpg", "alt": "Golden Temple (Harmandir Sahib), Amritsar" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Complete_view_of_Golden_Temple_complex_09.jpg/1280px-Complete_view_of_Golden_Temple_complex_09.jpg", "alt": "Golden Temple (Harmandir Sahib), Amritsar" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Painting_of_Guru_Arjan_overseeing_the_construction_of_the_original_Golden_Temple_%28Harmandir_Sahib%29%2C_circa_1890-95.jpg/1280px-Painting_of_Guru_Arjan_overseeing_the_construction_of_the_original_Golden_Temple_%28Harmandir_Sahib%29%2C_circa_1890-95.jpg", "alt": "Golden Temple (Harmandir Sahib), Amritsar" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/A_Sikh_Guru_%28Perhaps_Guru_Arjan_Dev%29_Seated_in_the_Golden_Temple_at_Amritsar%2C_Guler%2C_circa_1830.jpg/1280px-A_Sikh_Guru_%28Perhaps_Guru_Arjan_Dev%29_Seated_in_the_Golden_Temple_at_Amritsar%2C_Guler%2C_circa_1830.jpg", "alt": "Golden Temple (Harmandir Sahib), Amritsar" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Ranjit_Singh_at_Harmandir_Sahib_-_August_Schoefft_-_Vienna_1850_-_Princess_Bamba_Collection_-_Lahore_Fort.jpg/1280px-Ranjit_Singh_at_Harmandir_Sahib_-_August_Schoefft_-_Vienna_1850_-_Princess_Bamba_Collection_-_Lahore_Fort.jpg", "alt": "Golden Temple (Harmandir Sahib), Amritsar" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/The_Golden_Temple_in_1840.png/1280px-The_Golden_Temple_in_1840.png", "alt": "Golden Temple (Harmandir Sahib), Amritsar" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Golden_Temple%2C_Amritsar_03.jpg/1280px-Golden_Temple%2C_Amritsar_03.jpg", "alt": "Golden Temple (Harmandir Sahib), Amritsar" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/1880_photograph_of_the_Golden_Temple%2C_Darbar_Sahib%2C_sacred_pool_and_nearby_buildings%2C_Amritsar.jpg/1280px-1880_photograph_of_the_Golden_Temple%2C_Darbar_Sahib%2C_sacred_pool_and_nearby_buildings%2C_Amritsar.jpg", "alt": "Golden Temple (Harmandir Sahib), Amritsar" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -343,6 +379,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Sikh architecture blending Indo-Islamic and Hindu elements",
       "presidingDeity": "None (the Guru Granth Sahib is installed and revered)"
     },
+    "architecturalStyleSlug": "sikh",
     "timings": {
       "opening": "Open 24 hours (shrine opens before dawn)",
       "closing": "Late night (the Guru Granth Sahib is taken to rest at night and reinstalled before dawn)",
@@ -453,7 +490,8 @@ export const temples: Temple[] = [
       "Gilded"
     ],
     "rating": 4.9,
-    "featured": true
+    "featured": true,
+    "tripDuration": { "temples": 2, "days": 2, "km": 30 }
   },
   {
     "id": "jagannath-temple-puri",
@@ -464,6 +502,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Jagannath (a form of Vishnu/Krishna), worshipped with siblings Balabhadra and Subhadra",
     "tagline": "Lord of the Universe on the sea-swept shore of Puri",
+    "whyVisit": "Jagannath Temple is the beating heart of one of Hinduism's most distinctive traditions — the deity here isn't a stone or metal murti but a wooden image renewed every dozen or so years in a closely guarded ritual. Non-Hindus can't enter the sanctum, but the temple's towering shikhara dominates Puri's skyline and can be viewed from nearby rooftops. Time a visit around the Rath Yatra in June or July, when the deities are pulled through the streets on massive wooden chariots before a crowd of hundreds of thousands. Combine the trip with Puri's beach and Konark's Sun Temple, just up the coast, for a full day of Odisha's Kalinga architecture.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Shri_Jagannath_temple.jpg/1280px-Shri_Jagannath_temple.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Shri_Jagannath_temple.jpg/1280px-Shri_Jagannath_temple.jpg",
@@ -474,6 +513,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/East_Gopura_of_Rameswaram_Temple.jpg/1280px-East_Gopura_of_Rameswaram_Temple.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Dwarakadheesh_Temple%2C_2014.jpg/1280px-Dwarakadheesh_Temple%2C_2014.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Badrinath_Temple_-_OCT_2014.jpg/1280px-Badrinath_Temple_-_OCT_2014.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Shri_Jagannath_temple.jpg/1280px-Shri_Jagannath_temple.jpg", "alt": "Jagannath Temple, Puri" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vishnu.jpg/1280px-Vishnu.jpg", "alt": "Jagannath Temple, Puri" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Indika._The_country_and_the_people_of_India_and_Ceylon_%281891%29_%2814767897094%29.jpg/1280px-Indika._The_country_and_the_people_of_India_and_Ceylon_%281891%29_%2814767897094%29.jpg", "alt": "Jagannath Temple, Puri" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/PURI_JAGANATHA_TEMPLE%2C_PURI%2C_ORISSA%2C_INDIA%2C_ASIA.jpg/1280px-PURI_JAGANATHA_TEMPLE%2C_PURI%2C_ORISSA%2C_INDIA%2C_ASIA.jpg", "alt": "Jagannath Temple, Puri" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/ABX_SHRI_PURUSHOTTAMA_KSHETRA_PURI.jpg/1280px-ABX_SHRI_PURUSHOTTAMA_KSHETRA_PURI.jpg", "alt": "Jagannath Temple, Puri" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/East_Gopura_of_Rameswaram_Temple.jpg/1280px-East_Gopura_of_Rameswaram_Temple.jpg", "alt": "Jagannath Temple, Puri" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Dwarakadheesh_Temple%2C_2014.jpg/1280px-Dwarakadheesh_Temple%2C_2014.jpg", "alt": "Jagannath Temple, Puri" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Badrinath_Temple_-_OCT_2014.jpg/1280px-Badrinath_Temple_-_OCT_2014.jpg", "alt": "Jagannath Temple, Puri" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -491,6 +540,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Kalinga (Odishan) temple architecture",
       "presidingDeity": "Lord Jagannath (form of Vishnu/Krishna), with Balabhadra and Subhadra"
     },
+    "architecturalStyleSlug": "kalinga",
     "timings": {
       "opening": "5:00 AM (approx.)",
       "closing": "10:00 PM (approx.)",
@@ -595,6 +645,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Venkateswara / Balaji (a form of Vishnu)",
     "tagline": "Lord of the seven hills, drawing pilgrims from across the world",
+    "whyVisit": "Tirumala is reportedly the most-visited religious site on Earth, and arriving here — winding up the seven hills to the temple town above Tirupati — makes that scale tangible. Most pilgrims queue for hours for a few seconds of darshan before the deity, an experience that's as much about the anticipation and the crowd's quiet devotion as the moment itself. The tonsuring hall, where pilgrims offer their hair, and the temple's vast free and paid dining halls are worth seeing even if you don't queue for the sanctum. Book your darshan slot online well in advance — walk-up queues can run to many hours.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tirumala_090615.jpg/1280px-Tirumala_090615.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tirumala_090615.jpg/1280px-Tirumala_090615.jpg",
@@ -605,6 +656,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Tirumala_Venkateswara_temple_entrance_09062015.JPG/1280px-Tirumala_Venkateswara_temple_entrance_09062015.JPG",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Sri_vari_swarana_radham879.jpg/1280px-Sri_vari_swarana_radham879.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Stamp_of_India_-_2017_-_Colnect_805329_-_Bhog_Prasad_Tirupati_Laddoo_%28cropped%29.jpeg/1280px-Stamp_of_India_-_2017_-_Colnect_805329_-_Bhog_Prasad_Tirupati_Laddoo_%28cropped%29.jpeg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tirumala_090615.jpg/1280px-Tirumala_090615.jpg", "alt": "Tirumala Venkateswara Temple, Tirumala" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vishnu.jpg/1280px-Vishnu.jpg", "alt": "Tirumala Venkateswara Temple, Tirumala" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/SwamiPushkarni.JPG/1280px-SwamiPushkarni.JPG", "alt": "Tirumala Venkateswara Temple, Tirumala" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/The_Prime_Minister%2C_Shri_Narendra_Modi_pays_obeisance_at_Tirumala_Temple%2C_in_Tirupati%2C_Andhra_Pradesh.jpg/1280px-The_Prime_Minister%2C_Shri_Narendra_Modi_pays_obeisance_at_Tirumala_Temple%2C_in_Tirupati%2C_Andhra_Pradesh.jpg", "alt": "Tirumala Venkateswara Temple, Tirumala" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Tirumala_View_from_srivari_padalu.jpg/1280px-Tirumala_View_from_srivari_padalu.jpg", "alt": "Tirumala Venkateswara Temple, Tirumala" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Tirumala_Venkateswara_temple_entrance_09062015.JPG/1280px-Tirumala_Venkateswara_temple_entrance_09062015.JPG", "alt": "Tirumala Venkateswara Temple, Tirumala" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Sri_vari_swarana_radham879.jpg/1280px-Sri_vari_swarana_radham879.jpg", "alt": "Tirumala Venkateswara Temple, Tirumala" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Stamp_of_India_-_2017_-_Colnect_805329_-_Bhog_Prasad_Tirupati_Laddoo_%28cropped%29.jpeg/1280px-Stamp_of_India_-_2017_-_Colnect_805329_-_Bhog_Prasad_Tirupati_Laddoo_%28cropped%29.jpeg", "alt": "Tirumala Venkateswara Temple, Tirumala" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -622,6 +683,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Dravidian temple architecture",
       "presidingDeity": "Lord Venkateswara / Balaji (form of Vishnu)"
     },
+    "architecturalStyleSlug": "dravidian",
     "timings": {
       "opening": "Opens well before dawn for early rituals (around 3:00 AM for special services)",
       "closing": "Continues through the day and late into the night",
@@ -714,7 +776,8 @@ export const temples: Temple[] = [
       "TTD"
     ],
     "rating": 4.8,
-    "featured": true
+    "featured": true,
+    "tripDuration": { "temples": 4, "days": 5, "km": 600 }
   },
   {
     "id": "kedarnath-temple",
@@ -725,6 +788,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Kedarnath (Shiva), one of the twelve Jyotirlingas and part of the Panch Kedar",
     "tagline": "A Himalayan Jyotirlinga standing in stone against the high snows",
+    "whyVisit": "Kedarnath rewards those willing to earn it: the temple sits at over 3,500 meters, reached only by a strenuous trek (or a pony or helicopter) through some of the most dramatic scenery in the Himalayas. It's one of the twelve Jyotirlingas and part of the Char Dham and Panch Kedar pilgrimage circuits, so many visitors combine it with Badrinath, Gangotri, and Yamunotri into a single multi-day pilgrimage. The temple's mortarless stone construction has survived earthquakes, floods, and centuries of Himalayan winters — a fact that becomes viscerally apparent once you're standing in front of it. The trekking season is short, roughly May to October, so plan well ahead.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Kedarnath_Temple_in_Rainy_season.jpg/1280px-Kedarnath_Temple_in_Rainy_season.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Kedarnath_Temple_in_Rainy_season.jpg/1280px-Kedarnath_Temple_in_Rainy_season.jpg",
@@ -735,6 +799,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Temple_in_the_aftermath_of_the_flood.jpg/1280px-Temple_in_the_aftermath_of_the_flood.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Panda_visit_Kedarnath.jpg/1280px-Panda_visit_Kedarnath.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Kedarnath_Temple_in_2014.jpg/1280px-Kedarnath_Temple_in_2014.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Kedarnath_Temple_in_Rainy_season.jpg/1280px-Kedarnath_Temple_in_Rainy_season.jpg", "alt": "Kedarnath Temple, Kedarnath" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Yamunotri_temple_and_ashram.jpg/1280px-Yamunotri_temple_and_ashram.jpg", "alt": "Kedarnath Temple, Kedarnath" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Gangotri_%28ganga_river%29.jpg/1280px-Gangotri_%28ganga_river%29.jpg", "alt": "Kedarnath Temple, Kedarnath" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Kedarnath_Temple.jpg/1280px-Kedarnath_Temple.jpg", "alt": "Kedarnath Temple, Kedarnath" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Badrinath_Temple_%2C_Uttarakhand.jpg/1280px-Badrinath_Temple_%2C_Uttarakhand.jpg", "alt": "Kedarnath Temple, Kedarnath" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Temple_in_the_aftermath_of_the_flood.jpg/1280px-Temple_in_the_aftermath_of_the_flood.jpg", "alt": "Kedarnath Temple, Kedarnath" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Panda_visit_Kedarnath.jpg/1280px-Panda_visit_Kedarnath.jpg", "alt": "Kedarnath Temple, Kedarnath" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Kedarnath_Temple_in_2014.jpg/1280px-Kedarnath_Temple_in_2014.jpg", "alt": "Kedarnath Temple, Kedarnath" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -752,6 +826,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "North Indian stone temple architecture (mortarless stone construction)",
       "presidingDeity": "Lord Kedarnath (Shiva), worshipped as a Jyotirlinga in the form of a conical rock"
     },
+    "architecturalStyleSlug": "nagara",
     "timings": {
       "opening": "Early morning (around 4:00 AM for pre-dawn rituals) during the pilgrimage season",
       "closing": "Evening, closing at night after the final aarti",
@@ -846,7 +921,8 @@ export const temples: Temple[] = [
       "Seasonal"
     ],
     "rating": 4.9,
-    "featured": true
+    "featured": true,
+    "tripDuration": { "temples": 4, "days": 7, "km": 220 }
   },
   {
     "id": "somnath-temple",
@@ -857,6 +933,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Somnath (Shiva), revered as the first among the twelve Jyotirlingas",
     "tagline": "The eternal shrine by the Arabian Sea, rebuilt again and again through history",
+    "whyVisit": "Somnath's history of destruction and reconstruction — sacked and rebuilt across a millennium — is as much the story here as the current, gleaming structure completed in the 1950s. Its coastal setting is dramatic: the temple looks directly out over the Arabian Sea, and a sound-and-light show held on the grounds most evenings tells the site's layered history against that same seafront backdrop. It's revered as the first among the twelve Jyotirlingas, giving it particular weight for Shiva pilgrims. Pair a visit with nearby Somnath beach for the fuller experience.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Somanath_mandir_%28cropped%29.jpg/1280px-Somanath_mandir_%28cropped%29.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Somanath_mandir_%28cropped%29.jpg/1280px-Somanath_mandir_%28cropped%29.jpg",
@@ -867,6 +944,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Ancient_Somnath_temple%2C_Veraval_Gujarat.jpg/1280px-Ancient_Somnath_temple%2C_Veraval_Gujarat.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Somanath_Temple.jpg/1280px-Somanath_Temple.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Somnath_temple_in_Gujarat_converted_into_a_mosque%2C_sketched_by_Captain_Postans_and_lithograph_by_Thomas_Dibdin%2C_published_in_1850.jpg/1280px-Somnath_temple_in_Gujarat_converted_into_a_mosque%2C_sketched_by_Captain_Postans_and_lithograph_by_Thomas_Dibdin%2C_published_in_1850.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Somanath_mandir_%28cropped%29.jpg/1280px-Somanath_mandir_%28cropped%29.jpg", "alt": "Somnath Temple, Prabhas Patan (Veraval)" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Somnath_temple_ruins_%281869%29.jpg/1280px-Somnath_temple_ruins_%281869%29.jpg", "alt": "Somnath Temple, Prabhas Patan (Veraval)" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/19th_century_archive_photos_of_Somanatha_temple%2C_Veraval_Prabhas_Patan%2C_Gujarat.jpg/1280px-19th_century_archive_photos_of_Somanatha_temple%2C_Veraval_Prabhas_Patan%2C_Gujarat.jpg", "alt": "Somnath Temple, Prabhas Patan (Veraval)" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Red_Fort%2C_Ghazni_gate_%28photographic_restoration%29.jpg/1280px-Red_Fort%2C_Ghazni_gate_%28photographic_restoration%29.jpg", "alt": "Somnath Temple, Prabhas Patan (Veraval)" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/K_M_Munshi_at_Somnath_in_July_1950.jpg/1280px-K_M_Munshi_at_Somnath_in_July_1950.jpg", "alt": "Somnath Temple, Prabhas Patan (Veraval)" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Ancient_Somnath_temple%2C_Veraval_Gujarat.jpg/1280px-Ancient_Somnath_temple%2C_Veraval_Gujarat.jpg", "alt": "Somnath Temple, Prabhas Patan (Veraval)" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Somanath_Temple.jpg/1280px-Somanath_Temple.jpg", "alt": "Somnath Temple, Prabhas Patan (Veraval)" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Somnath_temple_in_Gujarat_converted_into_a_mosque%2C_sketched_by_Captain_Postans_and_lithograph_by_Thomas_Dibdin%2C_published_in_1850.jpg/1280px-Somnath_temple_in_Gujarat_converted_into_a_mosque%2C_sketched_by_Captain_Postans_and_lithograph_by_Thomas_Dibdin%2C_published_in_1850.jpg", "alt": "Somnath Temple, Prabhas Patan (Veraval)" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -884,6 +971,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Chalukya / Maru-Gurjara style",
       "presidingDeity": "Shiva as Somnath (first Jyotirlinga)"
     },
+    "architecturalStyleSlug": "maru-gurjara",
     "timings": {
       "opening": "6:00 AM",
       "closing": "9:30 PM",
@@ -1001,6 +1089,7 @@ export const temples: Temple[] = [
     "religion": "Hindu (Swaminarayan tradition)",
     "deity": "Swaminarayan (Bhagwan Swaminarayan), with the BAPS tradition",
     "tagline": "A modern marvel of hand-carved stone honouring the Swaminarayan faith in Delhi",
+    "whyVisit": "Akshardham is less a single temple than an entire cultural campus — a hand-carved sandstone-and-marble monument surrounded by gardens, exhibitions, a musical fountain, and boat rides through dioramas of Indian history. It's a newer addition to India's temple landscape, completed in 2005, but was built using traditional Hindu temple-building techniques and craftsmanship, without structural steel. Give yourself the better part of a day: the main monument alone can be seen in an hour, but the exhibition halls and evening water show extend the visit considerably. It's an easy, family-friendly entry point to Hindu temple architecture for visitors new to it.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Swaminarayan_Akshardham%2C_Delhi.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/New_Delhi_Temple.jpg/1280px-New_Delhi_Temple.jpg",
@@ -1008,6 +1097,14 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Akshardham_fountain.jpg/1280px-Akshardham_fountain.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Akshardham_Delhi_Ricky_W.jpg/1280px-Akshardham_Delhi_Ricky_W.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Akshardham_construction.jpg/1280px-Akshardham_construction.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Swaminarayan_Akshardham%2C_Delhi.jpg", "alt": "Swaminarayan Akshardham, New Delhi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/New_Delhi_Temple.jpg/1280px-New_Delhi_Temple.jpg", "alt": "Swaminarayan Akshardham, New Delhi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Akshardham_Dome.jpg/1280px-Akshardham_Dome.jpg", "alt": "Swaminarayan Akshardham, New Delhi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Akshardham_fountain.jpg/1280px-Akshardham_fountain.jpg", "alt": "Swaminarayan Akshardham, New Delhi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Akshardham_Delhi_Ricky_W.jpg/1280px-Akshardham_Delhi_Ricky_W.jpg", "alt": "Swaminarayan Akshardham, New Delhi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Akshardham_construction.jpg/1280px-Akshardham_construction.jpg", "alt": "Swaminarayan Akshardham, New Delhi" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -1025,6 +1122,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Traditional Indian temple style in hand-carved pink sandstone and marble",
       "presidingDeity": "Bhagwan Swaminarayan"
     },
+    "architecturalStyleSlug": "modern",
     "timings": {
       "opening": "9:30 AM",
       "closing": "6:30 PM (last entry earlier in the day)",
@@ -1141,6 +1239,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Surya (the Sun God)",
     "tagline": "A colossal stone chariot of the Sun God rising from the Odisha coast",
+    "whyVisit": "Even in its partly ruined state — its great tower collapsed centuries ago — Konark is one of India's most extraordinary architectural achievements: the entire temple is carved as a colossal stone chariot for the Sun God, complete with ornately sculpted wheels and a team of straining horses. The surviving jagamohana hall's sculpture alone can occupy an hour of close looking. It's a UNESCO World Heritage Site and forms the third point of Odisha's popular coastal circuit with Puri and Bhubaneswar, making it easy to combine into a short itinerary. Visit in the low afternoon light, when the carvings' depth and shadow are at their most dramatic.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/4/47/Konarka_Temple.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Konarka_Temple.jpg/1280px-Konarka_Temple.jpg",
@@ -1151,6 +1250,17 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/1815_sketch_of_the_sculpture_at_Konarak_Sun_Temple%2C_Odisha_India.jpg/1280px-1815_sketch_of_the_sculpture_at_Konarak_Sun_Temple%2C_Odisha_India.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Plan-temple-konarak.png/1280px-Plan-temple-konarak.png",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Konark_Temple_Panorama2.jpg/1280px-Konark_Temple_Panorama2.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/4/47/Konarka_Temple.jpg", "alt": "Konark Sun Temple, Konark" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Konarka_Temple.jpg/1280px-Konarka_Temple.jpg", "alt": "Konark Sun Temple, Konark" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Surya%2C_11th_century.jpg/1280px-Surya%2C_11th_century.jpg", "alt": "Konark Sun Temple, Konark" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Closeup_of_the_center_of_a_stone_wheel_-_Konark_Sun_Temple%2C_Orissa%2C_India.jpg/1280px-Closeup_of_the_center_of_a_stone_wheel_-_Konark_Sun_Temple%2C_Orissa%2C_India.jpg", "alt": "Konark Sun Temple, Konark" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Stone_wheel_engraved_in_the_13th_century_built_Konark_Sun_Temple_in_Orissa%2C_India.jpg/1280px-Stone_wheel_engraved_in_the_13th_century_built_Konark_Sun_Temple_in_Orissa%2C_India.jpg", "alt": "Konark Sun Temple, Konark" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/1822_drawing_of_elevation_of_the_east_side_of_the_Mandapa_of_the_Temple_of_the_Sun%2C_Konarak.jpg/1280px-1822_drawing_of_elevation_of_the_east_side_of_the_Mandapa_of_the_Temple_of_the_Sun%2C_Konarak.jpg", "alt": "Konark Sun Temple, Konark" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/1815_sketch_of_the_sculpture_at_Konarak_Sun_Temple%2C_Odisha_India.jpg/1280px-1815_sketch_of_the_sculpture_at_Konarak_Sun_Temple%2C_Odisha_India.jpg", "alt": "Konark Sun Temple, Konark" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Plan-temple-konarak.png/1280px-Plan-temple-konarak.png", "alt": "Konark Sun Temple, Konark" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Konark_Temple_Panorama2.jpg/1280px-Konark_Temple_Panorama2.jpg", "alt": "Konark Sun Temple, Konark" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -1168,6 +1278,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Kalinga style, conceived as a colossal chariot",
       "presidingDeity": "Surya (the Sun God)"
     },
+    "architecturalStyleSlug": "kalinga",
     "timings": {
       "opening": "6:00 AM",
       "closing": "8:00 PM",
@@ -1275,7 +1386,8 @@ export const temples: Temple[] = [
       "Chariot"
     ],
     "rating": 4.8,
-    "featured": true
+    "featured": true,
+    "tripDuration": { "temples": 3, "days": 3, "km": 65 }
   },
   {
     "id": "brihadeeswarar-temple",
@@ -1286,6 +1398,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Brihadeeswarar (Shiva), worshipped as a colossal linga",
     "tagline": "A thousand-year-old granite masterpiece crowning the imperial age of the Cholas",
+    "whyVisit": "Rajaraja Chola's eleventh-century masterpiece is a genuine feat of engineering — its roughly 66-metre granite vimana was, for centuries, one of the tallest structures in the world, and nobody has fully explained how its multi-hundred-tonne capstone was lifted into place. The temple's base is covered in detailed Tamil inscriptions recording a millennium-old economy of gold, land, and labor, rewarding visitors who slow down to read them. It's grouped with Gangaikonda Cholapuram and Darasuram as the Great Living Chola Temples, a UNESCO listing that makes for a satisfying multi-day circuit. Come in the morning for the best light on the frescoes inside the mandapa.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Brihadisvara_Temple_during_Maha_Shivaratri-WUS03611_%28edit%29.jpg/1280px-Brihadisvara_Temple_during_Maha_Shivaratri-WUS03611_%28edit%29.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28747%29.jpg/1280px-Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28747%29.jpg",
@@ -1296,6 +1409,17 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28404%29.jpg/1280px-Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28404%29.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Brihadisvara_Temple%2C_Thanjavur%2C_Tamil_Nadu%2C_India_%282017%29.jpg/1280px-Brihadisvara_Temple%2C_Thanjavur%2C_Tamil_Nadu%2C_India_%282017%29.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Thanjavur_Brihadeeswara_Temple_Entrance.JPG/1280px-Thanjavur_Brihadeeswara_Temple_Entrance.JPG"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Brihadisvara_Temple_during_Maha_Shivaratri-WUS03611_%28edit%29.jpg/1280px-Brihadisvara_Temple_during_Maha_Shivaratri-WUS03611_%28edit%29.jpg", "alt": "Brihadeeswarar Temple, Thanjavur" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28747%29.jpg/1280px-Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28747%29.jpg", "alt": "Brihadeeswarar Temple, Thanjavur" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Raraja_detail.png/1280px-Raraja_detail.png", "alt": "Brihadeeswarar Temple, Thanjavur" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Brihadisvara_Temple%2C_Thanjavur_by_William_Hodges.jpg/1280px-Brihadisvara_Temple%2C_Thanjavur_by_William_Hodges.jpg", "alt": "Brihadeeswarar Temple, Thanjavur" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Brihadisvara_Temple%2C_Thanjavur_by_Henry_Salt.jpg/1280px-Brihadisvara_Temple%2C_Thanjavur_by_Henry_Salt.jpg", "alt": "Brihadeeswarar Temple, Thanjavur" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28451%29.jpg/1280px-Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28451%29.jpg", "alt": "Brihadeeswarar Temple, Thanjavur" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28404%29.jpg/1280px-Brihadisvara_Temple_-_Thanjavur_peruvudaiyar_kovil_ttkcvrvb122k23iph_%28404%29.jpg", "alt": "Brihadeeswarar Temple, Thanjavur" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Brihadisvara_Temple%2C_Thanjavur%2C_Tamil_Nadu%2C_India_%282017%29.jpg/1280px-Brihadisvara_Temple%2C_Thanjavur%2C_Tamil_Nadu%2C_India_%282017%29.jpg", "alt": "Brihadeeswarar Temple, Thanjavur" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Thanjavur_Brihadeeswara_Temple_Entrance.JPG/1280px-Thanjavur_Brihadeeswara_Temple_Entrance.JPG", "alt": "Brihadeeswarar Temple, Thanjavur" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -1313,6 +1437,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Dravidian (Chola)",
       "presidingDeity": "Brihadeeswarar (Shiva), as a colossal linga"
     },
+    "architecturalStyleSlug": "dravidian",
     "timings": {
       "opening": "6:00 AM",
       "closing": "8:30 PM",
@@ -1419,7 +1544,8 @@ export const temples: Temple[] = [
       "Pilgrimage"
     ],
     "rating": 4.9,
-    "featured": false
+    "featured": false,
+    "tripDuration": { "temples": 3, "days": 3, "km": 150 }
   },
   {
     "id": "virupaksha-temple-hampi",
@@ -1430,6 +1556,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Virupaksha (a form of Shiva), with the goddess Pampa",
     "tagline": "A living shrine of Shiva rising amid the boulder-strewn ruins of Vijayanagara",
+    "whyVisit": "Virupaksha is the rare Hampi structure that's still a living shrine rather than a ruin — worship here has continued for over a thousand years, even through the empire's catastrophic fall in the sixteenth century. Its towering eastern gopuram is the first thing you'll see arriving in Hampi, and it's worth climbing the surrounding boulder hills at sunset for a view over both the temple and the sprawling ruined city beyond it. Hampi rewards at least two full days: the temple itself is a quick visit, but the wider UNESCO site of palaces, markets, and shrines scattered across the boulder-strewn landscape takes real time to explore. The temple's resident elephant still gives blessings at the entrance most mornings.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Complex_of_Virupaksha_Temple%2C_Hampi_%2804%29.jpg/1280px-Complex_of_Virupaksha_Temple%2C_Hampi_%2804%29.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Complex_of_Virupaksha_Temple%2C_Hampi_%2804%29.jpg/1280px-Complex_of_Virupaksha_Temple%2C_Hampi_%2804%29.jpg",
@@ -1440,6 +1567,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Complex_of_Virupaksha_Temple%2C_Hampi_%2803%29.jpg/1280px-Complex_of_Virupaksha_Temple%2C_Hampi_%2803%29.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Virupaksha_Temple_DSC00910.jpg/1280px-Virupaksha_Temple_DSC00910.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Virupaksha_Temple_from_hilltop.jpg/1280px-Virupaksha_Temple_from_hilltop.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Complex_of_Virupaksha_Temple%2C_Hampi_%2804%29.jpg/1280px-Complex_of_Virupaksha_Temple%2C_Hampi_%2804%29.jpg", "alt": "Virupaksha Temple, Hampi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Virupaksha_Temple_Complex%2C_Interior%2C_Eastern_Sanctuary_1856_photo.jpg/1280px-Virupaksha_Temple_Complex%2C_Interior%2C_Eastern_Sanctuary_1856_photo.jpg", "alt": "Virupaksha Temple, Hampi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/004_Virupaksha_Temple_surrounding.jpg/1280px-004_Virupaksha_Temple_surrounding.jpg", "alt": "Virupaksha Temple, Hampi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Main_Entrance_of_Virupaksha_Temple%2C_Hampi.jpg/1280px-Main_Entrance_of_Virupaksha_Temple%2C_Hampi.jpg", "alt": "Virupaksha Temple, Hampi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2803%29.jpg/1280px-Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2803%29.jpg", "alt": "Virupaksha Temple, Hampi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Complex_of_Virupaksha_Temple%2C_Hampi_%2803%29.jpg/1280px-Complex_of_Virupaksha_Temple%2C_Hampi_%2803%29.jpg", "alt": "Virupaksha Temple, Hampi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Virupaksha_Temple_DSC00910.jpg/1280px-Virupaksha_Temple_DSC00910.jpg", "alt": "Virupaksha Temple, Hampi" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Virupaksha_Temple_from_hilltop.jpg/1280px-Virupaksha_Temple_from_hilltop.jpg", "alt": "Virupaksha Temple, Hampi" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -1457,6 +1594,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Dravidian, in the Vijayanagara idiom",
       "presidingDeity": "Virupaksha (a form of Shiva), with the goddess Pampa"
     },
+    "architecturalStyleSlug": "dravidian",
     "timings": {
       "opening": "6:00 AM",
       "closing": "8:00 PM",
@@ -1574,6 +1712,7 @@ export const temples: Temple[] = [
     "religion": "Hindu (Shakta)",
     "deity": "Kamakhya Devi, a principal Shakti and Tantric goddess",
     "tagline": "A revered Shakti Pitha on Nilachal hill honouring the goddess as living creative power",
+    "whyVisit": "Kamakhya is one of the most important Shakti Peethas in the subcontinent and a major center of Tantric practice — a genuinely different atmosphere from the more mainstream temples elsewhere in this guide. Its distinctive beehive-shaped shikhara and hilltop setting over the Brahmaputra make it visually striking even before you learn the site's significance. The annual Ambubachi Mela, when the temple closes for three days before reopening to enormous crowds, is one of India's more unusual and fascinating festivals to witness. Go early to avoid the steep queues that build through the day, and set aside time for the view over the river from the temple grounds.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Kamakhya_Temple_-_DEV_8829.jpg/1280px-Kamakhya_Temple_-_DEV_8829.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Kamakhya_Temple_-_DEV_8829.jpg/1280px-Kamakhya_Temple_-_DEV_8829.jpg",
@@ -1584,6 +1723,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Singers_performing_Bhajan_in_front_of_Umanand_temple%2C_Guwahati%2C_Assam%2C_India.JPG/1280px-Singers_performing_Bhajan_in_front_of_Umanand_temple%2C_Guwahati%2C_Assam%2C_India.JPG",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Kamakhya-adhisthana.jpg/1280px-Kamakhya-adhisthana.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Pegions_at_the_Kamakhya_temple.jpg/1280px-Pegions_at_the_Kamakhya_temple.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Kamakhya_Temple_-_DEV_8829.jpg/1280px-Kamakhya_Temple_-_DEV_8829.jpg", "alt": "Kamakhya Temple, Guwahati" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Kamakhya_Temple.jpg/1280px-Kamakhya_Temple.jpg", "alt": "Kamakhya Temple, Guwahati" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Kamakhya-plan-outline.png", "alt": "Kamakhya Temple, Guwahati" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Idol_at_Kamakhya_temple%2C_Guwahati%2C_Assam_01.jpg/1280px-Idol_at_Kamakhya_temple%2C_Guwahati%2C_Assam_01.jpg", "alt": "Kamakhya Temple, Guwahati" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Kamakhya.jpg/1280px-Kamakhya.jpg", "alt": "Kamakhya Temple, Guwahati" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Singers_performing_Bhajan_in_front_of_Umanand_temple%2C_Guwahati%2C_Assam%2C_India.JPG/1280px-Singers_performing_Bhajan_in_front_of_Umanand_temple%2C_Guwahati%2C_Assam%2C_India.JPG", "alt": "Kamakhya Temple, Guwahati" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Kamakhya-adhisthana.jpg/1280px-Kamakhya-adhisthana.jpg", "alt": "Kamakhya Temple, Guwahati" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Pegions_at_the_Kamakhya_temple.jpg/1280px-Pegions_at_the_Kamakhya_temple.jpg", "alt": "Kamakhya Temple, Guwahati" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -1601,6 +1750,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Distinctive hemispherical shikhara, sometimes called the Nilachala style",
       "presidingDeity": "Kamakhya Devi, a principal Shakti and Tantric goddess"
     },
+    "architecturalStyleSlug": "nilachala",
     "timings": {
       "opening": "5:30 AM",
       "closing": "10:00 PM",
@@ -1718,6 +1868,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Ganesha (as Shri Siddhivinayak)",
     "tagline": "Mumbai's beloved wish-granting Ganesha, thronged by millions and famous devotees alike",
+    "whyVisit": "Siddhivinayak is a resolutely urban, modern temple — no ancient ruins here, just Mumbai's most beloved Ganesha shrine, drawing everyone from daily commuters to visiting celebrities and cricketers before big matches. The queue moves briskly most days, and the small sanctum's gold-plated dome makes for a striking contrast against the surrounding city. Tuesdays are the temple's busiest day by tradition, so visit another weekday if you'd rather skip the crowds. It's an easy, low-commitment stop to fold into a day exploring central Mumbai.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Shree_Siddhivinayak_Temple_Mumbai.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Shree_Siddhivinayak_Temple_Mumbai.jpg/1280px-Shree_Siddhivinayak_Temple_Mumbai.jpg",
@@ -1728,6 +1879,17 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Hajiali.jpg/1280px-Hajiali.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Hanging-Gardens-5.jpg/1280px-Hanging-Gardens-5.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Jejuri_gadkot.jpg/1280px-Jejuri_gadkot.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Shree_Siddhivinayak_Temple_Mumbai.jpg", "alt": "Siddhivinayak Temple, Mumbai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Shree_Siddhivinayak_Temple_Mumbai.jpg/1280px-Shree_Siddhivinayak_Temple_Mumbai.jpg", "alt": "Siddhivinayak Temple, Mumbai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Amriteshwar_temple.jpg/1280px-Amriteshwar_temple.jpg", "alt": "Siddhivinayak Temple, Mumbai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Chowpatti.jpg", "alt": "Siddhivinayak Temple, Mumbai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Elephanta_Caves%2C_India%2C_Shiva_as_Nataraja%2C_King_of_Dance.jpg/1280px-Elephanta_Caves%2C_India%2C_Shiva_as_Nataraja%2C_King_of_Dance.jpg", "alt": "Siddhivinayak Temple, Mumbai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg", "alt": "Siddhivinayak Temple, Mumbai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Hajiali.jpg/1280px-Hajiali.jpg", "alt": "Siddhivinayak Temple, Mumbai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Hanging-Gardens-5.jpg/1280px-Hanging-Gardens-5.jpg", "alt": "Siddhivinayak Temple, Mumbai" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Jejuri_gadkot.jpg/1280px-Jejuri_gadkot.jpg", "alt": "Siddhivinayak Temple, Mumbai" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -1745,6 +1907,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Modern Hindu temple with gold-plated central dome and shikhara elements",
       "presidingDeity": "Ganesha as Shri Siddhivinayak, with a right-turned trunk"
     },
+    "architecturalStyleSlug": "modern",
     "timings": {
       "opening": "Around 5:30 AM (with an early morning kakad aarti)",
       "closing": "Around 9:50 PM",
@@ -1860,6 +2023,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Vaishno Devi (Mata Rani), a manifestation of the Mother Goddess / Adi Shakti, worshipped as three natural pindis",
     "tagline": "A revered Himalayan cave shrine of the Mother Goddess reached by a mountain trek",
+    "whyVisit": "Vaishno Devi's cave shrine, tucked into the Trikuta hills, draws millions of pilgrims a year up a roughly 13-kilometer paved trek — by foot, pony, palanquin, or helicopter — from Katra, making the journey itself as central to the experience as the shrine. Inside, the goddess is worshipped not as an idol but as three natural rock formations, or pindis, said to embody Mahakali, Mahalakshmi, and Mahasaraswati. The well-developed pilgrimage infrastructure, including lodging and food stalls along the entire route, makes this one of the more approachable Himalayan pilgrimages for first-timers. Start the trek in the evening or very early morning to avoid the worst of the daytime heat and crowds.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Snowfall_in_Vaishno_Devi.jpg",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Snowfall_in_Vaishno_Devi.jpg/1280px-Snowfall_in_Vaishno_Devi.jpg",
@@ -1868,6 +2032,14 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/c/c2/Vaishno_Devi_Navratras.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/LG_Sinha_inugurating_Command_and_Control_centre.jpg/1280px-LG_Sinha_inugurating_Command_and_Control_centre.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/b/b0/Snowfall_in_Vaishno_Devi.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Snowfall_in_Vaishno_Devi.jpg", "alt": "Vaishno Devi Temple, Katra" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Snowfall_in_Vaishno_Devi.jpg/1280px-Snowfall_in_Vaishno_Devi.jpg", "alt": "Vaishno Devi Temple, Katra" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Vaishno_devi.jpg/1280px-Vaishno_devi.jpg", "alt": "Vaishno Devi Temple, Katra" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Vaishno_Devi_Bhawan_Facade_Lighting.jpg", "alt": "Vaishno Devi Temple, Katra" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Vaishno_Devi_Navratras.jpg", "alt": "Vaishno Devi Temple, Katra" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/LG_Sinha_inugurating_Command_and_Control_centre.jpg/1280px-LG_Sinha_inugurating_Command_and_Control_centre.jpg", "alt": "Vaishno Devi Temple, Katra" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -1885,6 +2057,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Natural limestone cave sanctum with modern pilgrimage infrastructure",
       "presidingDeity": "Vaishno Devi (Mata Rani), worshipped as three natural pindis, Mahakali, Mahalakshmi and Mahasaraswati"
     },
+    "architecturalStyleSlug": "cave-shrine",
     "timings": {
       "opening": "The shrine is generally accessible through the day and night, with the yatra running around the clock",
       "closing": "Open around the clock except during brief periods of aarti and maintenance",
@@ -2002,6 +2175,7 @@ export const temples: Temple[] = [
     "religion": "Hindu",
     "deity": "Ramanathaswamy (Shiva), one of the twelve Jyotirlingas",
     "tagline": "Island Jyotirlinga linked to Rama, with the longest temple corridors and sacred wells",
+    "whyVisit": "Ramanathaswamy is famous above all for its corridors — the longest temple corridor in India, lined with over a thousand intricately carved pillars stretching for nearly a kilometer. It's one of the twelve Jyotirlingas and a key stop on the Char Dham pilgrimage, giving it outsized significance for Shiva devotees making that circuit. The temple's sacred wells, where pilgrims traditionally bathe in each in turn, are a ritual found nowhere quite like it elsewhere in India. Combine a visit with Dhanushkodi, the eerily beautiful ghost town and beach a short drive away at the island's tip.",
     "heroImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Ramanathaswamy_temple7.JPG/1280px-Ramanathaswamy_temple7.JPG",
     "gallery": [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Ramanathaswamy_temple7.JPG/1280px-Ramanathaswamy_temple7.JPG",
@@ -2012,6 +2186,16 @@ export const temples: Temple[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rameswaram_temple_%2811%29.jpg/1280px-Rameswaram_temple_%2811%29.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Plate_8._Procession_Religieuse_dans_les_Galeries_du_Convent_de_Ramisseram_pres_Ceylan_%28Juin_1841%29.jpg/1280px-Plate_8._Procession_Religieuse_dans_les_Galeries_du_Convent_de_Ramisseram_pres_Ceylan_%28Juin_1841%29.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/43Rameswaram_The_Great_Corridor.jpg/1280px-43Rameswaram_The_Great_Corridor.jpg"
+    ],
+    "media": [
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Ramanathaswamy_temple7.JPG/1280px-Ramanathaswamy_temple7.JPG", "alt": "Ramanathaswamy Temple, Rameswaram" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/ABX_SHRI_PURUSHOTTAMA_KSHETRA_PURI.jpg/1280px-ABX_SHRI_PURUSHOTTAMA_KSHETRA_PURI.jpg", "alt": "Ramanathaswamy Temple, Rameswaram" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/East_Gopura_of_Rameswaram_Temple.jpg/1280px-East_Gopura_of_Rameswaram_Temple.jpg", "alt": "Ramanathaswamy Temple, Rameswaram" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Dwarakadheesh_Temple%2C_2014.jpg/1280px-Dwarakadheesh_Temple%2C_2014.jpg", "alt": "Ramanathaswamy Temple, Rameswaram" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Badrinath_Temple_-_OCT_2014.jpg/1280px-Badrinath_Temple_-_OCT_2014.jpg", "alt": "Ramanathaswamy Temple, Rameswaram" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rameswaram_temple_%2811%29.jpg/1280px-Rameswaram_temple_%2811%29.jpg", "alt": "Ramanathaswamy Temple, Rameswaram" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Plate_8._Procession_Religieuse_dans_les_Galeries_du_Convent_de_Ramisseram_pres_Ceylan_%28Juin_1841%29.jpg/1280px-Plate_8._Procession_Religieuse_dans_les_Galeries_du_Convent_de_Ramisseram_pres_Ceylan_%28Juin_1841%29.jpg", "alt": "Ramanathaswamy Temple, Rameswaram" },
+      { "kind": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/43Rameswaram_The_Great_Corridor.jpg/1280px-43Rameswaram_The_Great_Corridor.jpg", "alt": "Ramanathaswamy Temple, Rameswaram" }
     ],
     "videoUrl": "",
     "coordinates": {
@@ -2029,6 +2213,7 @@ export const temples: Temple[] = [
       "architecturalStyle": "Dravidian, noted for towering gopurams and exceptionally long pillared corridors",
       "presidingDeity": "Ramanathaswamy (Shiva), worshipped as one of the twelve Jyotirlingas"
     },
+    "architecturalStyleSlug": "dravidian",
     "timings": {
       "opening": "Around 5:00 AM",
       "closing": "Around 9:00 PM",

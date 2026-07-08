@@ -16,38 +16,33 @@
 
 | Phase | Status | Notes |
 |---|---|---|
-| 0 — Foundation | ⚠️ **Partial** (unchanged since 07-07, new palette) | Token layer + `DESIGN.md` now reflect the Modern Utsavam palette (see callout above). Added since 07-07: `lib/deities.ts` (deity keyword-matching + counts), `countByState`/`topByState` in `lib/temple-queries.ts`. **Still not done:** schema fields (`whyVisit`, `media[]`, `architecturalStyleSlug`, `tripDuration`), `lib/search.ts` + `lib/search-aliases.ts`, `lib/media.ts`, `lib/india-geo.ts`, the `data/temples.ts` migration. These still block Phases 3/5/6/7. |
-| 1 — Chrome | ✅ **Complete** | Header, footer, language banner, about/contact/404 recolor. Unchanged this session; now inherits the Modern Utsavam palette automatically via the token aliases. |
-| 2 — Homepage | ✅ **Complete** (2026-07-08) | Hero carousel (photo, no autoplay, video-ready slide DTO for future production video), editorial paragraph, trip ideas, state strip (derived counts + accessible popover), popular searches, deity tiles (derived, keyword-matched), methodology teaser. `three`/`@react-three/fiber` removed; embers/parallax/region-explorer deleted. Verified: typecheck clean, 61/61 tests, lint clean, build 23/23 pages, manual browser check (desktop/mobile, popover focus/keyboard, carousel keyboard nav). Adversarial 4-dimension code review run; all 6 confirmed findings fixed (popover viewport-overflow at the `sm` breakpoint, Telugu `lang` attribute, two contrast failures, a dead-code exact-match bug in `pickRelated`, a mismatched `?tag=` slug). |
-| 3–10 | ⬜ Not started | `/explore` and `/temples/[id]` are still the pre-existing pages (untouched this session, out of scope). Phases 3/5/6/7 still depend on the pending Phase 0 work above. |
+| 0 — Foundation | ✅ **Complete**, with one deliberate exception (2026-07-08) | Schema, lib helpers, search, media, and the `data/temples.ts` migration are all done (see below). **Deliberately deferred:** `lib/india-geo.ts` (India state polygons) — its GeoJSON source/licensing is an open, unresolved question (§14.3) and needs real geographic accuracy for 37 states/UTs that shouldn't be hand-fabricated; do this just-in-time for Phase 4 once a real source is picked. |
+| 1 — Chrome | ✅ **Complete** | Header, footer, language banner, about/contact/404 recolor. Inherits the Modern Utsavam palette via the token aliases. |
+| 2 — Homepage | ✅ **Complete** (2026-07-08) | Hero carousel (photo, no autoplay, video-ready slide DTO for future production video), editorial paragraph, trip ideas, state strip (derived counts + accessible popover), popular searches, deity tiles (derived, keyword-matched), methodology teaser. `three`/`@react-three/fiber` removed; embers/parallax/region-explorer deleted. Verified: typecheck clean, 61/61 tests, lint clean, build 23/23 pages, manual browser check. Adversarial 4-dimension code review run; all 6 confirmed findings fixed. |
+| 3–10 | ⬜ Not started | `/explore` and `/temples/[id]` are still the pre-existing pages (untouched, out of scope). They can now proceed — Phase 0's blockers are cleared. |
 
-### Files changed in the 2026-07-08 session (Phase 0 minimum + Phase 2)
+### Files changed in the 2026-07-08 session (Phase 0 minimum + Phase 2, then full Phase 0)
 
-New: `DESIGN.md` (rewritten for Modern Utsavam), `lib/deities.ts` (+ test), `components/brand/{deity-icons,kolam-motif}.tsx`, `components/home/{hero-slide,hero-controls,editorial-paragraph,trip-ideas,trip-idea-card,state-strip,state-tile,state-popover,popular-searches,deity-tiles,methodology-teaser}.tsx`.
+**Phase 2 pass:** New: `DESIGN.md` (rewritten for Modern Utsavam), `lib/deities.ts` (+ test), `components/brand/{deity-icons,kolam-motif}.tsx`, `components/home/{hero-slide,hero-controls,editorial-paragraph,trip-ideas,trip-idea-card,state-strip,state-tile,state-popover,popular-searches,deity-tiles,methodology-teaser}.tsx`. Modified: `tailwind.config.ts`, `app/globals.css`, `app/fonts.ts`, `app/layout.tsx`, `app/page.tsx`, `lib/{regions,temple-queries,temples,utils}.ts`, `components/ui/{button,pill,section-heading}.tsx`, `components/motion/reveal.tsx`, `components/brand/divider.tsx`, `components/media/temple-scene.tsx`, `components/temple/temple-card.tsx`, `package.json` (dropped `three`/`@react-three/fiber`). Deleted: `components/home/{hero-embers,hero-embers-mount,region-explorer}.tsx`, `components/motion/parallax.tsx`.
 
-Modified: `tailwind.config.ts`, `app/globals.css`, `app/fonts.ts`, `app/layout.tsx`, `app/page.tsx`, `lib/{regions,temple-queries,temples,utils}.ts` (+ `temple-queries.test.ts`), `components/ui/{button,pill,section-heading}.tsx`, `components/motion/reveal.tsx`, `components/brand/divider.tsx`, `components/media/temple-scene.tsx`, `components/temple/temple-card.tsx`, `package.json` (dropped `three`, `@react-three/fiber`, `@types/three`).
+**Phase 0 completion pass:** New: `lib/distance.ts` (`haversineKm`), `lib/search.ts` (`searchTemples`, the alias-aware ranked search per UX_SPEC §4.2), `lib/search-aliases.ts` (12 entries), `lib/media.ts` (`getHero`/`getGallery`/`getVideo`) — plus a test file for each. Modified: `lib/types.ts` (added `MediaItem`, `Temple.whyVisit`/`media`/`architecturalStyleSlug`/`tripDuration?` — `heroImage`/`gallery` are **kept alongside** `media` for backward compatibility with not-yet-migrated Phase 5/7 consumers, not removed), `lib/temple-queries.ts` (`pickByDeity`, `pickByArchitecturalStyle`, `pickWithinRadius`), `lib/format.ts` (`formatRelativeDistance`), `lib/filter.ts` (`popularity` SortKey — additive, the old `SortKey`/`SORT_OPTIONS` are unchanged for the untouched `/explore` page's sake; new `PUBLIC_SORT_OPTIONS` for Phase 3), `lib/regions.ts` (`regionIconPath`), `lib/validate.ts` (validators for all new fields), `lib/__fixtures__/temple.ts` (defaults for the new required fields). **`data/temples.ts` migrated** — all 15 records now have `whyVisit` (hand-written, 3–4 sentences each), `architecturalStyleSlug` (hand-curated groupings — see below, not a mechanical per-record slugify, which would make every temple a singleton), `media: MediaItem[]` (wraps `heroImage`+deduped `gallery`), and `tripDuration` on 6 records tied to real documented circuits (Panch Kedar, Golden Triangle of Odisha, Great Living Chola Temples, etc.).
 
-Deleted: `components/home/{hero-embers,hero-embers-mount,region-explorer}.tsx`, `components/motion/parallax.tsx`.
+Architectural style groups after curation: `dravidian`×5, `nagara`×2, `kalinga`×2, `modern`×2, and four singletons (`sikh`, `maru-gurjara`, `nilachala`, `cave-shrine`).
 
-Git: repo initialized this session (previously untracked, per the prior session's own recommendation), connected to `https://github.com/OnlineBunker/ctemples.git`, pushed to `master` (2 commits: baseline snapshot + this Phase 0/2 work).
+Git: repo initialized this session, connected to `https://github.com/OnlineBunker/ctemples.git`, pushed to `master`.
 
-### Phase 0 — partial (done vs. pending)
+### Phase 0 — complete, with one deliberate exception
 
-Phase 0 was intentionally split: the **token subset** was implemented as a prerequisite to unblock Phase 1 (per an explicit "add the token layer, then Phase 1" decision). The rest of Phase 0 is **still pending**.
+Phase 0 was originally split (token subset first, to unblock Phase 1), then finished in full on 2026-07-08 in a dedicated completion pass, after Phase 2 shipped.
 
-**Done (token layer):**
-- `tailwind.config.ts` — replaced. Dropped all nightstone tokens (`nightstone`, `brass`, `vermilion`, `marigold`, `verdigris`, `lapis`, `jade`, `limewash`, `ash`, `stone`), the `sanctum-glow`/`grain` backgrounds, the `diya-flicker`/`mandala-spin` keyframes+animations, and the `lift`/`glow` shadows. Added: core (`canvas`, `ink`, `line`), brand (`temple-red`, `sand-yellow`, `warm-gold` — each with `soft`/`deep`), functional (`success`/`warning`/`info`/`danger` + `-soft`), `region` (6 hues), shadows `sm`/`md`/`lg`/`xl`/`focus`, `maxWidth` container-tight/default/wide/max (+ kept `prose`), `borderRadius.card` = 12px, motion easings `threshold`/`reveal` = `cubic-bezier(0.22,1,0.36,1)`. Kept the fluid `display-xl/lg/md` font sizes and `letterSpacing.label`.
-- `app/globals.css` — replaced. White canvas body, temple-red 2px/2px focus ring, temple-red-soft/ink selection, temple-red eyebrow, `border-line` hairline, `prose-temple` at `text-ink/85` 18px/1.7, temple-red 200ms link-draw, `.shell` = `max-w-[1280px]`, view-transition recipes retuned (3px blur, 400ms morph, new easing), reduced-motion override kept.
-- `app/layout.tsx` — `themeColor` → `#FFFFFF`; skip link → `bg-temple-red text-canvas`; default title → "CTemples — the temple encyclopedia of India"; mounts `<LanguageBanner/>` above `<Header/>`.
-- `app/icon.svg` — gopuram on white in temple-red + warm-gold.
+**Done (token layer, 07-07):**
+- `tailwind.config.ts`, `app/globals.css`, `app/layout.tsx`, `app/icon.svg` — see the palette-supersession callout at the top of this section; these now carry the Modern Utsavam palette, not the originally-planned temple-red/sand-yellow/warm-gold literal hexes.
 
-**Pending (rest of Phase 0 — REQUIRED before Phases 3/5/6/7):**
-- **Schema** (`lib/types.ts`): `whyVisit`, `media: MediaItem[]` (replacing `heroImage`+`gallery`), `architecturalStyleSlug`, `tripDuration?`.
-- **Lib helpers** — `lib/temple-queries.ts`: `haversineKm`, `pickByDeity`, `pickByArchitecturalStyle`, `pickWithinRadius`; `lib/format.ts`: `formatRelativeDistance`; `lib/filter.ts`: `searchTemples` + `SORT_OPTIONS` → rating/popularity/name.
-- **New lib files:** `lib/search-aliases.ts`, `lib/media.ts`. **`lib/regions.ts`** pigment update + `regionIconPath`. **`lib/validate.ts`** validators for the new fields.
-- **Data migration:** `data/temples.ts` — add the 4 new fields to all 15 records (the "spine"; do it as one atomic change).
-- **`DESIGN.md`** — still **missing** (referenced by `CLAUDE.md` but never created); Phase 0 is meant to write the light-mode rationale here.
-- **Deity accent tokens** (§1.5) — not yet in `tailwind.config.ts`; Phase 2 deity tiles will need them.
+**Done (completion pass, 07-08):** schema (`whyVisit`, `media: MediaItem[]`, `architecturalStyleSlug`, `tripDuration?` — `heroImage`/`gallery` kept alongside `media`, not replaced, so Phase 5/7's not-yet-migrated consumers keep compiling), `haversineKm`/`pickByDeity`/`pickByArchitecturalStyle`/`pickWithinRadius`, `formatRelativeDistance`, `searchTemples` + `lib/search-aliases.ts` (12 entries), `lib/media.ts`, `regionIconPath`, `lib/validate.ts` validators, the full `data/temples.ts` migration (all 15 records), `DESIGN.md`. Deity accent colors were implemented as inline hex styles in `lib/deities.ts` rather than named Tailwind tokens (avoids the purge/safelist risk the original plan flagged, functionally equivalent).
+
+**Deliberately deferred:** `lib/india-geo.ts` (parsed India state polygons for the Explore map, Phase 4). Its GeoJSON source and license are an explicitly open, unresolved question in this document (§14.3) — shipping fabricated/approximate boundary data for 37 states/UTs would be worse than not shipping it. Pick a real source before Phase 4 needs it. `components/brand/region-icons.tsx` (the presentational component consuming `regionIconPath`) is also deferred — it's Phase 4's map-region-pills UI, not a Phase 0 lib concern.
+
+**Schema note:** `MediaItem`/`Temple.media` is a *locked schema addition* (CLAUDE.md), but the actual *removal* of `heroImage`/`gallery` and the *consumption* of `media[]` by the gallery/lightbox is explicitly Phase 7 scope (IMPLEMENTATION_PHASES.md). Phase 0 adds the field and populates it in the data; Phase 7 is when components switch over.
 
 ### Phase 1 — complete
 
@@ -79,32 +74,28 @@ Phase 0 was intentionally split: the **token subset** was implemented as a prere
 
 ### Current state of the running app (transitional)
 
-On the **new light palette:** all chrome (header/footer/banner) site-wide, plus `/about`, `/contact`, and 404.
+On the **new light palette:** all chrome (header/footer/banner) site-wide, plus `/about`, `/contact`, 404, and now the **full homepage** (Phase 2).
 
 Still on the **old nightstone look — intended, uniform breakage (do not "fix" piecemeal; the owning phase converts each):**
-- `app/page.tsx` homepage **body** (hero, region mandala, 4-stat strip) — Phase 2.
-- `/explore` + `components/explore/*` — Phase 3/4.
-- `/temples/[id]` + `components/temple/*` — Phase 5.
-- Shared primitives still nightstone: `components/ui/button.tsx`, `components/ui/pill.tsx`, `lib/regions.ts` pigments.
+- `/explore` + `components/explore/*` — Phase 3/4. (Confirmed still compiles/renders correctly against the expanded schema — `heroImage`/`gallery` were kept, not removed.)
+- `/temples/[id]` + `components/temple/*` — Phase 5. (Same — renders correctly, e.g. quick-facts, but visually still uses now-undefined `text-limewash`/`text-brass` classes, which resolve to no styling and fall through to the global `h1 { text-plum }` base rule. Confirmed via live browser check, no console errors, no crash.)
 
-**Pending deletion (Phase 2):** `components/home/hero-embers.tsx`, `hero-embers-mount.tsx`, `components/home/region-explorer.tsx`, `components/motion/parallax.tsx`. **Pending dep removal (Phase 2):** `three`, `@react-three/fiber`. **`components/motion/reveal.tsx`** still uses old timing (700ms / 80ms / old ease) — Phase 2 retunes it.
+Every Phase 0 blocker for Phases 3/5/6/7 is now cleared except `lib/india-geo.ts` (Phase 4 only).
 
 ### Environment & repo
 
-- **No git repository.** Changes are **not version-controlled** — strongly recommend `git init` + an initial commit before Phase 2. The plan assumes revertible, reviewable phase units, and the data-spine migration in the remaining Phase 0 is unrecoverable without version control.
-- `node_modules` is installed. Dev server: `npm run dev` → http://localhost:3000. Per-phase gate: `npm run typecheck && npm run test && npm run build`.
+- Git repository initialized 2026-07-08, connected to `https://github.com/OnlineBunker/ctemples.git`, pushed to `master`.
+- `node_modules` is installed. Dev server: `npm run dev` → http://localhost:3000. Per-phase gate: `npm run typecheck && npm run test && npm run lint && npm run build`.
 - `npm audit fix --force` remains forbidden (it downgrades Next and breaks the app).
 
 ### Recommended next step
 
-**Complete the deferred Phase 0 work, then proceed to Phase 3 — Explore list mode** (`IMPLEMENTATION_PHASES.md`, "Phase 3"). Start sequence for a future session:
+**Proceed to Phase 3 — Explore list mode** (`IMPLEMENTATION_PHASES.md`, "Phase 3"). All of its Phase 0 dependencies are now in place (`searchTemples`, `PUBLIC_SORT_OPTIONS`, the expanded schema). Start sequence for a future session:
 
 1. Read this **Build status** section (including the palette-supersession callout above), `DESIGN.md`, then `IMPLEMENTATION_PHASES.md` Phase 3 and `UX_SPEC.md` §2.
-2. **Reconcile the palette docs first** — `CLAUDE.md`'s "Project Vision" and `DESIGN_SYSTEM_V2.md` §1 still list the old temple-red/sand-yellow/warm-gold hex values as canonical/locked; they should be updated to match `DESIGN.md` and `tailwind.config.ts` (or at minimum cross-referenced) so they stop disagreeing.
-3. Do the **remaining Phase 0 work** (still pending, unchanged from before this session): schema fields (`whyVisit`, `media[]`, `architecturalStyleSlug`, `tripDuration`) in `lib/types.ts`, `lib/search.ts` + `lib/search-aliases.ts`, `lib/media.ts`, `lib/india-geo.ts`, and the coordinated `data/temples.ts` migration. Phases 3/5/6/7 hard-depend on this — do it as a dedicated pass or just-in-time before each dependent phase.
-4. Execute Phase 3; finish on `typecheck && test && lint && build` green, plus a manual/adversarial review pass (as done for Phase 2).
-
-**Note:** Phase 2 (homepage) is now complete — see the entry above. `/explore` and `/temples/[id]` are still pre-existing/untouched and are the next visible surfaces to convert.
+2. **Reconcile the palette docs** — `CLAUDE.md`'s "Project Vision" and `DESIGN_SYSTEM_V2.md` §1 still list the old temple-red/sand-yellow/warm-gold hex values as canonical/locked; they should be updated to match `DESIGN.md` and `tailwind.config.ts` (or at minimum cross-referenced) so they stop disagreeing. Both files already carry an inline callout flagging this.
+3. Execute Phase 3 (filter row, popovers, active-filters chips, search bar wired to `lib/search.ts`, smart-match banner, pagination, empty state — replacing `explore-client.tsx`); finish on `typecheck && test && lint && build` green, plus a manual/adversarial review pass (as done for Phase 2).
+4. When Phase 4 (map mode) comes up, pick a real, licensed GeoJSON source for `lib/india-geo.ts` before building against it — see the open question at §14.3.
 
 ---
 

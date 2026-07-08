@@ -6,6 +6,9 @@ import {
   countByRegion,
   countByState,
   topByState,
+  pickByDeity,
+  pickByArchitecturalStyle,
+  pickWithinRadius,
 } from "./temple-queries";
 import { makeTemple } from "./__fixtures__/temple";
 
@@ -119,5 +122,52 @@ describe("topByState", () => {
   });
   it("returns [] for a state with no temples", () => {
     expect(topByState(all, "Goa")).toEqual([]);
+  });
+});
+
+describe("pickByDeity", () => {
+  it("returns temples sharing a canonical deity, excluding self, highest rating first", () => {
+    const result = pickByDeity([south1, south2, east1, central1, south3], south1);
+    // south1 (4.9, self, excluded), central1 (4.6, "Shiva"), south3 (4.4, "Shiva") share
+    // south1's deity; south2 ("Vishnu") and east1 ("Surya") do not.
+    expect(result.map((t) => t.id)).toEqual(["c1", "s3"]);
+  });
+  it("returns [] when no other temple shares the deity", () => {
+    expect(pickByDeity([south2, south1], south2)).toEqual([]);
+  });
+});
+
+describe("pickByArchitecturalStyle", () => {
+  const dravidianA = makeTemple({ id: "d1", architecturalStyleSlug: "dravidian", rating: 4.9 });
+  const dravidianB = makeTemple({ id: "d2", architecturalStyleSlug: "dravidian", rating: 4.5 });
+  const kalinga = makeTemple({ id: "k1", architecturalStyleSlug: "kalinga", rating: 4.8 });
+
+  it("matches on architecturalStyleSlug, excludes self, highest rating first", () => {
+    const result = pickByArchitecturalStyle([dravidianA, dravidianB, kalinga], dravidianA);
+    expect(result.map((t) => t.id)).toEqual(["d2"]);
+  });
+  it("returns [] when no other temple shares the style", () => {
+    expect(pickByArchitecturalStyle([dravidianA, dravidianB, kalinga], kalinga)).toEqual([]);
+  });
+});
+
+describe("pickWithinRadius", () => {
+  // Near the equator, 1 degree of longitude is ~111.2 km — makes expected distances exact.
+  const near = makeTemple({ id: "near", coordinates: { lat: 0, lng: 0.5 } }); // ~55.6 km
+  const mid = makeTemple({ id: "mid", coordinates: { lat: 0, lng: 1.0 } }); // ~111.2 km
+  const far = makeTemple({ id: "far", coordinates: { lat: 0, lng: 2.0 } }); // ~222.4 km
+  const self = makeTemple({ id: "self", coordinates: { lat: 0, lng: 0 } }); // 0 km — excluded
+
+  it("returns temples within the radius, nearest first, excluding the exact query point", () => {
+    const result = pickWithinRadius([near, mid, far, self], 0, 0, 150);
+    expect(result.map((r) => r.temple.id)).toEqual(["near", "mid"]);
+    expect(result[0].distanceKm).toBeCloseTo(55.6, 0);
+  });
+  it("respects a limit", () => {
+    const result = pickWithinRadius([near, mid, far], 0, 0, 300, 1);
+    expect(result.map((r) => r.temple.id)).toEqual(["near"]);
+  });
+  it("returns [] when nothing is within range", () => {
+    expect(pickWithinRadius([far], 0, 0, 50)).toEqual([]);
   });
 });

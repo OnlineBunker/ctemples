@@ -7,13 +7,29 @@ import { parseRupeeRange } from "./format";
  * Unit-tested — see filter.test.ts.
  */
 
-export type SortKey = "featured" | "rating" | "name" | "cost";
+export type SortKey = "featured" | "rating" | "name" | "cost" | "popularity";
 
+// Kept for backward compatibility with the pre-redesign Explore page
+// (app/explore/page.tsx's VALID_SORT), which still reads all 5 keys. New (Phase 3)
+// Explore UI should use PUBLIC_SORT_OPTIONS below instead.
 export const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "featured", label: "Featured" },
   { key: "rating", label: "Top rated" },
   { key: "name", label: "A–Z" },
   { key: "cost", label: "Lowest cost" },
+  { key: "popularity", label: "Most visited" },
+];
+
+/**
+ * The 3 public sort options per DESIGN_SYSTEM_V2 §6.4/§8.6 — "Featured" and "Lowest
+ * cost" are dropped from the public-facing list (Featured is an internal default
+ * ordering; cost was a prototype-only convenience). For the new (Phase 3) Explore sort
+ * filter.
+ */
+export const PUBLIC_SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "rating", label: "Top rated" },
+  { key: "popularity", label: "Most visited" },
+  { key: "name", label: "A–Z" },
 ];
 
 export interface TempleFilters {
@@ -56,6 +72,18 @@ export function sortTemples(list: Temple[], sort: SortKey): Temple[] {
       break;
     case "cost":
       copy.sort((a, b) => cheapest(a) - cheapest(b) || a.name.localeCompare(b.name));
+      break;
+    case "popularity":
+      // No real visit-count metric exists in the schema yet (a documented prototype
+      // gap — see REDESIGN_PLAN's risk notes on synthetic popularity). Until real
+      // analytics land, "Most visited" uses the same featured-then-rating signal
+      // editors already use to mean "prominent", rather than fabricating a fake number.
+      copy.sort(
+        (a, b) =>
+          Number(b.featured) - Number(a.featured) ||
+          b.rating - a.rating ||
+          a.name.localeCompare(b.name),
+      );
       break;
     case "featured":
     default:

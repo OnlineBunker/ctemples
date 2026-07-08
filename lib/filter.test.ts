@@ -6,6 +6,7 @@ import {
   collectFacet,
   collectTags,
   countActiveFilters,
+  PUBLIC_SORT_OPTIONS,
 } from "./filter";
 import { makeTemple } from "./__fixtures__/temple";
 
@@ -109,6 +110,17 @@ describe("sortTemples", () => {
     const before = all.map((t) => t.id);
     sortTemples(all, "name");
     expect(all.map((t) => t.id)).toEqual(before);
+  });
+  it("'popularity' sorts featured first, then rating (same as 'featured')", () => {
+    expect(sortTemples(all, "popularity").map((t) => t.id)).toEqual(
+      sortTemples(all, "featured").map((t) => t.id),
+    );
+  });
+});
+
+describe("PUBLIC_SORT_OPTIONS", () => {
+  it("exposes exactly the 3 public options: rating, popularity, name", () => {
+    expect(PUBLIC_SORT_OPTIONS.map((o) => o.key)).toEqual(["rating", "popularity", "name"]);
   });
 });
 

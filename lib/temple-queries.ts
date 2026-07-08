@@ -2,6 +2,7 @@ import type { Temple, Region } from "./types";
 import { REGION_ORDER } from "./regions";
 import { slugify } from "./utils";
 import { DEITY_ORDER, matchesDeity } from "./deities";
+import { haversineKm } from "./distance";
 
 /**
  * Pure query helpers over a temple array. Kept free of any data import so they can be
@@ -86,4 +87,51 @@ export function topByState(list: Temple[], state: string, limit = 4): Temple[] {
     .filter((t) => t.state === state)
     .sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name))
     .slice(0, limit);
+}
+
+/**
+ * Temples sharing a canonical deity with `temple` (see lib/deities.ts), highest rating
+ * first. Excludes self. For the detail page's "By the same deity" section (Phase 5).
+ */
+export function pickByDeity(list: Temple[], temple: Temple, limit = 3): Temple[] {
+  return list
+    .filter((t) => t.id !== temple.id && sharesDeity(t, temple))
+    .sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name))
+    .slice(0, limit);
+}
+
+/**
+ * Temples sharing `temple.architecturalStyleSlug`, highest rating first. Excludes self.
+ * For the detail page's "Same architectural style" section (Phase 5).
+ */
+export function pickByArchitecturalStyle(list: Temple[], temple: Temple, limit = 3): Temple[] {
+  return list
+    .filter((t) => t.id !== temple.id && t.architecturalStyleSlug === temple.architecturalStyleSlug)
+    .sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name))
+    .slice(0, limit);
+}
+
+export interface NearbyResult {
+  temple: Temple;
+  distanceKm: number;
+}
+
+/**
+ * Temples within `km` of (lat, lng), nearest first, via Haversine distance. A point
+ * exactly at distance 0 (i.e. the query point's own temple, if it's in `list`) is
+ * excluded, so callers don't need to filter self out separately. For the detail page's
+ * "Plan around" and "Within 100 km" sections (Phase 5).
+ */
+export function pickWithinRadius(
+  list: Temple[],
+  lat: number,
+  lng: number,
+  km: number,
+  limit?: number,
+): NearbyResult[] {
+  const withDistance = list
+    .map((t) => ({ temple: t, distanceKm: haversineKm({ lat, lng }, t.coordinates) }))
+    .filter((r) => r.distanceKm > 0 && r.distanceKm <= km)
+    .sort((a, b) => a.distanceKm - b.distanceKm);
+  return typeof limit === "number" ? withDistance.slice(0, limit) : withDistance;
 }

@@ -72,3 +72,29 @@ export const REGION_META: Record<Region, RegionMeta> = {
 export function regionPigment(region: Region): string {
   return REGION_META[region].pigment;
 }
+
+/**
+ * SVG path data (24x24 viewBox) for each region's icon — mountain, wave, sun, leaf,
+ * star, mandala, per DESIGN_SYSTEM_V2 §1.4. Icon + label lead region identity; colour
+ * reinforces (see REGION_META). Pure data, consumed by a future RegionIcon component
+ * (Phase 4's map region pills) the same way components/brand/deity-icons.tsx consumes
+ * lib/deities.ts's icon keys.
+ */
+export const REGION_ICON_PATHS: Record<Region, string> = {
+  // Mountain — a simple twin-peak silhouette.
+  North: "M2 20 L9 8 L13 14 L16 9 L22 20 Z",
+  // Wave — two stacked crests.
+  South: "M2 15 Q6 11 10 15 T18 15 T22 15 M2 20 Q6 16 10 20 T18 20 T22 20",
+  // Sun — disc with radiating rays.
+  East: "M12 6 A6 6 0 1 1 11.99 6 Z M12 1 V3 M12 21 V23 M1 12 H3 M21 12 H23 M4.2 4.2 L5.6 5.6 M18.4 18.4 L19.8 19.8 M4.2 19.8 L5.6 18.4 M18.4 5.6 L19.8 4.2",
+  // Leaf — a single simple leaf with a center vein.
+  West: "M4 20 C4 10 12 3 21 3 C21 12 14 20 4 20 Z M4 20 L14 10",
+  // Star — a five-point outline.
+  Northeast: "M12 2 L14.6 9 L22 9.3 L16.2 14 L18.2 21 L12 17 L5.8 21 L7.8 14 L2 9.3 L9.4 9 Z",
+  // Mandala — concentric rings + petals, echoing the brand's kolam motif at small size.
+  Central: "M12 12 m-9 0 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 M12 12 m-4 0 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0 M12 3 V5 M12 19 V21 M3 12 H5 M19 12 H21",
+};
+
+export function regionIconPath(region: Region): string {
+  return REGION_ICON_PATHS[region];
+}

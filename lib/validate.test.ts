@@ -31,6 +31,37 @@ describe("validateTemple", () => {
     const bad = makeTemple({ region: "Middle" as never });
     expect(validateTemple(bad).some((i) => i.includes("region"))).toBe(true);
   });
+
+  it("flags a whyVisit with fewer than 3 sentences", () => {
+    const issues = validateTemple(makeTemple({ whyVisit: "Only one sentence." }));
+    expect(issues.some((i) => i.includes("whyVisit"))).toBe(true);
+  });
+
+  it("flags a non-slug architecturalStyleSlug", () => {
+    const issues = validateTemple(makeTemple({ architecturalStyleSlug: "Not A Slug!" }));
+    expect(issues.some((i) => i.includes("architecturalStyleSlug"))).toBe(true);
+  });
+
+  it("flags an empty media array", () => {
+    expect(validateTemple(makeTemple({ media: [] })).some((i) => i.includes("media"))).toBe(true);
+  });
+
+  it("flags a media item missing url or alt", () => {
+    const issues = validateTemple(
+      makeTemple({ media: [{ kind: "image", url: "", alt: "" } as never] }),
+    );
+    expect(issues.some((i) => i.includes("media[0].url"))).toBe(true);
+    expect(issues.some((i) => i.includes("media[0].alt"))).toBe(true);
+  });
+
+  it("flags an invalid tripDuration", () => {
+    const issues = validateTemple(makeTemple({ tripDuration: { temples: 0, days: 2, km: 100 } }));
+    expect(issues.some((i) => i.includes("tripDuration"))).toBe(true);
+  });
+
+  it("accepts a temple with no tripDuration (it's optional)", () => {
+    expect(validateTemple(makeTemple())).toEqual([]);
+  });
 });
 
 describe("validateTemples", () => {

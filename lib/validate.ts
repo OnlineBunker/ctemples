@@ -46,6 +46,27 @@ export function validateTemple(t: Temple): string[] {
   check(Array.isArray(t.gallery) && t.gallery.length >= 1, "gallery has no entries");
   check(Array.isArray(t.tags) && t.tags.length >= 1, "no tags");
 
+  const sentenceCount = (t.whyVisit ?? "")
+    .split(/[.!?]+/)
+    .map((s) => s.trim())
+    .filter(Boolean).length;
+  check(sentenceCount >= 3, `whyVisit has ${sentenceCount} sentence(s), expected at least 3`);
+
+  check(SLUG.test(t.architecturalStyleSlug ?? ""), `architecturalStyleSlug "${t.architecturalStyleSlug}" is not a url-safe slug`);
+
+  check(Array.isArray(t.media) && t.media.length >= 1, "media has no entries");
+  (t.media ?? []).forEach((m, i) => {
+    check(m.kind === "image" || m.kind === "video", `media[${i}].kind must be "image" or "video"`);
+    check(!!m.url?.trim(), `media[${i}].url is empty`);
+    check(!!m.alt?.trim(), `media[${i}].alt is empty`);
+  });
+
+  if (t.tripDuration) {
+    check(t.tripDuration.temples > 0, "tripDuration.temples must be positive");
+    check(t.tripDuration.days > 0, "tripDuration.days must be positive");
+    check(t.tripDuration.km > 0, "tripDuration.km must be positive");
+  }
+
   return issues;
 }
 
