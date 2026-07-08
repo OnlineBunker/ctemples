@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── View-transition timing (from vercel-react-view-transitions/css-recipes) ── */
+:root {
+  --duration-exit: 150ms;
+  --duration-enter: 220ms;
+  --duration-move: 400ms;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-body antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: #fbe9e7; /* temple-red-soft */
+    color: #1a1a1a; /* ink */
+  }
+
+  /* Visible, on-brand keyboard focus everywhere (§1.6, §10.3). */
+  :focus-visible {
+    outline: 2px solid theme("colors.temple-red.DEFAULT");
+    outline-offset: 2px;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Thin, warm-neutral scrollbar to match the light canvas. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme("colors.line.strong") transparent;
+  }
+}
+
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12;
+  }
+
+  /* Field-guide eyebrow: mono, spaced, temple-red. */
+  .eyebrow {
+    @apply font-mono text-[0.7rem] uppercase tracking-label text-temple-red;
+  }
+
+  .hairline {
+    @apply border-line;
+  }
+
+  /* Long-form temple prose. Paragraphs are split on \n\n in the data. */
+  .prose-temple {
+    @apply max-w-prose font-body text-[1.125rem] leading-[1.7] text-ink/85;
+  }
+  .prose-temple p + p {
+    @apply mt-5;
+  }
+
+  /* Animated underline drawn from the left on hover/focus. */
+  .link-draw {
+    background-image: linear-gradient(
+      theme("colors.temple-red.DEFAULT"),
+      theme("colors.temple-red.DEFAULT")
+    );
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-draw:hover,
+  .link-draw:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+/* ─────────────────────── View Transitions ───────────────────────
+   React's native <ViewTransition> drives these; classes are applied via the
+   share/enter/exit props. Recipes adapted from vercel-react-view-transitions. */
+
+@keyframes vt-fade {
+  from {
+    filter: blur(3px);
+    opacity: 0;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+@keyframes vt-slide {
+  from {
+    translate: var(--slide-offset, 40px);
+  }
+  to {
+    translate: 0;
+  }
+}
+@keyframes vt-via-blur {
+  30% {
+    filter: blur(3px);
+  }
+}
+
+/* Gentle default page crossfade for ordinary <Link> navigations. */
+::view-transition-old(root) {
+  animation: var(--duration-exit) ease-in both vt-fade reverse;
+}
+::view-transition-new(root) {
+  animation: var(--duration-enter) ease-out var(--duration-exit) both vt-fade;
+}
+
+/* Directional page slides (set via addTransitionType from the cards). */
+::view-transition-old(.nav-forward) {
+  --slide-offset: -48px;
+  animation:
+    var(--duration-exit) ease-in both vt-fade reverse,
+    var(--duration-move) cubic-bezier(0.22, 1, 0.36, 1) both vt-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 48px;
+  animation:
+    var(--duration-enter) ease-out var(--duration-exit) both vt-fade,
+    var(--duration-move) cubic-bezier(0.22, 1, 0.36, 1) both vt-slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 48px;
+  animation:
+    var(--duration-exit) ease-in both vt-fade reverse,
+    var(--duration-move) cubic-bezier(0.22, 1, 0.36, 1) both vt-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -48px;
+  animation:
+    var(--duration-enter) ease-out var(--duration-exit) both vt-fade,
+    var(--duration-move) cubic-bezier(0.22, 1, 0.36, 1) both vt-slide;
+}
+
+/* The signature: shared-element morph (Explore card image -> detail hero). */
+::view-transition-group(.morph) {
+  animation-duration: var(--duration-move);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: vt-via-blur;
+}
+
+/* Text morph avoids raster-scaling ghosting on the temple name. */
+::view-transition-group(.text-morph) {
+  animation-duration: var(--duration-move);
+}
+::view-transition-old(.text-morph) {
+  display: none;
+}
+::view-transition-new(.text-morph) {
+  animation: none;
+  object-fit: none;
+  object-position: left top;
+}
+
+/* Keep the sticky header from flashing during transitions. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 1000;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* ─────────────────────── Reduced motion ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+  }
+}

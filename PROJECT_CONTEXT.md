@@ -1,0 +1,966 @@
+# CTemples — Project Context
+
+> The single permanent document that a new Claude Code session should read first to understand the project. It summarizes the project vision, sitemap, information architecture, UX decisions, page specs, design system, feature priorities, architectural constraints, implementation roadmap, and open questions.
+>
+> Source documents: `CLAUDE.md` (project rulebook), `UX_SPEC.md` (section-by-section UX), `DESIGN_SYSTEM_V2.md` (14-section design system), `REDESIGN_PLAN.md` (file-by-file audit), `IMPLEMENTATION_PHASES.md` (11-phase build order). This document is the index.
+
+---
+
+## Build status — as of 2026-07-07
+
+> **This section is the source of truth for what is actually implemented.** Sections 1–15 below describe the *target* design and still read in the present/aspirational tense (e.g. "there is no 3D in the prototype" is a goal, not yet true — `three` is still installed). When the two disagree, trust this section.
+
+### Progress at a glance
+
+| Phase | Status | Notes |
+|---|---|---|
+| 0 — Foundation | ⚠️ **Partial** | Only the **token layer** landed (tailwind + globals + layout + icon). Schema, lib helpers, data migration, search, `DESIGN.md` — **not done**. |
+| 1 — Chrome | ✅ **Complete** | Header, footer, language banner, about/contact/404 recolor. Verified green. |
+| 2 — Homepage | ⬜ Not started | **Recommended next.** |
+| 3–10 | ⬜ Not started | Phases 3/5/6/7 depend on the pending Phase 0 work below. |
+
+### Phase 0 — partial (done vs. pending)
+
+Phase 0 was intentionally split: the **token subset** was implemented as a prerequisite to unblock Phase 1 (per an explicit "add the token layer, then Phase 1" decision). The rest of Phase 0 is **still pending**.
+
+**Done (token layer):**
+- `tailwind.config.ts` — replaced. Dropped all nightstone tokens (`nightstone`, `brass`, `vermilion`, `marigold`, `verdigris`, `lapis`, `jade`, `limewash`, `ash`, `stone`), the `sanctum-glow`/`grain` backgrounds, the `diya-flicker`/`mandala-spin` keyframes+animations, and the `lift`/`glow` shadows. Added: core (`canvas`, `ink`, `line`), brand (`temple-red`, `sand-yellow`, `warm-gold` — each with `soft`/`deep`), functional (`success`/`warning`/`info`/`danger` + `-soft`), `region` (6 hues), shadows `sm`/`md`/`lg`/`xl`/`focus`, `maxWidth` container-tight/default/wide/max (+ kept `prose`), `borderRadius.card` = 12px, motion easings `threshold`/`reveal` = `cubic-bezier(0.22,1,0.36,1)`. Kept the fluid `display-xl/lg/md` font sizes and `letterSpacing.label`.
+- `app/globals.css` — replaced. White canvas body, temple-red 2px/2px focus ring, temple-red-soft/ink selection, temple-red eyebrow, `border-line` hairline, `prose-temple` at `text-ink/85` 18px/1.7, temple-red 200ms link-draw, `.shell` = `max-w-[1280px]`, view-transition recipes retuned (3px blur, 400ms morph, new easing), reduced-motion override kept.
+- `app/layout.tsx` — `themeColor` → `#FFFFFF`; skip link → `bg-temple-red text-canvas`; default title → "CTemples — the temple encyclopedia of India"; mounts `<LanguageBanner/>` above `<Header/>`.
+- `app/icon.svg` — gopuram on white in temple-red + warm-gold.
+
+**Pending (rest of Phase 0 — REQUIRED before Phases 3/5/6/7):**
+- **Schema** (`lib/types.ts`): `whyVisit`, `media: MediaItem[]` (replacing `heroImage`+`gallery`), `architecturalStyleSlug`, `tripDuration?`.
+- **Lib helpers** — `lib/temple-queries.ts`: `haversineKm`, `pickByDeity`, `pickByArchitecturalStyle`, `pickWithinRadius`; `lib/format.ts`: `formatRelativeDistance`; `lib/filter.ts`: `searchTemples` + `SORT_OPTIONS` → rating/popularity/name.
+- **New lib files:** `lib/search-aliases.ts`, `lib/media.ts`. **`lib/regions.ts`** pigment update + `regionIconPath`. **`lib/validate.ts`** validators for the new fields.
+- **Data migration:** `data/temples.ts` — add the 4 new fields to all 15 records (the "spine"; do it as one atomic change).
+- **`DESIGN.md`** — still **missing** (referenced by `CLAUDE.md` but never created); Phase 0 is meant to write the light-mode rationale here.
+- **Deity accent tokens** (§1.5) — not yet in `tailwind.config.ts`; Phase 2 deity tiles will need them.
+
+### Phase 1 — complete
+
+**Delivered:** new light-mode chrome (sticky white header with Explore ▾ dropdown, About, search button, 8-language pill, and a focus-trapped mobile sheet), a 3-column footer with a v0.1 tag, a homepage-only dismissible language banner (30-day localStorage), and recolor of the About / Contact / 404 pages and the shared UI primitives.
+
+**Files created/modified (16 total):**
+- *New:* `components/home/language-banner.tsx`.
+- *Replaced:* `components/layout/header.tsx`, `components/layout/footer.tsx`.
+- *Modified (recolor):* `components/ui/eyebrow.tsx` (+ `tone="warm"`), `components/ui/section-heading.tsx`, `components/ui/rating.tsx` (+ `tone="overlay"`), `components/ui/stat.tsx`, `components/brand/divider.tsx`, `app/about/page.tsx`, `app/contact/page.tsx`, `components/contact/contact-form.tsx`, `app/not-found.tsx`.
+- *Token layer (Phase 0 subset):* `tailwind.config.ts`, `app/globals.css`, `app/layout.tsx`, `app/icon.svg`.
+
+**Verification (2026-07-07):** `npm run typecheck` clean · `npm run test` 48/48 · `npm run lint` clean · `npm run build` 23/23 static pages (incl. all 15 `/temples/[id]`). Prerendered HTML: about/contact/404 carry zero legacy tokens; the language banner is correctly absent from SSR (client-hydrated). Not exercised in a live browser: the interactive keyboard/focus behaviors (dropdown dismiss/trap, language ↑/↓, mobile-sheet focus trap, 30-day banner persistence) — implemented to standard patterns, typecheck/build clean, but manually unverified.
+
+### Implementation decisions (Phase 1)
+
+- **`button.tsx` left untouched** (its 5-variant rework is Phase 2). CTAs on `/about`, `/404`, and the contact form are **inline temple-red styles** instead of `<ButtonLink>`; Phase 2's new Button should reabsorb them.
+- **`contact-form.tsx` recolored** even though it isn't in Phase 1's file list — it *is* the substance of `/contact`, so recoloring it was required to meet the "no nightstone on /contact" gate.
+- **Language banner mounted in `layout.tsx`, gated to `/`** via `usePathname`, rather than editing the old `app/page.tsx` (which Phase 2 replaces). SSR-safe: renders `null` until hydration.
+- **Menus/sheet are hand-rolled** (no Radix/react-aria) with Esc + outside-click + focus restore + roving arrows + Tab trap. Phase 3's filter popovers may want a shared primitive — consider extracting one there.
+- **Deity color tokens deferred**; `display-*` sizes kept fluid (not refined to the §2.2 fixed scale); `transitionTimingFunction.threshold` kept (retuned to the new easing) for back-compat with un-migrated components.
+
+### Deviations from the original plan
+
+- **Phase 0 split** into "token layer now / rest later" — not in the original sequencing; a deliberate call to unblock Phase 1 without touching the data spine.
+- **Footer "Methodology" link omitted** — `/methodology` has no route and is an open question (§14.4); linking it would 404. "About the project" → `/about` is present instead.
+- **Footer "Suggest a temple →" added now** → `/suggest`, which **404s until Phase 8** (the plan's Phase 8 note sanctions placing the link early).
+- **Header Explore ▾ presets** link to `/explore?view=map&preset=…`; the **old** Explore page ignores `?view`/`?preset`, so they currently just land on the list — they start working in Phase 3/4.
+- **Header search button** navigates to `/explore` (the search overlay is Phase 6).
+
+### Current state of the running app (transitional)
+
+On the **new light palette:** all chrome (header/footer/banner) site-wide, plus `/about`, `/contact`, and 404.
+
+Still on the **old nightstone look — intended, uniform breakage (do not "fix" piecemeal; the owning phase converts each):**
+- `app/page.tsx` homepage **body** (hero, region mandala, 4-stat strip) — Phase 2.
+- `/explore` + `components/explore/*` — Phase 3/4.
+- `/temples/[id]` + `components/temple/*` — Phase 5.
+- Shared primitives still nightstone: `components/ui/button.tsx`, `components/ui/pill.tsx`, `lib/regions.ts` pigments.
+
+**Pending deletion (Phase 2):** `components/home/hero-embers.tsx`, `hero-embers-mount.tsx`, `components/home/region-explorer.tsx`, `components/motion/parallax.tsx`. **Pending dep removal (Phase 2):** `three`, `@react-three/fiber`. **`components/motion/reveal.tsx`** still uses old timing (700ms / 80ms / old ease) — Phase 2 retunes it.
+
+### Environment & repo
+
+- **No git repository.** Changes are **not version-controlled** — strongly recommend `git init` + an initial commit before Phase 2. The plan assumes revertible, reviewable phase units, and the data-spine migration in the remaining Phase 0 is unrecoverable without version control.
+- `node_modules` is installed. Dev server: `npm run dev` → http://localhost:3000. Per-phase gate: `npm run typecheck && npm run test && npm run build`.
+- `npm audit fix --force` remains forbidden (it downgrades Next and breaks the app).
+
+### Recommended next step
+
+**Proceed to Phase 2 — Homepage rebuild** (`IMPLEMENTATION_PHASES.md`, "Phase 2"). It is largely self-contained against the skipped Phase 0 data/schema work; its already-owned dependencies are the token layer (done) and `button.tsx` (deferred to Phase 2 anyway). Start sequence for a future session:
+
+1. Read this **Build status** section, then `IMPLEMENTATION_PHASES.md` Phase 2 and `UX_SPEC.md` §1.
+2. (Recommended) `git init` + initial commit first.
+3. Add **deity color tokens** to `tailwind.config.ts` when building the deity tiles.
+4. Execute Phase 2; finish on `typecheck && test && build` green.
+
+**Before Phases 3, 5, 6, 7**, complete the **pending Phase 0 work** listed above (schema fields, lib helpers, `searchTemples`, `data/temples.ts` migration, `DESIGN.md`) — those phases hard-depend on it. Do it as a dedicated "Phase 0 completion" pass or just-in-time before each dependent phase.
+
+---
+
+## 1. Project vision
+
+CTemples is a **Wikipedia-style encyclopedia of Indian temples** — a content platform that aims to be the most comprehensive, trustworthy, and tourist-friendly guide to temples in India.
+
+The visual and emotional identity is **light-mode, vibrant, premium, and welcoming** — closer to a high-end travel magazine than to a museum site.
+
+### Design tenets
+
+- **Light mode is primary and default.** No dark mode. No "switch theme" UI.
+- **Vibrant, not minimal.** Information density is the goal. The site rewards long reading sessions.
+- **Spiritual + tourist-friendly.** Premium without being austere. The look says: "This is a serious reference work, and you should want to visit these places."
+- **Mobile-first.** The most common reader is on a phone, planning a trip, with intermittent connectivity.
+
+### Color palette (the canonical hex)
+
+| Token | Hex | Role |
+|---|---|---|
+| `canvas` | `#FFFFFF` | Page background |
+| `canvas-soft` | `#FAF7F0` | Alternate sections, soft surfaces |
+| `ink` | `#1A1A1A` | Body text, primary ink |
+| `ink-muted` | `#5A5A5A` | Secondary text, captions |
+| `ink-subtle` | `#8A8A8A` | Tertiary text, metadata |
+| `line` | `#E5E0D6` | 1-px hairlines, card borders |
+| `line-strong` | `#C9C2B0` | Card hover borders, emphasis |
+| `temple-red` | `#C62828` | Brand primary, CTAs, links, eyebrow default |
+| `temple-red-soft` | `#FBE9E7` | Active states, selected surfaces |
+| `temple-red-deep` | `#8E1F1F` | Hover on primary CTA |
+| `sand-yellow` | `#E6C068` | Star fills, accent surfaces, premium highlight |
+| `sand-yellow-soft` | `#FBF1D9` | Empty-state surfaces, soft accents |
+| `sand-yellow-deep` | `#B68A3C` | Borders on warm surfaces |
+| `warm-gold` | `#B8860B` | Premium accents, region motifs, divider gopurams |
+| `warm-gold-soft` | `#F5E9C8` | Background tints on premium cards |
+
+### Typography
+
+- **Display:** Fraunces (serif, "carved-stone feel") — H1, H2, section titles.
+- **Body:** Hanken Grotesk (humanist sans) — body copy, UI text.
+- **Mono:** Space Mono (eyebrows, coordinates, fees, indices, "X temples · Y days · ~Z km" meta).
+
+All three are self-hosted via `next/font` (no third-party requests at runtime).
+
+### Visual inspiration
+
+Wikipedia (information depth) + Lonely Planet / Nat Geo Travel (premium tourism feel) + Indian cultural heritage portals (warmth, ornamentation) + premium tourism platforms (modern UX patterns).
+
+---
+
+## 2. Final sitemap
+
+### 2.1 Routes
+
+```
+/                          Home (hero carousel + 6 sections)
+/explore                   Searchable / filterable grid
+/explore?view=map          Same data, map mode
+/temples/[id]              One temple dossier (18 sections)
+/about                     About the project + methodology
+/contact                   Partner inquiry (UI-only form)
+/suggest                   "Suggest a temple" form (UI-only)
+/not-found                 404
+```
+
+There is **no** `/states/[slug]`, `/deities/[slug]`, `/regions/[slug]`, or `/blog`. State, deity, and region are **filters** on `/explore`, not top-level routes. The 3-click rule is the goal, and one filter URL is a click away from the homepage.
+
+### 2.2 URL contract for `/explore`
+
+```
+?view=list|map            Default: list
+?q=<query>                Alias-aware search
+?state=<slug>             28 states + 8 UTs
+?deity=<slug>             6 deities
+?tag=<slug>               Repeats up to 3 times
+?sort=rating|popularity|name   Default: rating
+?preset=<slug>            Pilgrimage | Architecture | Discover (top of Explore)
+?page=<n>                 Paginated
+```
+
+The URL is the **single source of truth**. Every filter round-trips through the URL. The back/forward buttons restore any filter combination.
+
+### 2.3 URL contract for `/temples/[id]`
+
+```
+/temples/<slug>           e.g. /temples/tirupati
+```
+
+No query parameters on the detail page. (Filters are on `/explore`; deep linking to a filtered Explore state is the contract for the back link from the detail page.)
+
+---
+
+## 3. Information architecture
+
+### 3.1 The 3-click rule
+
+A user should reach any temple in **3 clicks** from the homepage:
+
+```
+Click 1:  Homepage → /explore (any CTA: trip idea, state tile, deity tile,
+          popular search, hero CTA, or "Explore India" nav)
+Click 2:  /explore → filter (state, deity, tag, or search) or just browse
+Click 3:  /explore → /temples/[id]
+```
+
+The previous prototype allowed 4+ clicks. The new design budget is **3 clicks max, 2 preferred**.
+
+### 3.2 Navigation surfaces
+
+| Surface | Where | Purpose |
+|---|---|---|
+| Sticky header | All pages | Brand, primary nav, search, language |
+| Hero CTA | Homepage | Direct entry to a curated Explore state |
+| Trip ideas | Homepage | Pre-canned Explore URLs |
+| State strip | Homepage | Pick-by-state; 6 visible + popover for 37 |
+| Popular searches | Homepage | 6 chips → pre-canned Explore URLs |
+| Deity tiles | Homepage | 6 tiles → `/explore?deity=<slug>` |
+| Mode toggle | `/explore` | List ⇄ Map |
+| Filter row | `/explore` | State · Deity · Tag · Sort |
+| Region pills | Map mode | 6 regions + All |
+| Back link | Detail | "← Back to [state] temples" |
+
+### 3.3 Content hierarchy
+
+```
+Temple (canonical record, in data/temples.ts)
+├── Hero (1 photo, 16:9, with overlay)
+├── Quick facts (6 inline)
+├── Why visit (3–4 sentences, editorial)
+├── Plan around (3 nearest temples + summary)
+├── Best time (months + time of day + festivals)
+├── Overview (long-form)
+├── How to reach (long-form)
+├── History (long-form)
+├── Legends & mythology (long-form)
+├── Architecture (long-form)
+├── Spiritual significance (long-form)
+├── Cost to visit (table)
+├── Gallery (image + video, lightbox)
+├── Map (lat/lng plot, no API key)
+├── Within 100 km (up to 4 cards, by Haversine)
+├── By the same deity (up to 3 cards)
+├── Same architectural style (up to 3 cards)
+└── Nearby attractions (free text list)
+```
+
+Sections are reordered from the current dossier (which had 11 sections in a different order). The new order puts **tourist-relevant** information first (why visit, plan around, best time) and **encyclopedic depth** (history, legends, architecture) later — closer to how a Lonely Planet or Wikipedia entry would be structured.
+
+---
+
+## 4. UX decisions (locked)
+
+### 4.1 Carousels: limited and sensible
+
+- The **only** carousel on the site is the homepage hero (5–6 slides, no autoplay).
+- All other "scrollable" content is a **horizontal scroll** on mobile / **grid** on desktop — not a carousel.
+- No autoplay. No infinite loop. No autoplay-paused-on-hover UX. The hero carousel has visible prev/next buttons, dots, and keyboard control.
+- The mobile bottom sheet on map mode uses **snap points** (peek / half / full), not a carousel.
+
+### 4.2 Autoplay: muted by default
+
+- Video in the lightbox is **muted, playsInline, no controls** initially.
+- A visible "Tap to unmute" button is the only path to sound.
+- No autoplay on the hero. The hero is photo-only.
+- No autoplay on the "trip ideas" or "popular searches" rows.
+
+### 4.3 Search: alias-aware, single list
+
+- One search bar, on `/explore`, with a header-search overlay as a quick entry.
+- The same `lib/search.ts` powers both.
+- The search returns **one ranked list** (no "smart" vs "all" split).
+- Aliases (`mahadev → shiva`, `nataraja → shiva`, etc.) surface the matched alias as a "matched as 'Shiva temples'" chip in the smart-match banner.
+- The alias map is **data, not code**. It's `lib/search-aliases.ts` — easy to extend without code review.
+
+### 4.4 Map mode: simplified India, no API key
+
+- An inline SVG of India with state polygons. No Mapbox, no Leaflet, no Google Maps JS API.
+- Each state is a clickable button (`<g role="button" tabindex="0">`).
+- Region cluster circles overlay the polygons, sized by `log(count + 1)`.
+- A visually-hidden `<ul>` of state links mirrors the map for screen readers.
+- State names appear in the right column (desktop) or bottom sheet (mobile).
+- The detail page's small map is a coordinate plot, not a real map. It links out to Google Maps for directions.
+
+### 4.5 Detail page back link
+
+- "← Back to [state] temples" → `/explore?view=map&state=<slug>`
+- Not "← All temples" → `/explore`. The back link is state-aware.
+
+### 4.6 Filter UX: structured, not chaotic
+
+- 4 filters in a row: State · Deity · Tag · Sort.
+- Each filter is a **trigger button + popover** (focus-trapping, Esc-to-close, dismissible on outside click).
+- The active filters appear as **removable chips** below the filter row.
+- Max 3 tags (the design system enforces this; UX-spec'd to prevent over-narrowing).
+- No "show more" disclosure; the 4 filters are always visible.
+
+### 4.7 Mobile bottom sheet: snap points, not full-screen
+
+- The map mode's right column on mobile is a **bottom sheet** with peek (just the handle + state name), half (compact results list), and full (full results list + filters) snap points.
+- The sheet uses Framer Motion's `drag` and `useDragControls`.
+- Focus is trapped at half/full; Esc closes.
+- Replaces the "modal takeover" pattern that mobile sites often use.
+
+### 4.8 Forms: UI-only, explicit disclaimer
+
+- `/contact` and `/suggest` are **UI-only** forms. They show a visible "this is a prototype, nothing was sent" notice.
+- No network call. No fake success. No optimistic update.
+- The forms exist to demonstrate the *design* of the form, not to actually submit.
+
+### 4.9 3D embers: removed
+
+- The `react-three-fiber` 3D embers accent on the previous hero is **removed**.
+- The light-mode hero is photo-only.
+- `three` and `@react-three/fiber` are removed from `package.json`. There is no 3D in the prototype.
+
+### 4.10 Region mandala: removed
+
+- The 6-wedge mandala on the old homepage ("Browse by region") is **removed**.
+- The mandala SVG itself is reused as a decorative element in the methodology teaser or footer.
+- Region navigation now happens via:
+  - The state strip (homepage, by state, not by region).
+  - The deity tiles (homepage, by deity).
+  - The region pills on the map mode (Explore).
+
+---
+
+## 5. Homepage specification
+
+### 5.1 Section order
+
+1. **Sticky header** (logo, Explore ▾, About, search button, language pill)
+2. **Language banner** (homepage only; dismissible; "Available in 8 Indian languages — coming soon.")
+3. **Hero carousel** (5–6 slides, no autoplay; full-bleed photo, eyebrow, H1/H2, primary + secondary CTA)
+4. **Editorial paragraph** (2 sentences; max 640 px; centered)
+5. **Trip ideas** (4 cards; "X temples · Y days · ~Z km" meta; "Explore →")
+6. **State strip** (6 tiles + trailing "See all states →" tile; horizontal scroll on mobile)
+7. **Popular searches** (6 chips; pre-canned Explore URLs)
+8. **Deity tiles** (6 tiles in a 3×2 grid; deity icon + name + temple count)
+9. **Methodology teaser** (paragraph + "How we choose →")
+10. **Footer** (3 columns: About / Contribute / Connect)
+
+### 5.2 Hero carousel
+
+- 5–6 slides; each slide has a real photo, eyebrow, H1/H2, primary CTA, secondary CTA.
+- Aspect ratio: 16:9 desktop, 4:3 mobile, 60 vh max on mobile.
+- Visible prev/next buttons (left/right edge of photo), visible dots, visible counter ("2 of 6").
+- Keyboard: ←/→ moves, Home/End jumps, dots are buttons.
+- No autoplay. No "tap to pause" UX. A small "(no autoplay)" caption is fine.
+- Respects `prefers-reduced-motion` — the slide transition is a fade, not a slide.
+- The first slide is `priority` (LCP); subsequent slides are lazy-loaded.
+- Photos are real Wikimedia Commons URLs (consistent with the existing prototype).
+
+### 5.3 State strip
+
+- 6 visible tiles; horizontal scroll on mobile, grid on desktop.
+- Each tile: state silhouette (SVG) + state name (Fraunces) + temple count (Space Mono).
+- Each tile is a **button**, not a link. Tapping opens a popover with the state's top 4 temples + "See all →" link.
+- The 7th tile is "See all states →" — a link that opens a full picker popover with 37 states/UTs and a search input.
+- State silhouettes are 8–10 hand-drawn or GeoJSON-derived SVGs (the same data drives the India map on Explore).
+
+### 5.4 Deity tiles
+
+- 6 tiles in a 3×2 grid.
+- Each tile: deity icon (hand-built SVG) + deity name (Fraunces H3) + temple count (Space Mono).
+- Each tile is a **link** → `/explore?view=list&deity=<slug>`.
+- Deities: Shiva, Vishnu, Devi, Buddha, Ganesha, Murugan.
+- Icons: trishul, sudarshana-chakra, lotus, ankusha, vel, gadaa.
+
+### 5.5 Popular searches
+
+- 6 chips: "Shiva temples," "Tamil Nadu," "UNESCO sites," "Pilgrimage," "Himalayan temples," "Living temples."
+- Each chip is a **link** → pre-canned Explore URL (using aliases, not raw filter values).
+- Chips are the `FilterChip` component (recolored to the new palette).
+
+### 5.6 Trip ideas
+
+- 4 cards in a row (desktop) / 2×2 (tablet) / 1 column (mobile).
+- Each card: photo, title, 1-line description, "X temples · Y days · ~Z km" meta, "Explore →".
+- Trip ideas are pre-canned: e.g. "The Chola Trail · Tamil Nadu" (4 temples, 5 days, ~600 km) → `/explore?view=list&preset=chola-trail&state=tamil-nadu`.
+
+### 5.7 Methodology teaser
+
+- A short paragraph + "How we choose →" link.
+- Replaces the methodology callout in the old 4-stat strip.
+- The mandala SVG from the old region-explorer is reused here as a decorative motif.
+
+### 5.8 Removed from the homepage
+
+- The 3D embers accent (`components/home/hero-embers.tsx` + `hero-embers-mount.tsx`).
+- The region mandala (`components/home/region-explorer.tsx`).
+- The 4-stat strip ("2,000+ temples · 28 states · 6 cultural regions · 100s of festivals").
+- The "Featured temples" grid (folded into the trip ideas + popular searches).
+- The parallax motion on the hero.
+- The "scroll inward" cue at the bottom of the hero.
+
+---
+
+## 6. Explore page specification
+
+### 6.1 Two modes
+
+- **List mode (default):** 3-column grid on desktop, 2-column tablet, 1-column mobile.
+- **Map mode:** India map on the left (60% width on desktop), right column on the right (40% width). On mobile, the map is full-width and the right column is a bottom sheet.
+
+### 6.2 Mode toggle
+
+- Two buttons: "List" (with list icon) and "Map" (with map icon).
+- The active mode has `aria-pressed="true"` and a temple-red underline.
+- Clicking a button updates `?view=` in the URL.
+
+### 6.3 Filter row
+
+- 4 trigger buttons: State · Deity · Tag · Sort.
+- Each is a button that opens a popover. Active filters show a count badge ("State: 1").
+- A "Reset all" link is at the right end of the row (only visible when ≥1 filter is active).
+
+### 6.4 Filter popovers
+
+- **State popover:** 37 states/UTs with a search input (filter as you type). Selecting a state closes the popover.
+- **Deity popover:** 6 deities (the same 6 as the homepage tiles). Selecting one closes the popover.
+- **Tag popover:** 5–6 popular tags as checkboxes. Max 3 selected. "Done" button to close.
+- **Sort popover:** 3 options — Top rated (default), Most visited, A–Z.
+
+All popovers trap focus, dismiss on Esc, and dismiss on outside click.
+
+### 6.5 Active filters row
+
+- Removable chips below the filter row.
+- Each chip: filter name + value + "×" remove button. `aria-label="Remove filter: [name] [value]"`.
+- Trailing "Reset all" chip.
+
+### 6.6 Search bar
+
+- Top of the page, full width, sticky on scroll.
+- Leading search icon, trailing clear button.
+- Debounced URL update (≤300 ms on idle).
+- The query is server-side computed (per `lib/search.ts`).
+
+### 6.7 Smart-match banner
+
+- Below the search bar.
+- "Showing 47 temples for 'mahadev' (matched as 'Shiva temples')." + dismiss (×) button.
+- `role="status"`, `aria-live="polite"`.
+- Hidden when the query is empty.
+
+### 6.8 Result grid
+
+- 3 columns desktop, 2 tablet, 1 mobile.
+- Cards use the `TempleCard` component (16:9 photo, white surface, 12-px radius, 1-px `line` border, sand-yellow ring on hover).
+- The cards are the source of the **view-transition morph** to the detail hero.
+
+### 6.9 Pagination
+
+- ‹ 1 2 3 … N › control at the bottom of the grid.
+- Truncated middle (no more than 7 visible page indicators).
+- `aria-label="Page N"` on each link; `aria-current="page"` on the active page.
+
+### 6.10 Empty state
+
+- Sand-yellow-soft background, temple-red icon (gopuram).
+- "No temples match those filters." H3 + paragraph.
+- "Reset all filters" primary button.
+
+### 6.11 Map mode — map (left)
+
+- Inline SVG of India, 60% width on desktop, full-width on mobile (when bottom sheet is closed).
+- State polygons are `line` fill, hover/selected are `temple-red`.
+- Region cluster circles overlay the polygons.
+- A visually-hidden `<ul>` of state links mirrors the map for screen readers.
+- `next/dynamic` lazy-loaded (not in the initial bundle).
+
+### 6.12 Map mode — right column (desktop) / bottom sheet (mobile)
+
+- **Sticky on desktop.** Scrolls with the page on mobile.
+- **Your-state pill:** sticky at the top. Prompts first-time visitors to pick a state. Persists in `localStorage`.
+- **State header:** state name (H2) + temple count.
+- **Scoped search input** (filters within the selected state).
+- **Sort dropdown** (3 options).
+- **Compact card list:** 1 column, 1 card per row. The cards are a slimmer variant of the standard `TempleCard`.
+- **Pagination** at the bottom.
+
+### 6.13 Mobile bottom sheet
+
+- Framer Motion drag with snap points: peek (handle + state name), half (compact list), full (full list + filters).
+- Drag handle at the top; the sheet is dismissible by dragging below peek.
+- Focus is trapped at half/full; Esc closes.
+- Respects `prefers-reduced-motion` (the drag is disabled; the sheet opens/closes with a fade).
+
+---
+
+## 7. Temple page specification
+
+### 7.1 Section order (18 sections)
+
+1. **Hero** (16:9 photo, 1 photo, with overlay)
+2. **Quick-facts bar** (6 facts: Built · Dynasty · Style · Deity · Open today · Entry)
+3. **Why visit** (3–4 sentences from `temple.whyVisit`)
+4. **Plan around** (3 nearest temples + "X temples · Y days · ~Z km" summary)
+5. **Best time** (callout: months + time of day + festivals)
+6. **Overview** (long-form)
+7. **How to reach** (long-form)
+8. **History** (long-form)
+9. **Legends & mythology** (long-form)
+10. **Architecture** (long-form)
+11. **Spiritual significance** (long-form)
+12. **Cost to visit** (table)
+13. **Gallery** (image + video, lightbox)
+14. **Map** (lat/lng plot, no API key, "Open in Google Maps" link)
+15. **Within 100 km** (up to 4 cards, by Haversine)
+16. **By the same deity** (up to 3 cards)
+17. **Same architectural style** (up to 3 cards)
+18. **Nearby attractions** (free text list)
+
+### 7.2 Hero
+
+- 16:9 desktop, 4:3 mobile, 60 vh max on mobile.
+- The view-transition morph source — `view-transition-name="temple-${id}"` on the photo.
+- Back link: "← Back to [state] temples" → `/explore?view=map&state=<slug>`.
+- Action row (top-right): Save · Share · Get directions.
+- Overlay: region badge (left), star rating + visit count (right), H1 name (center), tagline + city/state (below).
+- The first photo is `priority` (LCP).
+
+### 7.3 Quick-facts bar
+
+- 6 facts in a horizontal row on desktop, horizontally scrollable on mobile with a right-edge fade.
+- Each fact: label (Space Mono, 11 px, ink-subtle) + value (Hanken 14 px, ink).
+- The "Open today" and "Entry" facts are derived (e.g. "Open 6:00 AM – 9:00 PM" and "Free" or "₹ 20–100").
+
+### 7.4 Why visit
+
+- H2 + 3–4 sentences from `temple.whyVisit`.
+- The text is **editorial**, not auto-generated from the overview.
+- Hanken body, 18 px, 1.7 line-height, `text-ink/85`.
+
+### 7.5 Plan around
+
+- 3 nearest temples (Haversine distance, fallback to region match if <2 within 100 km).
+- Summary line: "5 temples · 4 days · ~600 km" (uses `temple.tripDuration` if set, else derived from the 3 nearest temples).
+- Cards are the standard `TempleCard` in a horizontal row (1 column on mobile, 3 columns on desktop).
+
+### 7.6 Best time
+
+- A 2-up callout: "Ideal months" (Jan, Feb, Mar, …) + "Time of day" (sunrise, sunset, etc.).
+- Festivals grid: each festival has a name, a 1-line description, and a date range.
+
+### 7.7 Long-form sections (Overview, How to reach, History, Legends, Architecture, Significance)
+
+- H2 + `\n\n`-delimited paragraphs.
+- Hanken body, 18 px, 1.7 line-height, `text-ink/85`.
+- The "Architecture" section may have H3 sub-sections (vimana, mandapa, gopuram).
+
+### 7.8 Cost to visit
+
+- A 2-column table on desktop, a 1-column card list on mobile.
+- Each row: line item (label) + value (formatted rupees).
+
+### 7.9 Gallery
+
+- 2-column grid on desktop, 1-column on mobile.
+- Lightbox (focus-trapping, Esc, keyboard nav, backdrop click).
+- Image items: `<Image>` from `next/image`.
+- Video items: `<video controls muted playsInline preload="metadata">` with a visible "Tap to unmute" button.
+- Failed media falls back to the procedural `TempleScene`.
+
+### 7.10 Map
+
+- Inline SVG coordinate plot, no API key.
+- Background: `canvas-soft` with `line` graticule.
+- Marker: `temple-red` MapPin (no flicker, no glow).
+- "Open in Google Maps" link below the map, with the lat/lng pre-filled.
+
+### 7.11 Within 100 km
+
+- Up to 4 cards, by `pickWithinRadius` (Haversine).
+- Each card shows the distance via `formatRelativeDistance` ("38 km away").
+- Fallback to same-region cards if <2 temples are within 100 km.
+- Hidden if no match.
+
+### 7.12 By the same deity / Same architectural style
+
+- Up to 3 cards each.
+- Hidden if no match.
+
+### 7.13 Nearby attractions
+
+- A free-text list of nearby non-temple attractions (parks, museums, viewpoints).
+- Not a "related temples" list — that's covered by the 3 previous sections.
+
+---
+
+## 8. Search system
+
+### 8.1 Two entry points
+
+- **Header search button** (top-right of the sticky header) → opens the search overlay.
+- **Search bar** at the top of `/explore` → the persistent search.
+
+Both use the same `lib/search.ts` and the same alias map.
+
+### 8.2 Header search overlay
+
+- Full-screen on mobile, right-side panel on desktop.
+- Traps focus. Closes on Esc. Closes on outside click.
+- Live results as the user types (debounced ≤100 ms for the 15-temple dataset).
+- Result groups: **Top match** (one temple) and **Mentions** (deity, state, architectural style).
+- Empty state: "No results for X" + popular searches.
+
+### 8.3 Explore search bar
+
+- Top of the page, sticky on scroll.
+- Debounced URL update (≤300 ms on idle).
+- Server-side computation: the page reads `?q=`, calls `lib/search.ts`, and renders results.
+- The smart-match banner appears below the search bar when an alias is matched.
+
+### 8.4 Alias map
+
+- `lib/search-aliases.ts` exports the alias map. Data, not code.
+- Initial seed: 8–20 entries. Examples: `mahadev → shiva`, `nataraja → shiva`, `vishnu → vishnu`, `gautama-buddha → buddha`, `parvati → devi`, `murugan → murugan`.
+- Aliases are typed `Record<string, string>` with a "Why this alias?" comment per entry.
+- The map is extended in Phase 6 of the implementation plan.
+
+### 8.5 Smart-match banner
+
+- "Showing 47 temples for 'mahadev' (matched as 'Shiva temples')."
+- `role="status"`, `aria-live="polite"`.
+- Dismissable (× button). Hides on dismiss; re-shows on a new query.
+
+---
+
+## 9. Navigation system
+
+### 9.1 Sticky header
+
+- Logo (top-left, gopuram silhouette + "CTemples" wordmark).
+- Explore ▾ (dropdown with 3 presets: Pilgrimage · Architecture · Discover).
+- About (top-level link).
+- Search button (top-right, opens the search overlay).
+- Language pill (top-right, 8-language dropdown, all but English "Coming soon").
+- Mobile: logo + hamburger; sheet mirrors the desktop nav with expand/collapse for Explore.
+
+### 9.2 Footer
+
+- 3 columns: **About** (logo, one-line description, About link, Methodology link) · **Contribute** (Suggest a temple →, Partner with us →) · **Connect** (social placeholders, copyright, "Made in India.").
+- Bottom bar: "v0.1 prototype" tag.
+
+### 9.3 Skip-to-content
+
+- The first focusable element on every page.
+- Becomes visible on focus.
+- `bg-temple-red text-canvas` for AA contrast.
+
+### 9.4 Keyboard map
+
+| Action | Shortcut |
+|---|---|
+| Skip to content | Tab (from page load) |
+| Open search overlay | Click search button / `Cmd-K` (TBD) |
+| Close overlay / popover / sheet | Esc |
+| Move carousel | ← / → / Home / End |
+| Activate tile / button | Enter / Space |
+| Move between filter popovers | Tab (from filter row) |
+
+### 9.5 URL is the source of truth
+
+- Every filter, sort, page, and mode round-trips through the URL.
+- The back/forward buttons restore any state.
+- The URL is shareable.
+
+---
+
+## 10. Design decisions (locked)
+
+### 10.1 Visual identity
+
+- Light mode only. No dark mode toggle. No system theme detection.
+- White canvas, ink text, temple-red CTAs, sand-yellow accents, warm-gold for premium surfaces.
+- Hairlines are 1 px `line` (or warm-gold at 30% opacity for premium sections).
+- Focus ring: 2-px `temple-red` outline, 2-px offset, no rounded corners.
+- Selection: `temple-red-soft` background, `ink` color.
+
+### 10.2 Motion philosophy
+
+- **Three motion types only:** scroll reveals, page transitions, and the one memorable moment (the card → hero morph).
+- Scroll reveal: 16-px translate + 3-px un-blur, 350 ms, 60 ms stagger, ease `cubic-bezier(0.22, 1, 0.36, 1)`.
+- Page transition: the shared-element morph (card → hero) only. No directional slide.
+- The one memorable moment: the card → hero morph. Everything else is restrained.
+- **No ambient loops.** No diya flicker, no mandala spin, no 3D embers.
+- `prefers-reduced-motion` is a floor: every animation is reduced or disabled.
+
+### 10.3 Components and primitives
+
+The design system has these primitives:
+
+- **Buttons** (5 variants × 3 sizes): primary, secondary, tertiary, warm, destructive. sm (32 px), md (44 px, default), lg (52 px).
+- **Cards** (5 compositions): `TempleCard` (standard), `TempleCardCompact` (slim for map mode), `TripIdeaCard`, `DeityTile`, `StateTile`.
+- **Pills / chips** (4 types): `Tag`, `RegionBadge`, `DeityBadge`, `ActiveFilterChip`.
+- **Sections**: `SectionHeading` (H2 + eyebrow + optional action slot), `DetailSection` (H2 + content), `StatFigure`, `Rating`, `Eyebrow`.
+- **Filter popover** (generic over content), filter triggers, active filters row, pagination.
+- **Search**: `SearchBar`, `SearchOverlay`, `SearchResult`, `SearchEmpty`, `SmartMatchBanner`.
+- **Map**: `IndiaMap`, `RegionPills`, `StateResultsColumn`, `YourStatePill`, `BottomSheet`, `ModeToggle`.
+- **Brand**: `GopuramMark`, `MandalaMark`, `Divider`, 6 `DeityIcon`s, 6 `RegionIcon`s, 8–10 `StateSilhouette`s.
+- **Media**: `TempleImage`, `PhotoWithFallback`, `TempleScene` (procedural fallback, daytime palette).
+
+### 10.4 Accessibility floor
+
+- WCAG 2.1 AA contrast on every surface.
+- Keyboard-operable on every interactive element.
+- Visible focus on every focusable element.
+- `prefers-reduced-motion` respected everywhere.
+- `prefers-reduced-data` considered (no autoplay video, no autoplay carousel).
+- Touch targets ≥ 44×44 px.
+- 200% zoom test passes (no horizontal scroll).
+- Screen reader walkthrough passes on every page.
+- Semantic HTML, labelled controls, alt text on every image.
+
+### 10.5 Performance floor
+
+- Lighthouse Performance ≥ 90 on `/`, `/explore`, `/temples/<id>`.
+- Lighthouse Accessibility ≥ 95 on every page.
+- Lighthouse Best Practices ≥ 95 on every page.
+- LCP < 2.5 s on simulated 4G Moto G4.
+- Single `priority` image per page (the hero).
+- All other images are lazy-loaded with `next/image`.
+- `next/dynamic` for the India map (map mode only).
+- `next/font` self-hosts all three fonts.
+
+### 10.6 Out-of-design decisions
+
+- **No skeletons.** A loading state is a banner ("Loading temples…") or a static empty state. No shimmering rectangles.
+- **No tooltips on touch.** Tooltips are keyboard-only on desktop.
+- **No modals** (except the search overlay, the lightbox, and the bottom sheet). All other UI is inline.
+- **No pop-ups, no banners** beyond the language banner on the homepage.
+- **No newsletter signup.** Out of scope for the prototype.
+
+---
+
+## 11. Feature prioritization
+
+### 11.1 In-scope for the prototype (must ship)
+
+- All routes in the sitemap.
+- Hero carousel on the homepage (5–6 slides, no autoplay).
+- Trip ideas, state strip, popular searches, deity tiles, methodology teaser.
+- Explore list mode with 4 filters, search, active filters, pagination, empty state.
+- Explore map mode with India map SVG, region pills, right column, your-state pill, mobile bottom sheet.
+- Temple detail page with 18 sections, including the 4 new "related" sections.
+- Header search overlay, alias-aware search, smart-match banner.
+- Media gallery with image and video support.
+- `/suggest` form (UI-only).
+- Lightbox for the gallery.
+- View transition morph (card → hero).
+- All a11y and perf floors.
+
+### 11.2 In-scope but lower priority (ship if time allows)
+
+- Trip ideas carousel (4 cards is the current spec; can expand to 6).
+- More deity icons (beyond the 6 in the spec).
+- More state silhouettes (beyond 8–10).
+- A "Methodology" page at `/methodology` (currently a link in the footer, no destination).
+- A "Recently viewed" pill on the homepage (localStorage, no server).
+
+### 11.3 Out of scope (deferred)
+
+- Multi-language content (UI chrome only; English + 7 placeholders).
+- User accounts, saved temples, trip planning.
+- Real CMS / authoring tools.
+- Real video content (schema is ready).
+- State landing pages (`/states/[slug]`) — folded into `/explore?state=…`.
+- Deity landing pages (`/deities/[slug]`) — folded into `/explore?deity=…`.
+- A blog / editorial content.
+- Server-side search index (Fuse.js, Meilisearch, etc.).
+- Booking / "Plan visit" with third parties.
+- Mobile app.
+- Dark mode.
+- Real-time data (festivals, timings).
+
+---
+
+## 12. Architectural constraints
+
+### 12.1 The content contract
+
+- `data/temples.ts` is a single typed array of `Temple` records.
+- `lib/types.ts` is the schema.
+- `lib/validate.ts` is a dev-time shape validator (the `placeholder dataset` vitest suite).
+- To go live, replace the array with the full generated set (15 → 2,000+). Nothing else needs to change.
+- **Nothing in the app hardcodes the current count.** No "showing 1 of 15" copy, no "we have 15 temples" stats — every count is derived.
+
+### 12.2 The lib layer
+
+```
+data/temples.ts  →  lib/temples.ts  (data-bound public API)
+                  ↘  lib/temple-queries.ts  (pure helpers, unit-tested)
+                  ↘  lib/filter.ts  (Explore search/filter/sort, pure)
+                  ↘  lib/format.ts  (cost/number/distance formatters)
+                  ↘  lib/regions.ts  (REGION_ORDER, region → pigment mapping)
+                  ↘  lib/search.ts  (alias-aware ranked search)
+                  ↘  lib/search-aliases.ts  (the alias map)
+                  ↘  lib/india-geo.ts  (parsed India state polygons)
+                  ↘  lib/media.ts  (MediaItem helpers)
+                  ↘  lib/distance.ts  (Haversine)
+                  ↘  lib/validate.ts  (shape validator)
+                  ↘  lib/utils.ts  (cn, shimmer)
+```
+
+- `lib/temples.ts` is the only file pages import for data.
+- Everything else in `lib/` is **pure** (no data import) and unit-tested with `lib/__fixtures__/`.
+- Path alias `@/*` → repo root.
+- Vitest only picks up `lib/**/*.test.ts`. `app/` and `components/` have no test files by design.
+
+### 12.3 Static generation
+
+- `next.config.mjs` has `output: "standalone"` (for the Dockerfile).
+- `reactStrictMode: true`.
+- `experimental.viewTransition: true`.
+- At 20,000+ temples, `generateStaticParams` for `/temples/[id]` is a known scale step (deferred; documented in `CLAUDE.md`).
+- The Explore page is server-rendered (the page component reads URL params and hands data to the client).
+
+### 12.4 Stack
+
+- Next.js 15 (App Router).
+- React 19.
+- TypeScript (strict).
+- Tailwind v3 (custom tokens).
+- Framer Motion (reveals, bottom sheet drag).
+- React View Transitions API (native, via `experimental.viewTransition`).
+- `next/font` (Fraunces, Hanken Grotesk, Space Mono).
+- `lucide-react` (icons).
+- **Removed:** `react-three-fiber`, `three` (the 3D embers are gone).
+
+### 12.5 Tooling
+
+- ESLint (`next/core-web-vitals`) ignores `.agents/`, `.claude/`, `skill-observations/`, `skill-updates/`.
+- `tsconfig.json` excludes the same directories and uses path alias `@/*` → repo root.
+- No Cursor rules, no Copilot rules. Project conventions live in `CLAUDE.md`, `UX_SPEC.md`, `DESIGN_SYSTEM_V2.md`, `REDESIGN_PLAN.md`, `IMPLEMENTATION_PHASES.md`, and this file.
+- `npm audit` reports dev-only advisories (esbuild/vite/postcss). **Do not run `npm audit fix --force`** — it downgrades Next.js and breaks the app.
+
+### 12.6 Images
+
+- Real URLs flow through `next/image` with blur-up.
+- Wikimedia Commons URLs are served `unoptimized` (browser → Wikimedia's CDN) to avoid rate-limiting the Next optimizer's proxy.
+- Self-hosted photos add their host to `images.remotePatterns` in `next.config.mjs`.
+- Failed images fall back to the procedural `TempleScene` (extended in Phase 7 to cover failed videos).
+- Empty `""` also renders the procedural scene.
+- Fixed aspect-ratio boxes ensure zero CLS.
+
+### 12.7 Forms and APIs
+
+- All forms are **UI-only**. No backend, no API routes, no fetch calls.
+- The forms explicitly say so on submit ("this is a prototype, nothing was sent").
+- No optimistic updates. No fake success. No fake loading.
+
+---
+
+## 13. Implementation roadmap
+
+The full 11-phase build order is in `IMPLEMENTATION_PHASES.md`. The phases are independently reviewable, independently testable, and have stop-and-review gates between them.
+
+> **Build progress:** Phase 0 is *partially* done (token layer only) and Phase 1 is *complete* as of 2026-07-07. See the **Build status** section at the top of this document for the authoritative status, the exact files changed, the decisions/deviations, and the recommended next step (Phase 2).
+
+| # | Phase | Effort | What ships |
+|---|---|---|---|
+| 0 | Foundation | 4 d | Tokens, globals, DESIGN.md, schema, lib helpers, data migration |
+| 1 | Chrome | 3 d | Header, footer, language banner, about/contact/404 recolor |
+| 2 | Homepage | 6 d | Hero carousel, editorial, trip ideas, state strip, deity tiles, popular searches, methodology |
+| 3 | Explore list mode | 4 d | Filter row, popovers, active filters, search, smart-match, pagination, empty state |
+| 4 | Explore map mode | 8 d | India map SVG, region pills, right column, your-state pill, mobile bottom sheet |
+| 5 | Temple detail | 4 d | Section reorder, 4 new sections, hero actions, quick-facts bar, gallery refactor, map recolor |
+| 6 | Search system | 3 d | Header overlay, alias-aware search, smart-match banner integration |
+| 7 | Media gallery | 2 d | `media: MediaItem[]` refactor, video-ready lightbox |
+| 8 | `/suggest` page | 1 d | New UI-only form |
+| 9 | Perf + a11y pass | 2 d | Lighthouse, axe, keyboard, reduced motion, zoom, contrast |
+| 10 | Deploy readiness | 1 d | README, Docker, smoke test |
+| | **Total** | **~36 d** | |
+
+A 2–3-engineer team + 1 designer can compress to **3–4 calendar weeks**. A solo engineer should plan for **8–10 weeks**.
+
+### 13.1 Phase 0 is special
+
+- It is the only phase with no visible UI change.
+- It locks the design system, the schema, and the pure helpers.
+- It is the foundation for every subsequent phase.
+- A 1-day review of the design tokens, the schema, and the data migration is mandatory.
+
+### 13.2 Phase 4 is the largest
+
+- 8 days. The India map SVG, the bottom sheet, and the right column are the bulk.
+- Plan a 2-day spike to validate the bottom sheet (Framer Motion drag + focus trap + snap points) before integration.
+- If the bottom sheet spike fails, the fallback is a simpler full-screen sheet (no snap points).
+
+### 13.3 Phase 9 is non-negotiable
+
+- The perf + a11y pass is not a "polish" step. It is a gate.
+- If Lighthouse Performance is < 90 or axe-core reports critical issues, the prototype is not shippable.
+- The `prefers-reduced-motion` audit is reviewed by an a11y expert.
+
+### 13.4 Documentation set
+
+The full documentation set, in the order a new Claude Code session should read it:
+
+1. **`PROJECT_CONTEXT.md`** (this file) — the index.
+2. **`CLAUDE.md`** — the project rulebook.
+3. **`UX_SPEC.md`** — section-by-section UX spec for every page.
+4. **`DESIGN_SYSTEM_V2.md`** — 14-section design system.
+5. **`REDESIGN_PLAN.md`** — file-by-file audit, keep/modify/replace/delete.
+6. **`IMPLEMENTATION_PHASES.md`** — 11-phase build order.
+
+---
+
+## 14. Open questions
+
+These are the questions that are still undecided or could use input. None block the prototype, but each is worth a deliberate answer before production.
+
+### 14.1 Content
+
+- **"Why visit" copy** — each of the 15 temples needs a hand-written 3–4-sentence "Why visit" paragraph. Who writes this, and when?
+- **Trip ideas** — the 4 trip ideas are pre-canned (e.g. "The Chola Trail," "Buddhist Circuit," "Living Temples of Tamil Nadu," "Himalayan Pilgrimage"). Who curates these, and is the 4-card grid the right count?
+- **"How we choose" methodology** — the methodology teaser links to `/methodology` (a page that doesn't exist yet). What's the methodology? Is this an early-phase content task or a Phase 10 task?
+- **Festival dates** — the current data has festival names + 1-line descriptions, but no machine-readable date ranges. Do we need them? (UX spec says yes for the "Best time" callout.)
+
+### 14.2 Design
+
+- **State silhouettes** — 8–10 hand-drawn or GeoJSON-derived. Is the GeoJSON-derived path the right one, or are hand-drawn silhouettes more on-brand? (The data set drives both the state strip and the India map; the silhouettes can be a simplified view of the same polygons.)
+- **Deity icons** — 6 hand-built SVGs. Who designs them? Is the trishul/sudarshana-chakra/lotus/ankusha/vel/gadaa set the right one?
+- **Hero photos** — 5–6 photos for the hero carousel. The current data has 15 temples; the hero carousel needs only 5–6. Which 5–6? Is this a content-strategy decision or a designer decision?
+- **The mandala SVG** — the old region-explorer mandala is reused as a decorative element in the methodology teaser. Is this the right reuse, or should it appear elsewhere (footer, about page)?
+
+### 14.3 Technical
+
+- **Static generation at 20,000+** — `generateStaticParams` for `/temples/[id]` will be slow at 20,000 records. Deferred to a future scale step. When? Is it a CI/infra decision or a code decision?
+- **Server-side search at 20,000+** — a naive substring search on 20,000 records is O(n) but 1,300× slower than on 15. Is Fuse.js / Meilisearch in the prototype's future? Deferred; documented.
+- **The `media: MediaItem[]` refactor** — the data migration in Phase 0 adds `media[]` to all 15 records. The `heroImage` and `gallery` fields are removed. Is the migration strategy (single coordinated change) safe for the 20,000-record future?
+- **The `lib/india-geo.ts` source** — the India map needs state polygons. Where does the GeoJSON come from? A public-domain source (e.g. Survey of India, Natural Earth)? Is the license compatible with the prototype's distribution?
+- **The bottom sheet's drag interaction** — Framer Motion's `drag` prop on iOS Safari conflicts with the native rubber-band scroll. What is the fallback if the conflict is unresolvable? (Simpler full-screen sheet is the documented fallback.)
+- **The alias map's coverage** — the initial seed has 8–20 entries. Is 20 enough? Should the map be expanded to 50+ before launch? Who curates it?
+
+### 14.4 Product
+
+- **The language banner's "Notify me →" CTA** — currently a dead link. Should it open an email composer, a `/contact` form, or a Tally / Formspree widget?
+- **The footer social links** — currently placeholders (UI-only). What services? Twitter? Instagram? YouTube?
+- **The "v0.1 prototype" tag** — the footer is honest about its prototype status. Should this tag persist in production, or only in the prototype?
+- **The "How we choose" page** — the methodology teaser links to a page that doesn't exist. Should `/methodology` be a Phase 0 deliverable (a 1-page static doc) or a Phase 10 deliverable?
+
+### 14.5 A11y
+
+- **The "tap to unmute" button** — visible on the lightbox. Is the language clear? Should it be "Tap to unmute" or "🔊 Unmute" (icon + label)?
+- **The smart-match banner's "matched as 'X'" chip** — does this need a screen-reader-friendly alternative? The current text is "Showing 47 temples for 'mahadev' (matched as 'Shiva temples')." which is screen-reader-readable, but the dismiss button is on the right.
+- **The bottom sheet's "peek" state** — the peek state is a handle + state name. On mobile, the state name is the only visible text. Is this enough context for a screen reader user to know what's open?
+
+---
+
+## 15. Document maintenance
+
+This document is **permanent**. It is the first thing a new Claude Code session should read.
+
+When any of the following change, update this document first, then the source documents:
+
+- A build phase is started, completed, or partially completed (update the **Build status** section at the top).
+- A new route is added or removed.
+- A new homepage section is added or removed.
+- A new filter is added or removed.
+- A new deity, region, or state is added.
+- A new design system primitive is added.
+- A new architectural constraint is added.
+- An open question is answered.
+
+The source documents (`CLAUDE.md`, `UX_SPEC.md`, `DESIGN_SYSTEM_V2.md`, `REDESIGN_PLAN.md`, `IMPLEMENTATION_PHASES.md`) are the canonical sources. This document is the index.
+
+---
+
+End of Project Context.
