@@ -25,6 +25,14 @@
 
 ## 1. Color palette
 
+> **Superseded (2026-07-08):** the exact hexes in §1.1–1.5 below are stale. The
+> implemented palette is "Modern Utsavam" — porcelain canvas, `magenta #E5006D` /
+> `coral #FF3D6E` / `saffron #FF7A00` / `turmeric #FFC300` / `plum #3D0A40` — per
+> `DESIGN.md` and `tailwind.config.ts`. The token names below (`temple-red`,
+> `sand-yellow`, `warm-gold`) survive as aliases onto the new hexes; the roles and
+> component-level rules in this document (§2–§14) still apply, just with the new
+> colors. See `PROJECT_CONTEXT.md`'s Build status callout for the full context.
+
 The palette is light-mode primary. White is the canvas. Temple red, sand yellow, and warm gold are the pigment box. The system is restrained, AA-compliant on white, and inspired by Indian temple architecture (gopuram polychromy, kumkum, marigold garlands, gilt accents).
 
 ### 1.1 Core tokens

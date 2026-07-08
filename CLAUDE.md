@@ -34,10 +34,18 @@ This website is a comprehensive encyclopedia of Indian temples, similar to Wikip
 
 ### Design system
 
+> **Palette superseded (2026-07-08):** the exact hex values below are stale. The approved
+> visual direction is now "Modern Utsavam" — porcelain canvas, `magenta #E5006D` / `coral
+> #FF3D6E` / `saffron #FF7A00` / `turmeric #FFC300` / `plum #3D0A40` — implemented in
+> `tailwind.config.ts` and documented in `DESIGN.md`. The token *names* below (temple-red,
+> sand-yellow, warm-gold) still exist as aliases onto the new hexes so old code keeps
+> working, but treat `DESIGN.md` + `tailwind.config.ts` as canonical, not this section.
+> See `PROJECT_CONTEXT.md`'s Build status callout for the full context.
+
 - Light mode is the primary and default theme.
 - Avoid dark mode designs unless explicitly requested.
 - Use vibrant and welcoming colors inspired by Indian temple architecture and culture.
-- Primary colors:
+- Primary colors (superseded — see callout above):
   - White (`#FFFFFF`)
   - Temple Red (`#C62828` or similar)
   - Sand Yellow (`#E6C068` or similar)

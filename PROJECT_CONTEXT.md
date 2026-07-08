@@ -6,18 +6,30 @@
 
 ---
 
-## Build status — as of 2026-07-07
+## Build status — as of 2026-07-08
 
-> **This section is the source of truth for what is actually implemented.** Sections 1–15 below describe the *target* design and still read in the present/aspirational tense (e.g. "there is no 3D in the prototype" is a goal, not yet true — `three` is still installed). When the two disagree, trust this section.
+> **This section is the source of truth for what is actually implemented.** Sections 1–15 below describe the *target* design and still read in the present/aspirational tense (e.g. "there is no 3D in the prototype" is a goal, not yet true for out-of-scope pages). When the two disagree, trust this section.
+
+> **⚠️ PALETTE SUPERSEDED (2026-07-08).** §1 below and `CLAUDE.md`'s "Project Vision" still state the literal hex palette `temple-red #C62828` / `sand-yellow #E6C068` / `warm-gold #B8860B` as canonical. That palette has been **replaced** by an approved visual reference nicknamed **"Modern Utsavam"**: porcelain canvas, `magenta #E5006D` / `coral #FF3D6E` / `saffron #FF7A00` / `turmeric #FFC300` / `plum #3D0A40`, with Bricolage Grotesque + Inter + Space Mono + Noto Sans Telugu typography. The old token *names* (`temple-red`, `sand-yellow`, `warm-gold`) are kept as **aliases** onto the new hexes in `tailwind.config.ts` so nothing broke, but the actual canonical values now live in `DESIGN.md` (rewritten) and `tailwind.config.ts` — **not** in `CLAUDE.md`/`DESIGN_SYSTEM_V2.md` §1, which are stale and still pending a reconciliation pass.
 
 ### Progress at a glance
 
 | Phase | Status | Notes |
 |---|---|---|
-| 0 — Foundation | ⚠️ **Partial** | Only the **token layer** landed (tailwind + globals + layout + icon). Schema, lib helpers, data migration, search, `DESIGN.md` — **not done**. |
-| 1 — Chrome | ✅ **Complete** | Header, footer, language banner, about/contact/404 recolor. Verified green. |
-| 2 — Homepage | ⬜ Not started | **Recommended next.** |
-| 3–10 | ⬜ Not started | Phases 3/5/6/7 depend on the pending Phase 0 work below. |
+| 0 — Foundation | ⚠️ **Partial** (unchanged since 07-07, new palette) | Token layer + `DESIGN.md` now reflect the Modern Utsavam palette (see callout above). Added since 07-07: `lib/deities.ts` (deity keyword-matching + counts), `countByState`/`topByState` in `lib/temple-queries.ts`. **Still not done:** schema fields (`whyVisit`, `media[]`, `architecturalStyleSlug`, `tripDuration`), `lib/search.ts` + `lib/search-aliases.ts`, `lib/media.ts`, `lib/india-geo.ts`, the `data/temples.ts` migration. These still block Phases 3/5/6/7. |
+| 1 — Chrome | ✅ **Complete** | Header, footer, language banner, about/contact/404 recolor. Unchanged this session; now inherits the Modern Utsavam palette automatically via the token aliases. |
+| 2 — Homepage | ✅ **Complete** (2026-07-08) | Hero carousel (photo, no autoplay, video-ready slide DTO for future production video), editorial paragraph, trip ideas, state strip (derived counts + accessible popover), popular searches, deity tiles (derived, keyword-matched), methodology teaser. `three`/`@react-three/fiber` removed; embers/parallax/region-explorer deleted. Verified: typecheck clean, 61/61 tests, lint clean, build 23/23 pages, manual browser check (desktop/mobile, popover focus/keyboard, carousel keyboard nav). Adversarial 4-dimension code review run; all 6 confirmed findings fixed (popover viewport-overflow at the `sm` breakpoint, Telugu `lang` attribute, two contrast failures, a dead-code exact-match bug in `pickRelated`, a mismatched `?tag=` slug). |
+| 3–10 | ⬜ Not started | `/explore` and `/temples/[id]` are still the pre-existing pages (untouched this session, out of scope). Phases 3/5/6/7 still depend on the pending Phase 0 work above. |
+
+### Files changed in the 2026-07-08 session (Phase 0 minimum + Phase 2)
+
+New: `DESIGN.md` (rewritten for Modern Utsavam), `lib/deities.ts` (+ test), `components/brand/{deity-icons,kolam-motif}.tsx`, `components/home/{hero-slide,hero-controls,editorial-paragraph,trip-ideas,trip-idea-card,state-strip,state-tile,state-popover,popular-searches,deity-tiles,methodology-teaser}.tsx`.
+
+Modified: `tailwind.config.ts`, `app/globals.css`, `app/fonts.ts`, `app/layout.tsx`, `app/page.tsx`, `lib/{regions,temple-queries,temples,utils}.ts` (+ `temple-queries.test.ts`), `components/ui/{button,pill,section-heading}.tsx`, `components/motion/reveal.tsx`, `components/brand/divider.tsx`, `components/media/temple-scene.tsx`, `components/temple/temple-card.tsx`, `package.json` (dropped `three`, `@react-three/fiber`, `@types/three`).
+
+Deleted: `components/home/{hero-embers,hero-embers-mount,region-explorer}.tsx`, `components/motion/parallax.tsx`.
+
+Git: repo initialized this session (previously untracked, per the prior session's own recommendation), connected to `https://github.com/OnlineBunker/ctemples.git`, pushed to `master` (2 commits: baseline snapshot + this Phase 0/2 work).
 
 ### Phase 0 — partial (done vs. pending)
 
@@ -85,14 +97,14 @@ Still on the **old nightstone look — intended, uniform breakage (do not "fix" 
 
 ### Recommended next step
 
-**Proceed to Phase 2 — Homepage rebuild** (`IMPLEMENTATION_PHASES.md`, "Phase 2"). It is largely self-contained against the skipped Phase 0 data/schema work; its already-owned dependencies are the token layer (done) and `button.tsx` (deferred to Phase 2 anyway). Start sequence for a future session:
+**Complete the deferred Phase 0 work, then proceed to Phase 3 — Explore list mode** (`IMPLEMENTATION_PHASES.md`, "Phase 3"). Start sequence for a future session:
 
-1. Read this **Build status** section, then `IMPLEMENTATION_PHASES.md` Phase 2 and `UX_SPEC.md` §1.
-2. (Recommended) `git init` + initial commit first.
-3. Add **deity color tokens** to `tailwind.config.ts` when building the deity tiles.
-4. Execute Phase 2; finish on `typecheck && test && build` green.
+1. Read this **Build status** section (including the palette-supersession callout above), `DESIGN.md`, then `IMPLEMENTATION_PHASES.md` Phase 3 and `UX_SPEC.md` §2.
+2. **Reconcile the palette docs first** — `CLAUDE.md`'s "Project Vision" and `DESIGN_SYSTEM_V2.md` §1 still list the old temple-red/sand-yellow/warm-gold hex values as canonical/locked; they should be updated to match `DESIGN.md` and `tailwind.config.ts` (or at minimum cross-referenced) so they stop disagreeing.
+3. Do the **remaining Phase 0 work** (still pending, unchanged from before this session): schema fields (`whyVisit`, `media[]`, `architecturalStyleSlug`, `tripDuration`) in `lib/types.ts`, `lib/search.ts` + `lib/search-aliases.ts`, `lib/media.ts`, `lib/india-geo.ts`, and the coordinated `data/temples.ts` migration. Phases 3/5/6/7 hard-depend on this — do it as a dedicated pass or just-in-time before each dependent phase.
+4. Execute Phase 3; finish on `typecheck && test && lint && build` green, plus a manual/adversarial review pass (as done for Phase 2).
 
-**Before Phases 3, 5, 6, 7**, complete the **pending Phase 0 work** listed above (schema fields, lib helpers, `searchTemples`, `data/temples.ts` migration, `DESIGN.md`) — those phases hard-depend on it. Do it as a dedicated "Phase 0 completion" pass or just-in-time before each dependent phase.
+**Note:** Phase 2 (homepage) is now complete — see the entry above. `/explore` and `/temples/[id]` are still pre-existing/untouched and are the next visible surfaces to convert.
 
 ---
 
