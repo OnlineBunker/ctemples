@@ -1,6 +1,15 @@
 import { temples } from "@/data/temples";
 import type { Temple } from "./types";
-import { findTempleById, pickFeatured, pickRelated, countByRegion } from "./temple-queries";
+import {
+  findTempleById,
+  pickFeatured,
+  pickRelated,
+  countByRegion,
+  countByState,
+  topByState,
+  type StateCount,
+} from "./temple-queries";
+import { countByDeity, pickByDeityKey, type DeityKey } from "./deities";
 
 /**
  * Data-bound public API. Every function reads the single `temples` array from
@@ -35,4 +44,24 @@ export function getRelatedTemples(temple: Temple, limit?: number): Temple[] {
 
 export function getRegionCounts() {
   return countByRegion(temples);
+}
+
+/** States present in the data, with slug + count, richest first (homepage state strip). */
+export function getStateCounts(): StateCount[] {
+  return countByState(temples);
+}
+
+/** Top temples in a state (state-strip popover). */
+export function getTopTemplesByState(state: string, limit?: number): Temple[] {
+  return topByState(temples, state, limit);
+}
+
+/** Count of temples under each of the six canonical deities (homepage deity tiles). */
+export function getDeityCounts(): Record<DeityKey, number> {
+  return countByDeity(temples);
+}
+
+/** Temples under a deity, highest rating first. */
+export function getTemplesByDeity(key: DeityKey, limit?: number): Temple[] {
+  return pickByDeityKey(temples, key, limit);
 }

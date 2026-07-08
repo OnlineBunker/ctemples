@@ -3,18 +3,19 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import type { ReactNode } from "react";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+// Shared easing with the view transitions (DESIGN_SYSTEM §11.2): ease-out-quart.
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
- * Scroll-triggered reveal: rises + un-blurs as it enters the viewport, matching the
- * view-transition easing so page and scroll motion feel of a piece. Under
- * prefers-reduced-motion it becomes an instant, transform-free fade.
+ * Scroll-triggered reveal: rises 16px + un-blurs (3px) as it enters the viewport,
+ * matching the view-transition easing so page and scroll motion feel of a piece.
+ * Under prefers-reduced-motion it becomes an instant, transform-free fade.
  */
 export function Reveal({
   children,
   className,
   delay = 0,
-  y = 18,
+  y = 16,
 }: {
   children: ReactNode;
   className?: string;
@@ -23,12 +24,12 @@ export function Reveal({
 }) {
   const reduce = useReducedMotion();
   const variants: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : y, filter: reduce ? "blur(0px)" : "blur(4px)" },
+    hidden: { opacity: 0, y: reduce ? 0 : y, filter: reduce ? "blur(0px)" : "blur(3px)" },
     show: {
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
-      transition: { duration: reduce ? 0.2 : 0.7, ease: EASE, delay },
+      transition: { duration: reduce ? 0.2 : 0.35, ease: EASE, delay },
     },
   };
   return (
@@ -45,13 +46,12 @@ export function Reveal({
 }
 
 /**
- * Container that staggers its RevealItem children. Wrap a group and let each child
- * animate in sequence as the group enters view.
+ * Container that staggers its RevealItem children (60ms) as the group enters view.
  */
 export function Stagger({
   children,
   className,
-  stagger = 0.08,
+  stagger = 0.06,
   delayChildren = 0,
 }: {
   children: ReactNode;
@@ -85,7 +85,7 @@ export function Stagger({
 export function RevealItem({
   children,
   className,
-  y = 20,
+  y = 16,
 }: {
   children: ReactNode;
   className?: string;
@@ -98,7 +98,7 @@ export function RevealItem({
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
-      transition: { duration: reduce ? 0.2 : 0.6, ease: EASE },
+      transition: { duration: reduce ? 0.2 : 0.35, ease: EASE },
     },
   };
   return (

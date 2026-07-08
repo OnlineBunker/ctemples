@@ -2,10 +2,11 @@ import type { Region } from "@/lib/types";
 import { REGION_META } from "@/lib/regions";
 
 /**
- * Procedural, deterministic dusk scene used as on-brand placeholder art wherever a real
+ * Procedural, deterministic *daytime* scene — on-brand placeholder art wherever a real
  * photo/video will later go. Seeded from a string so it is stable across SSR/hydration
  * and gives each temple (and each gallery frame) a distinct composition. Region tints
- * the sky via the pigment box. Pure/serverable — no hooks, no Math.random at runtime.
+ * the ledges + horizon via the pigment box. Pure/serverable — no hooks, no Math.random
+ * at runtime. "Modern Utsavam" palette: porcelain sky, turmeric sun, plum silhouette.
  */
 
 // Deterministic string hash -> 32-bit seed.
@@ -58,16 +59,9 @@ export function TempleScene({
   const rnd = mulberry32(xmur3(uid));
   const pigment = REGION_META[region].pigment;
 
-  const sunX = 180 + rnd() * 840;
-  const sunY = 300 + rnd() * 120;
+  const sunX = 200 + rnd() * 800;
+  const sunY = 170 + rnd() * 120;
   const mountainous = region === "North" || region === "Northeast";
-
-  const stars = Array.from({ length: 26 }, () => ({
-    x: rnd() * 1200,
-    y: rnd() * 360,
-    r: 0.6 + rnd() * 1.3,
-    o: 0.3 + rnd() * 0.5,
-  }));
 
   const backTowers = Array.from({ length: 3 }, (_, i) => {
     const w = 90 + rnd() * 70;
@@ -75,7 +69,7 @@ export function TempleScene({
       cx: 120 + i * 360 + rnd() * 160,
       w,
       h: 150 + rnd() * 90,
-      o: 0.35 + i * 0.12,
+      o: 0.14 + i * 0.05,
     };
   });
 
@@ -91,11 +85,6 @@ export function TempleScene({
     return { y, half: half * 0.92 };
   });
 
-  const diyas = Array.from({ length: 3 }, () => ({
-    x: mainCx + (rnd() - 0.5) * 420,
-    y: 720 + rnd() * 40,
-  }));
-
   return (
     <svg
       viewBox="0 0 1200 800"
@@ -108,60 +97,67 @@ export function TempleScene({
       {label ? <title>{label}</title> : null}
       <defs>
         <linearGradient id={`sky-${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0A0816" />
-          <stop offset="48%" stopColor="#17122b" />
-          <stop offset="76%" stopColor={pigment} stopOpacity="0.45" />
-          <stop offset="100%" stopColor="#0c0a18" />
+          <stop offset="0%" stopColor="#FFF9F1" />
+          <stop offset="55%" stopColor="#FDEEDE" />
+          <stop offset="100%" stopColor="#FFE9D3" />
         </linearGradient>
         <radialGradient id={`sun-${uid}`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#F7D9A0" />
-          <stop offset="35%" stopColor="#F2A93B" />
-          <stop offset="70%" stopColor="#E1462F" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#E1462F" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id={`sanctum-${uid}`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#F2A93B" stopOpacity="0.9" />
-          <stop offset="60%" stopColor="#E1462F" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#E1462F" stopOpacity="0" />
+          <stop offset="0%" stopColor="#FFC300" stopOpacity="0.55" />
+          <stop offset="55%" stopColor="#FF7A00" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="#FF7A00" stopOpacity="0" />
         </radialGradient>
         <linearGradient id={`ground-${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0b0814" />
-          <stop offset="100%" stopColor="#06040d" />
+          <stop offset="0%" stopColor="#F4EADF" />
+          <stop offset="100%" stopColor="#EADCCB" />
         </linearGradient>
       </defs>
 
       {/* sky */}
       <rect width="1200" height="800" fill={`url(#sky-${uid})`} />
 
-      {/* stars */}
-      {stars.map((s, i) => (
-        <circle key={i} cx={s.x} cy={s.y} r={s.r} fill="#F4EEE2" opacity={s.o} />
+      {/* kolam arcs — faint concentric geometry, echoing the graphic language */}
+      {[300, 220, 140].map((r) => (
+        <circle
+          key={r}
+          cx={sunX}
+          cy={sunY}
+          r={r}
+          fill="none"
+          stroke={pigment}
+          strokeOpacity={0.08}
+          strokeWidth={2}
+        />
       ))}
 
-      {/* sun / moon glow + disc */}
-      <circle cx={sunX} cy={sunY} r={260} fill={`url(#sun-${uid})`} />
-      <circle cx={sunX} cy={sunY} r={54} fill="#F7D9A0" opacity={0.92} />
+      {/* sun glow + disc */}
+      <circle cx={sunX} cy={sunY} r={220} fill={`url(#sun-${uid})`} />
+      <circle cx={sunX} cy={sunY} r={46} fill="#FFC300" opacity={0.9} />
 
       {/* distant ridges */}
       {mountainous ? (
         <>
-          <path d={`M0 560 L220 400 L430 540 L640 380 L860 520 L1080 400 L1200 500 L1200 800 L0 800 Z`} fill="#141026" opacity={0.85} />
-          <path d={`M0 640 L260 520 L520 620 L780 500 L1020 610 L1200 540 L1200 800 L0 800 Z`} fill="#0f0b20" opacity={0.9} />
+          <path
+            d="M0 560 L220 400 L430 540 L640 380 L860 520 L1080 400 L1200 500 L1200 800 L0 800 Z"
+            fill={pigment}
+            opacity={0.1}
+          />
+          <path
+            d="M0 640 L260 520 L520 620 L780 500 L1020 610 L1200 540 L1200 800 L0 800 Z"
+            fill={pigment}
+            opacity={0.14}
+          />
         </>
       ) : (
-        <path d={`M0 640 Q300 590 600 630 T1200 620 L1200 800 L0 800 Z`} fill="#120e24" opacity={0.85} />
+        <path d="M0 640 Q300 590 600 630 T1200 620 L1200 800 L0 800 Z" fill={pigment} opacity={0.1} />
       )}
 
       {/* back temple silhouettes */}
       {backTowers.map((t, i) => (
-        <path key={i} d={towerPath(t.cx, 700, t.w, t.h)} fill="#0b0817" opacity={t.o} />
+        <path key={i} d={towerPath(t.cx, 700, t.w, t.h)} fill="#3D0A40" opacity={t.o} />
       ))}
 
-      {/* sanctum glow behind the main tower */}
-      <circle cx={mainCx} cy={640} r={260} fill={`url(#sanctum-${uid})`} />
-
-      {/* main temple */}
-      <path d={towerPath(mainCx, baseY, mainW, mainH)} fill="#080610" />
+      {/* main temple — plum silhouette */}
+      <path d={towerPath(mainCx, baseY, mainW, mainH)} fill="#3D0A40" />
       {ledges.map((l, i) => (
         <line
           key={i}
@@ -170,34 +166,31 @@ export function TempleScene({
           x2={mainCx + l.half}
           y2={l.y}
           stroke={pigment}
-          strokeOpacity={0.22}
-          strokeWidth={2}
+          strokeOpacity={0.55}
+          strokeWidth={3}
         />
       ))}
       {/* finial */}
-      <path d={`M ${mainCx - 26} ${baseY - mainH} L ${mainCx} ${baseY - mainH - 40} L ${mainCx + 26} ${baseY - mainH} Z`} fill="#080610" />
-      <circle cx={mainCx} cy={baseY - mainH - 48} r={7} fill={pigment} opacity={0.8} />
-      {/* lit doorway */}
+      <path
+        d={`M ${mainCx - 26} ${baseY - mainH} L ${mainCx} ${baseY - mainH - 40} L ${mainCx + 26} ${baseY - mainH} Z`}
+        fill="#3D0A40"
+      />
+      <circle cx={mainCx} cy={baseY - mainH - 48} r={7} fill="#E5006D" />
+      {/* daylight doorway (light, not glowing) */}
       <path
         d={`M ${mainCx - 26} ${baseY} L ${mainCx - 26} ${baseY - 78} Q ${mainCx} ${baseY - 118} ${mainCx + 26} ${baseY - 78} L ${mainCx + 26} ${baseY} Z`}
-        fill={`url(#sanctum-${uid})`}
+        fill="#FFF9F1"
+        opacity={0.9}
       />
       <path
         d={`M ${mainCx - 14} ${baseY} L ${mainCx - 14} ${baseY - 60} Q ${mainCx} ${baseY - 88} ${mainCx + 14} ${baseY - 60} L ${mainCx + 14} ${baseY} Z`}
-        fill="#F7D9A0"
-        opacity={0.85}
+        fill="#E5006D"
+        opacity={0.16}
       />
 
       {/* ground */}
       <rect x="0" y="700" width="1200" height="100" fill={`url(#ground-${uid})`} />
-
-      {/* diyas */}
-      {diyas.map((d, i) => (
-        <g key={i}>
-          <circle cx={d.x} cy={d.y} r={22} fill="#F2A93B" opacity={0.28} />
-          <circle cx={d.x} cy={d.y} r={4.5} fill="#F7D9A0" />
-        </g>
-      ))}
+      <line x1="0" y1="704" x2="1200" y2="704" stroke={pigment} strokeOpacity={0.2} strokeWidth={2} />
     </svg>
   );
 }

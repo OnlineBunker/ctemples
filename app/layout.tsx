@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { fontDisplay, fontBody, fontMono } from "./fonts";
+import { fontDisplay, fontBody, fontMono, fontTelugu } from "./fonts";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -24,12 +24,20 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
+  themeColor: "#FBF6F0",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={cn(fontDisplay.variable, fontBody.variable, fontMono.variable)}>
+    <html
+      lang="en"
+      className={cn(
+        fontDisplay.variable,
+        fontBody.variable,
+        fontMono.variable,
+        fontTelugu.variable,
+      )}
+    >
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"

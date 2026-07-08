@@ -34,10 +34,10 @@ export function TempleCard({
       )}
       aria-label={`${temple.name}, ${temple.city} — view details`}
     >
-      <article className="flex h-full flex-col overflow-hidden rounded-card border border-brass/15 bg-nightstone-800/60 transition-colors duration-500 group-hover:border-brass/40">
-        <div className="relative aspect-[4/5] overflow-hidden">
+      <article className="flex h-full flex-col overflow-hidden rounded-card border border-line bg-canvas shadow-sm transition-[border-color,box-shadow] duration-300 group-hover:border-magenta/40 group-hover:shadow-md">
+        <div className="relative aspect-[16/9] overflow-hidden">
           <ViewTransition name={`temple-${temple.id}`} share="morph">
-            <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-[1.06]">
+            <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-[1.03]">
               <TempleImage
                 src={temple.heroImage}
                 alt={`${temple.name}, ${temple.city}`}
@@ -49,29 +49,25 @@ export function TempleCard({
             </div>
           </ViewTransition>
 
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-nightstone-900 via-nightstone-900/10 to-transparent"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-nightstone-900/75 to-transparent"
-          />
-          <div className="absolute left-4 top-4">
+          <div className="absolute left-3 top-3 rounded-full bg-white/85 px-2.5 py-1 backdrop-blur-sm">
             <RegionBadge region={temple.region} />
           </div>
-          <div className="absolute right-4 top-4 rounded-full bg-nightstone-900/70 px-2.5 py-1 backdrop-blur-sm">
+          <div className="absolute right-3 top-3 rounded-full bg-white/85 px-2.5 py-1 backdrop-blur-sm">
             <Rating value={temple.rating} />
           </div>
         </div>
 
         <div className="flex flex-1 flex-col p-5">
-          <h3 className="font-display text-xl leading-tight text-limewash">{temple.name}</h3>
-          <p className="mt-1.5 inline-flex items-center gap-1.5 font-mono text-[0.68rem] uppercase tracking-label text-limewash/50">
-            <MapPin className="h-3 w-3" aria-hidden />
+          <h3 className="font-display text-xl font-semibold leading-tight text-plum">
+            {temple.name}
+          </h3>
+          <p className="mt-1.5 inline-flex items-center gap-1.5 text-[0.8rem] text-ink-muted">
+            <MapPin className="h-3.5 w-3.5 text-magenta" aria-hidden />
             {temple.city}, {temple.state}
           </p>
-          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-limewash/70">{temple.tagline}</p>
+          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-ink-muted">
+            {temple.tagline}
+          </p>
 
           <div className="mt-auto flex items-end justify-between gap-3 pt-5">
             <div className="flex flex-wrap gap-1.5">
@@ -80,7 +76,7 @@ export function TempleCard({
               ))}
             </div>
             {from ? (
-              <span className="whitespace-nowrap text-right font-mono text-[0.68rem] uppercase tracking-label text-brass">
+              <span className="whitespace-nowrap text-right font-mono text-[0.68rem] uppercase tracking-label text-magenta">
                 from {formatRupees(from)}
               </span>
             ) : null}

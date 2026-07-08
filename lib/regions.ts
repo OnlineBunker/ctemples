@@ -1,16 +1,16 @@
 import type { Region } from "./types";
 
 /**
- * Regional "pigment box" — each of India's six regions owns one color drawn from
- * gopuram polychromy (see DESIGN.md). The color is data, not decoration: it codes
- * region on cards, chips, and the map so a hue carries meaning.
+ * Regional "pigment box" — each of India's six regions owns one hue from the
+ * "Modern Utsavam" palette (see DESIGN.md). Colour reinforces region on cards and
+ * chips; icon + label lead (DESIGN_SYSTEM §1.4). Hexes mirror the `region-*` tokens.
  */
 export interface RegionMeta {
   region: Region;
   label: string;
-  /** Hex pigment, mirrors tailwind.config.ts tokens. */
+  /** Hex pigment, mirrors the `region-*` tokens in tailwind.config.ts. */
   pigment: string;
-  /** Tailwind text/border/bg token stem, e.g. "lapis" -> text-lapis. */
+  /** Tailwind `region-*` token stem, e.g. "north" -> text-region-north. */
   token: string;
   blurb: string;
 }
@@ -28,43 +28,43 @@ export const REGION_META: Record<Region, RegionMeta> = {
   North: {
     region: "North",
     label: "North",
-    pigment: "#3E6CC4",
-    token: "lapis",
+    pigment: "#7A2C9E",
+    token: "north",
     blurb: "Himalayan shrines, Ganga ghats, and the shikhara-crowned temples of the plains.",
   },
   South: {
     region: "South",
     label: "South",
-    pigment: "#E1462F",
-    token: "vermilion",
+    pigment: "#E5006D",
+    token: "south",
     blurb: "Towering gopurams, granite mandapams, and living Dravidian ritual.",
   },
   East: {
     region: "East",
     label: "East",
-    pigment: "#3E9385",
-    token: "verdigris",
+    pigment: "#FF7A00",
+    token: "east",
     blurb: "The Kalinga spires of Odisha and the Shakta seats of Bengal and Assam.",
   },
   West: {
     region: "West",
     label: "West",
-    pigment: "#F2A93B",
-    token: "marigold",
-    blurb: "Marble jain shrines, sun temples, and the coastal seats of the Deccan.",
+    pigment: "#FF3D6E",
+    token: "west",
+    blurb: "Marble Jain shrines, sun temples, and the coastal seats of the Deccan.",
   },
   Northeast: {
     region: "Northeast",
     label: "Northeast",
-    pigment: "#4FA06B",
-    token: "jade",
+    pigment: "#E0AB00",
+    token: "northeast",
     blurb: "Hill temples and tantric power-seats wrapped in cloud forest.",
   },
   Central: {
     region: "Central",
     label: "Central",
-    pigment: "#C9A24B",
-    token: "brass",
+    pigment: "#3D0A40",
+    token: "central",
     blurb: "The sculpted sandstone of Khajuraho and the temple-forts of the heartland.",
   },
 };

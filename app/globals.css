@@ -16,23 +16,25 @@
   }
 
   body {
-    @apply bg-canvas text-ink font-body antialiased;
+    @apply bg-porcelain text-ink font-body antialiased;
     text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background: #fbe9e7; /* temple-red-soft */
-    color: #1a1a1a; /* ink */
+    background: #fce0ee; /* magenta-soft */
+    color: #3d0a40; /* plum */
   }
 
-  /* Visible, on-brand keyboard focus everywhere (§1.6, §10.3). */
+  /* Visible, on-brand keyboard focus everywhere (DESIGN_SYSTEM §1.6, §10.3). */
   :focus-visible {
-    outline: 2px solid theme("colors.temple-red.DEFAULT");
+    outline: 2px solid theme("colors.magenta.DEFAULT");
     outline-offset: 2px;
   }
 
+  /* Display headings are plum by default; components override (e.g. text-canvas
+     over a photo) with a utility, which wins over this base rule. */
   h1, h2, h3, h4 {
-    @apply font-display;
+    @apply font-display text-plum;
     text-wrap: balance;
   }
 
@@ -40,7 +42,7 @@
     text-wrap: pretty;
   }
 
-  /* Thin, warm-neutral scrollbar to match the light canvas. */
+  /* Thin, warm scrollbar to match the porcelain canvas. */
   * {
     scrollbar-width: thin;
     scrollbar-color: theme("colors.line.strong") transparent;
@@ -52,7 +54,7 @@
     @apply mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12;
   }
 
-  /* Field-guide eyebrow: mono, spaced, temple-red. */
+  /* Festival eyebrow: mono, spaced, magenta (temple-red alias). */
   .eyebrow {
     @apply font-mono text-[0.7rem] uppercase tracking-label text-temple-red;
   }
@@ -72,17 +74,22 @@
   /* Animated underline drawn from the left on hover/focus. */
   .link-draw {
     background-image: linear-gradient(
-      theme("colors.temple-red.DEFAULT"),
-      theme("colors.temple-red.DEFAULT")
+      theme("colors.magenta.DEFAULT"),
+      theme("colors.magenta.DEFAULT")
     );
-    background-size: 0% 1px;
+    background-size: 0% 1.5px;
     background-position: 0 100%;
     background-repeat: no-repeat;
     transition: background-size 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .link-draw:hover,
   .link-draw:focus-visible {
-    background-size: 100% 1px;
+    background-size: 100% 1.5px;
+  }
+
+  /* Telugu bilingual accent (hero flourish only). */
+  .telugu {
+    font-family: theme("fontFamily.telugu");
   }
 }
 

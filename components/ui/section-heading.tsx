@@ -19,7 +19,7 @@ export function SectionHeading({
     <div className={cn("flex flex-col gap-6 md:flex-row md:items-end md:justify-between", className)}>
       <div className="max-w-2xl">
         {eyebrow ? <Eyebrow className="mb-5">{eyebrow}</Eyebrow> : null}
-        <h2 className="font-display text-display-md text-ink">{title}</h2>
+        <h2 className="font-display text-display-md text-plum">{title}</h2>
         {description ? (
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-muted">{description}</p>
         ) : null}

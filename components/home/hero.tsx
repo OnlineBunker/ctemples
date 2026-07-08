@@ -1,82 +1,151 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useState, useCallback, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { Parallax } from "@/components/motion/parallax";
-import { TempleScene } from "@/components/media/temple-scene";
-import { HeroEmbersMount } from "./hero-embers-mount";
 import { ButtonLink } from "@/components/ui/button";
-import { Eyebrow } from "@/components/ui/eyebrow";
+import { KolamMotif } from "@/components/brand/kolam-motif";
+import { HeroSlide, type HeroSlideData } from "./hero-slide";
+import { HeroControls } from "./hero-controls";
+import { REGION_META } from "@/lib/regions";
 
-export function Hero() {
+/**
+ * Homepage hero — a user-driven photo carousel (no autoplay, a locked decision).
+ * The editorial block (H1 thesis + bilingual flourish + CTAs) is persistent; the photo
+ * stage cross-fades between featured temples. Keyboard: ←/→ move, Home/End jump, when
+ * the stage is focused. Under prefers-reduced-motion the cross-fade is instant.
+ *
+ * The single <h1> is the page thesis ("Discover the sacred"); per-slide temple names are
+ * <h2> inside the slide overlay — one H1 per page (DESIGN_SYSTEM §2.5).
+ */
+export function Hero({ slides }: { slides: HeroSlideData[] }) {
   const reduce = useReducedMotion();
+  const [index, setIndex] = useState(0);
+  const [interacted, setInteracted] = useState(false);
+  const count = slides.length;
+
+  const go = useCallback(
+    (next: number) => {
+      if (count === 0) return;
+      const clamped = Math.max(0, Math.min(count - 1, next));
+      setIndex(clamped);
+      setInteracted(true);
+    },
+    [count],
+  );
+
+  const onKeyDown = useCallback(
+    (e: ReactKeyboardEvent<HTMLDivElement>) => {
+      switch (e.key) {
+        case "ArrowRight":
+          e.preventDefault();
+          go(index + 1);
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          go(index - 1);
+          break;
+        case "Home":
+          e.preventDefault();
+          go(0);
+          break;
+        case "End":
+          e.preventDefault();
+          go(count - 1);
+          break;
+      }
+    },
+    [go, index, count],
+  );
+
+  if (count === 0) return null;
+  const slide = slides[index];
+  const eyebrow = `${slide.state} · ${REGION_META[slide.region].label} India`;
 
   return (
-    <section className="relative flex min-h-[92svh] items-center overflow-hidden">
-      {/* Parallax dusk scene behind the headline. Taller than the section so the drift
-          never reveals an edge. */}
-      <Parallax speed={0.35} className="absolute inset-0">
-        <div className="relative h-[135%] w-full -translate-y-[12%]">
-          <TempleScene
-            seed="ctemples-hero-gate"
-            region="South"
-            className="absolute inset-0 h-full w-full"
-          />
-        </div>
-      </Parallax>
-
-      <div aria-hidden className="absolute inset-0 bg-sanctum-glow" />
+    <section
+      className="relative overflow-hidden"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured temples"
+    >
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-r from-nightstone-900 via-nightstone-900/45 to-transparent"
-      />
-      <div aria-hidden className="absolute inset-0 bg-grain opacity-[0.12] mix-blend-overlay" />
-
-      {/* One tasteful 3D accent — drifting diya embers. Lazy, motion/WebGL-gated. */}
-      <HeroEmbersMount />
-
-      <div className="shell relative z-10 py-24">
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 26, filter: "blur(6px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-2xl"
-        >
-          <Eyebrow>2,000+ temples · 28 states · centuries of stone</Eyebrow>
-          <h1 className="mt-6 font-display text-display-xl text-limewash">
-            The gate is only
-            <br />
-            <span className="italic text-brass">the beginning.</span>
-          </h1>
-          <p className="mt-7 max-w-xl text-lg leading-relaxed text-limewash/75">
-            CTemples is a cinematic field guide to the temples of India — their history and
-            legend, their architecture and festivals, and exactly what it takes to stand
-            before them.
-          </p>
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-            <ButtonLink href="/explore" variant="primary">
-              Explore temples
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </ButtonLink>
-            <ButtonLink href="/explore" variant="outline">
-              Browse by region
-            </ButtonLink>
-          </div>
-        </motion.div>
+        className="pointer-events-none absolute -right-24 -top-24 h-[28rem] w-[28rem] text-magenta/10"
+      >
+        <KolamMotif className="h-full w-full" />
       </div>
 
-      {/* scroll cue */}
-      <div
-        aria-hidden
-        className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[0.6rem] uppercase tracking-label text-limewash/40"
-      >
-        <span>Scroll inward</span>
-        <motion.span
-          className="block h-8 w-px bg-gradient-to-b from-brass/60 to-transparent"
-          animate={reduce ? undefined : { scaleY: [0.4, 1, 0.4], opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          style={{ transformOrigin: "top" }}
-        />
+      <div className="shell grid items-center gap-8 py-12 md:py-16 lg:grid-cols-[minmax(0,45%)_minmax(0,55%)] lg:gap-12 lg:py-20">
+        {/* Editorial (persistent) */}
+        <div className="order-2 lg:order-1">
+          <p className="eyebrow" aria-live="off">
+            {eyebrow}
+          </p>
+          <h1 className="mt-5 font-display text-display-lg font-semibold text-plum">
+            Discover the sacred
+          </h1>
+          <p lang="te" className="telugu mt-2 text-2xl font-semibold text-magenta sm:text-3xl">
+            పవిత్ర దేవాలయాలు
+          </p>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
+            From the Jyotirlingas of the Himalayas to the shore temples of the south, explore
+            India&apos;s living heritage — its legends, festivals, architecture, and darshan.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <ButtonLink href="/explore" variant="primary" size="lg">
+              Plan your darshan
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </ButtonLink>
+            <ButtonLink href="/explore?view=map" variant="secondary" size="lg">
+              Explore by region
+            </ButtonLink>
+          </div>
+
+          <div className="mt-10">
+            <HeroControls
+              index={index}
+              count={count}
+              onPrev={() => go(index - 1)}
+              onNext={() => go(index + 1)}
+              onSelect={go}
+            />
+            <p className="mt-3 font-mono text-[0.6rem] uppercase tracking-label text-ink-muted">
+              Browse at your pace — no autoplay
+            </p>
+          </div>
+        </div>
+
+        {/* Photo stage (carousel) */}
+        <div className="order-1 lg:order-2">
+          <div
+            tabIndex={0}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`Slide ${index + 1} of ${count}: ${slide.name}`}
+            onKeyDown={onKeyDown}
+            className="relative aspect-[4/3] w-full overflow-hidden rounded-card outline-none ring-magenta/0 focus-visible:ring-2 focus-visible:ring-magenta lg:aspect-[16/12]"
+          >
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.div
+                key={slide.id}
+                className="absolute inset-0"
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduce ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ duration: reduce ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <HeroSlide slide={slide} priority={index === 0} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+
+      {/* Slide announcement for assistive tech (only after the user interacts). */}
+      <div className="sr-only" role="status" aria-live="polite">
+        {interacted ? `Slide ${index + 1} of ${count}: ${slide.name}, ${slide.state}` : ""}
       </div>
     </section>
   );
