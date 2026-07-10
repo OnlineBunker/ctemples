@@ -43,3 +43,4 @@ yarn-error.log*
 # agent tooling scaffolding (not part of the app)
 /.claude/
 /skill-observations/
+.env*
