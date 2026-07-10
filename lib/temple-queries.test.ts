@@ -9,6 +9,7 @@ import {
   pickByDeity,
   pickByArchitecturalStyle,
   pickWithinRadius,
+  runExploreQuery,
 } from "./temple-queries";
 import { makeTemple } from "./__fixtures__/temple";
 
@@ -169,5 +170,111 @@ describe("pickWithinRadius", () => {
   });
   it("returns [] when nothing is within range", () => {
     expect(pickWithinRadius([far], 0, 0, 50)).toEqual([]);
+  });
+});
+
+describe("runExploreQuery", () => {
+  const shivaTN = makeTemple({
+    id: "shiva-tn",
+    name: "Somveshwar Temple",
+    state: "Tamil Nadu",
+    region: "South",
+    deity: "Shiva",
+    tags: ["Dravidian", "UNESCO"],
+    rating: 4.9,
+    overview: "A stone Dravidian shrine.",
+    history: "Ancient origins.",
+  });
+  const vishnuKerala = makeTemple({
+    id: "vishnu-kerala",
+    name: "Ananta Padmanabha Temple",
+    state: "Kerala",
+    region: "South",
+    deity: "Vishnu",
+    tags: ["Dravidian"],
+    rating: 4.5,
+    overview: "A coastal Vishnu shrine.",
+    history: "Royal patronage.",
+  });
+  const shivaOdisha = makeTemple({
+    id: "shiva-odisha",
+    name: "Lingaraj Temple",
+    state: "Odisha",
+    region: "East",
+    deity: "Shiva",
+    tags: ["Kalinga"],
+    rating: 4.7,
+    overview: "A Kalinga-style shrine unique to Odisha's tradition.",
+    history: "Built by the Somavamshi dynasty.",
+  });
+  const all = [shivaTN, vishnuKerala, shivaOdisha];
+
+  it("filters by state/deity/tag with AND-across-facets, OR-within-tags semantics", () => {
+    const byState = runExploreQuery(all, { stateSlug: "tamil-nadu" });
+    expect(byState.items.map((t) => t.id)).toEqual(["shiva-tn"]);
+
+    const byDeity = runExploreQuery(all, { deity: "shiva" });
+    expect(byDeity.items.map((t) => t.id).sort()).toEqual(["shiva-odisha", "shiva-tn"]);
+
+    const byStateAndDeity = runExploreQuery(all, { stateSlug: "kerala", deity: "shiva" });
+    expect(byStateAndDeity.items).toEqual([]); // AND across facets: no Shiva temple in Kerala
+  });
+
+  it("sorts by the requested key when q is empty", () => {
+    const byRating = runExploreQuery(all, { sort: "rating" });
+    expect(byRating.items.map((t) => t.id)).toEqual(["shiva-tn", "shiva-odisha", "vishnu-kerala"]);
+    const byName = runExploreQuery(all, { sort: "name" });
+    expect(byName.items.map((t) => t.id)).toEqual(
+      [...all].sort((a, b) => a.name.localeCompare(b.name)).map((t) => t.id),
+    );
+  });
+
+  it("ignores the sort param and uses search relevance order when q is set", () => {
+    // "shiva" matches both Shiva temples; relevance order (score/rating) must win over
+    // an explicit sort=name request — this is what the golden-query suite depends on.
+    const result = runExploreQuery(all, { q: "shiva", sort: "name" });
+    expect(result.items.map((t) => t.id)).toEqual(["shiva-tn", "shiva-odisha"]); // rating desc, not name asc
+  });
+
+  it("facets reflect the active search query, not just structural filters (the regression this test guards)", () => {
+    // A query matching only the Odisha Shiva temple must narrow every facet down to
+    // that temple's own facets — previously facets ignored `q` entirely.
+    const result = runExploreQuery(all, { q: "lingaraj" });
+    expect(result.items.map((t) => t.id)).toEqual(["shiva-odisha"]);
+    expect(result.facets.states.map((s) => s.state)).toEqual(["Odisha"]);
+    expect(result.facets.tags.map((t) => t.tag)).toEqual(["Kalinga"]);
+    // Combining that query with an unrelated state must now correctly yield zero, proving
+    // the facet counts were genuinely conditioned on the query, not just displayed as if.
+    const combined = runExploreQuery(all, { q: "lingaraj", stateSlug: "tamil-nadu" });
+    expect(combined.items).toEqual([]);
+  });
+
+  it("keeps a selected state/tag visible in facets at count 0 when other filters exclude it", () => {
+    const result = runExploreQuery(all, { stateSlug: "kerala", deity: "shiva" });
+    const keralaFacet = result.facets.states.find((s) => s.slug === "kerala");
+    expect(keralaFacet).toMatchObject({ state: "Kerala", count: 0 });
+
+    const tagResult = runExploreQuery(all, { tagSlugs: ["kalinga"], stateSlug: "tamil-nadu" });
+    const kalingaFacet = tagResult.facets.tags.find((t) => t.slug === "kalinga");
+    expect(kalingaFacet).toMatchObject({ tag: "Kalinga", count: 0 });
+  });
+
+  it("clamps pagination and computes total pages correctly", () => {
+    const page1 = runExploreQuery(all, { perPage: 2, page: 1 });
+    expect(page1.items).toHaveLength(2);
+    expect(page1.totalPages).toBe(2);
+    const overshoot = runExploreQuery(all, { perPage: 2, page: 99 });
+    expect(overshoot.page).toBe(2); // clamped to the last valid page
+    expect(overshoot.items).toHaveLength(1);
+  });
+
+  it("passes matchedAliases through from the search step", () => {
+    const result = runExploreQuery(all, { q: "mahadev" }); // deity alias for Shiva
+    expect(result.matchedAliases).toEqual(["mahadev"]);
+  });
+
+  it("exact disables alias expansion (docs/02 §3.1 exact=1)", () => {
+    const result = runExploreQuery(all, { q: "mahadev", exact: true });
+    expect(result.matchedAliases).toEqual([]);
   });
 });

@@ -19,7 +19,9 @@ const PRESETS: Preset[] = [
     title: "South India Temple Trail",
     description: "Granite gopurams and living Dravidian ritual, from Hampi to the coast.",
     meta: "6 temples · 7 days · ~800 km",
-    href: "/explore?view=map&preset=discover",
+    // Region is inexpressible in the URL contract (docs/02 §4) — the card's own subject,
+    // Dravidian temple tradition, is the filter instead (docs/04 §4).
+    href: "/explore?tag=dravidian",
     representativeId: "virupaksha-temple-hampi",
     fallbackRegion: "South",
   },
@@ -27,7 +29,7 @@ const PRESETS: Preset[] = [
     title: "Shiva Temples of the Himalayas",
     description: "High-altitude Jyotirlingas and shrines wrapped in mountain weather.",
     meta: "4 temples · 7 days · ~900 km",
-    href: "/explore?view=list&deity=shiva",
+    href: "/explore?deity=shiva",
     representativeId: "kedarnath-temple",
     fallbackRegion: "North",
   },
@@ -35,7 +37,7 @@ const PRESETS: Preset[] = [
     title: "UNESCO World Heritage Temples",
     description: "The stone masterworks — Konark, Thanjavur, Hampi — recognised worldwide.",
     meta: "6 temples · pan-India",
-    href: "/explore?view=list&tag=unesco-world-heritage",
+    href: "/explore?tag=unesco-world-heritage",
     representativeId: "konark-sun-temple",
     fallbackRegion: "East",
   },
@@ -43,25 +45,27 @@ const PRESETS: Preset[] = [
     title: "Living Temples of Tamil Nadu",
     description: "Everyday darshan in the great temple-towns of the far south.",
     meta: "5 temples · 4 days · ~450 km",
-    href: "/explore?view=map&state=tamil-nadu",
+    href: "/explore?state=tamil-nadu",
     representativeId: "brihadeeswarar-temple",
     fallbackRegion: "South",
   },
 ];
 
-export function TripIdeas() {
-  const ideas: TripIdea[] = PRESETS.map((preset) => {
-    const temple = getTempleById(preset.representativeId);
-    return {
-      title: preset.title,
-      description: preset.description,
-      meta: preset.meta,
-      href: preset.href,
-      image: temple?.heroImage ?? "",
-      region: temple?.region ?? preset.fallbackRegion,
-      seed: preset.representativeId,
-    };
-  });
+export async function TripIdeas() {
+  const ideas: TripIdea[] = await Promise.all(
+    PRESETS.map(async (preset) => {
+      const temple = await getTempleById(preset.representativeId);
+      return {
+        title: preset.title,
+        description: preset.description,
+        meta: preset.meta,
+        href: preset.href,
+        image: temple?.heroImage ?? "",
+        region: temple?.region ?? preset.fallbackRegion,
+        seed: preset.representativeId,
+      };
+    }),
+  );
 
   return (
     <section className="shell py-14 md:py-20">

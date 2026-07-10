@@ -4,6 +4,8 @@ import { SEARCH_ALIASES } from "./search-aliases";
 
 export interface SearchOptions {
   limit?: number;
+  /** Skip alias expansion entirely — powers Explore's `?exact=1` (dismissing the smart-match banner). */
+  disableAliases?: boolean;
 }
 
 export interface SearchOutcome {
@@ -46,7 +48,7 @@ export function searchTemples(
     return { results: applyLimit(results, options), matchedAliases: [] };
   }
 
-  const aliasCanonical = SEARCH_ALIASES[q];
+  const aliasCanonical = options.disableAliases ? undefined : SEARCH_ALIASES[q];
   const matchedAliases = aliasCanonical ? [q] : [];
 
   const scored = list.map((t) => {

@@ -1,8 +1,10 @@
 import type { Temple, Region } from "./types";
 import { REGION_ORDER } from "./regions";
 import { slugify } from "./utils";
-import { DEITY_ORDER, matchesDeity } from "./deities";
+import { DEITY_ORDER, matchesDeity, countByDeity, type DeityKey } from "./deities";
 import { haversineKm } from "./distance";
+import { sortTemples, type SortKey } from "./filter";
+import { searchTemples } from "./search";
 
 /**
  * Pure query helpers over a temple array. Kept free of any data import so they can be
@@ -81,6 +83,33 @@ export function countByState(list: Temple[]): StateCount[] {
     .sort((a, b) => b.count - a.count || a.state.localeCompare(b.state));
 }
 
+export interface TagCount {
+  tag: string;
+  slug: string;
+  count: number;
+}
+
+/**
+ * Every tag present in the data, with a URL slug and count, richest first. Mirrors
+ * countByState's shape/slug convention so Explore's tag filter works the same way as
+ * the state filter — URLs use slugs (`?tag=unesco-world-heritage`), never raw display
+ * strings with spaces/casing.
+ */
+export function countByTag(list: Temple[]): TagCount[] {
+  const map = new Map<string, { tag: string; count: number }>();
+  for (const t of list) {
+    for (const tag of t.tags) {
+      const slug = slugify(tag);
+      const entry = map.get(slug);
+      if (entry) entry.count += 1;
+      else map.set(slug, { tag, count: 1 });
+    }
+  }
+  return [...map.entries()]
+    .map(([slug, { tag, count }]) => ({ tag, slug, count }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+}
+
 /** Top temples in a state, highest rating first (for the state-strip popover). */
 export function topByState(list: Temple[], state: string, limit = 4): Temple[] {
   return list
@@ -134,4 +163,137 @@ export function pickWithinRadius(
     .filter((r) => r.distanceKm > 0 && r.distanceKm <= km)
     .sort((a, b) => a.distanceKm - b.distanceKm);
   return typeof limit === "number" ? withDistance.slice(0, limit) : withDistance;
+}
+
+export interface ExploreQuery {
+  q?: string;
+  /** `?exact=1` — dismisses the smart-match banner by disabling alias expansion. */
+  exact?: boolean;
+  /** State slug (`slugify(state)`), matches `?state=`. */
+  stateSlug?: string;
+  deity?: DeityKey;
+  /** Tag slugs (`slugify(tag)`), matches repeated `?tag=`. OR semantics within the facet. */
+  tagSlugs?: string[];
+  sort?: SortKey;
+  /** 1-based. */
+  page?: number;
+  perPage?: number;
+}
+
+export interface ExploreFacets {
+  states: StateCount[];
+  deities: Record<DeityKey, number>;
+  tags: TagCount[];
+}
+
+export interface ExploreResult {
+  items: Temple[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+  matchedAliases: string[];
+  facets: ExploreFacets;
+}
+
+/** Keeps a currently-selected slug present (at count 0 if needed) even when the
+ *  contextual computation dropped it — docs/05 §3.3: a selected value must stay
+ *  visible/deselectable. `fallbackSource` is the FULL unfiltered list, so this never
+ *  needs a second data call from the page (docs/05 §9 — queryTemples is the only call). */
+function ensurePresent<T extends { slug: string; count: number }>(
+  contextual: T[],
+  selectedSlugs: string[],
+  fallbackSource: T[],
+): T[] {
+  if (selectedSlugs.length === 0) return contextual;
+  const bySlug = new Map(contextual.map((o) => [o.slug, o]));
+  for (const slug of selectedSlugs) {
+    if (!bySlug.has(slug)) {
+      const fallback = fallbackSource.find((g) => g.slug === slug);
+      if (fallback) bySlug.set(slug, { ...fallback, count: 0 });
+    }
+  }
+  return [...bySlug.values()];
+}
+
+/**
+ * The single query composition behind Explore's list mode (docs/05 §1, docs/11 §3's
+ * queryTemples). Pure — the data-bound `queryTemples` wrapper in lib/temples.ts supplies
+ * the real array and projects the output to TempleSummary.
+ *
+ * Ordering rule (recorded here and in docs/05 §4): when `q` is non-empty, result order
+ * is ALWAYS the search relevance order (score desc, rating desc, name asc) — the `sort`
+ * param does not re-order matches. This is what the golden-query suite (docs/10 §8)
+ * requires (e.g. "jagannath" must pin the Puri temple first) and matches standard
+ * search UX: sort controls apply to browsing, not to ranking search matches. `sort`
+ * applies in full whenever `q` is empty (browse mode) — default "rating" per D6.
+ *
+ * Facet counts are contextual: each facet's counts are computed with every OTHER active
+ * filter applied but NOT its own — INCLUDING `q` as one of those "other filters" (a
+ * search for "somnath" narrows the state/deity/tag facets down to Somnath's own facets,
+ * not the unfiltered dataset) — so selecting a deity narrows the state/tag counts, but
+ * the deity facet itself still shows every deity's count against the state/tag/q filters
+ * alone. `ensurePresent` then guarantees a currently-selected state/tag stays visible
+ * even at 0, so it always stays deselectable (docs/05 §3.3).
+ */
+export function runExploreQuery(list: Temple[], query: ExploreQuery): ExploreResult {
+  const {
+    q = "",
+    exact = false,
+    stateSlug,
+    deity,
+    tagSlugs = [],
+    sort = "rating",
+    page = 1,
+    perPage = 24,
+  } = query;
+
+  const byState = (arr: Temple[]) =>
+    stateSlug ? arr.filter((t) => slugify(t.state) === stateSlug) : arr;
+  const byDeity = (arr: Temple[]) => (deity ? arr.filter((t) => matchesDeity(t, deity)) : arr);
+  const byTags = (arr: Temple[]) =>
+    tagSlugs.length
+      ? arr.filter((t) => tagSlugs.some((slug) => t.tags.some((tag) => slugify(tag) === slug)))
+      : arr;
+
+  const trimmedQ = q.trim();
+  const byQuery = (arr: Temple[]) =>
+    trimmedQ ? searchTemples(arr, trimmedQ, { disableAliases: exact }).results : arr;
+
+  const facets: ExploreFacets = {
+    states: ensurePresent(
+      countByState(byQuery(byTags(byDeity(list)))),
+      stateSlug ? [stateSlug] : [],
+      countByState(list),
+    ),
+    deities: countByDeity(byQuery(byTags(byState(list)))),
+    tags: ensurePresent(countByTag(byQuery(byDeity(byState(list)))), tagSlugs, countByTag(list)),
+  };
+
+  let matched = byTags(byDeity(byState(list)));
+  let matchedAliases: string[] = [];
+
+  if (trimmedQ) {
+    const outcome = searchTemples(matched, trimmedQ, { disableAliases: exact });
+    matched = outcome.results;
+    matchedAliases = outcome.matchedAliases;
+  } else {
+    matched = sortTemples(matched, sort);
+  }
+
+  const total = matched.length;
+  const perPageClamped = perPage > 0 ? perPage : 24;
+  const totalPages = Math.max(1, Math.ceil(total / perPageClamped));
+  const pageClamped = Math.min(Math.max(1, page), totalPages);
+  const start = (pageClamped - 1) * perPageClamped;
+
+  return {
+    items: matched.slice(start, start + perPageClamped),
+    total,
+    page: pageClamped,
+    perPage: perPageClamped,
+    totalPages,
+    matchedAliases,
+    facets,
+  };
 }

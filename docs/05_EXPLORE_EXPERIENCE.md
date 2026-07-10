@@ -43,13 +43,15 @@ Below the row when ≥1 non-default filter: removable chips (file 03 §6.3) — 
 When `matchedAliases.length > 0` and `exact` is not set: banner above results — magenta-soft bg, magenta-deep text, `role="status" aria-live="polite"`, dismissible ×. Copy template: `"Showing {canonical label} results for '{original query}'"` (e.g. "Showing Shiva results for 'mahadev'"; temple-target aliases: "Showing Jagannath Temple, Puri for 'jagannath'"). **Dismissal navigates to the current URL + `exact=1`** (file 02 §3.1) — alias expansion is disabled server-side, the banner disappears (no aliases fire), and the state round-trips/shares like everything else. Clearing or changing `q` drops `exact`.
 
 ### 3.5 Result grid
-1/2/3 columns of TempleCard (the morph source). Cards from `items` (`TempleSummary` projection — pages never receive full records, D25). First 4 images eager (no priority), rest lazy. Order is exactly the server order — no client re-sorting.
+1/2/3 columns of TempleCard (the morph source). Cards from `items` (`TempleSummary` projection — pages never receive full records, D25). No card carries `priority` — Explore has no single LCP element the way the homepage hero does (file 01 §5's "single priority image per page" bar), so every image lazy-loads by default. Order is exactly the server order — no client re-sorting.
 
 ### 3.6 Pagination
 File 03 §6.9. 24/page. Page links are real `<a>`s preserving all params; out-of-range clamps (file 02 §3.1).
 
 ## 4. Sort semantics (D6)
 `rating`: rating desc, name asc. `popularity`: `popularity.score` desc (prototype: committed snapshot ordinal, D12), rating desc, name asc — labeled "Most visited". `name`: locale-aware A–Z. Legacy values coerced silently (file 02 §3.1).
+
+**Sort vs. search relevance (implementation resolution, recorded here per the amendment rule in file 14):** whenever `q` is non-empty, result order is **always** the search relevance order (score desc, rating desc, name asc, file 10 §2) — `sort` does not re-order matches. This is required by the golden-query suite (file 10 §8: e.g. "jagannath" must pin the Puri temple first regardless of the selected sort) and matches standard search UX — sort controls apply to browsing, not to re-ranking search matches. `sort` applies in full whenever `q` is empty. The Sort control stays interactive while a query is active (so the choice is preserved for when the query clears), but its popover shows an inline note that search results are relevance-ordered.
 
 ## 5. Empty & edge states (derived copy templates)
 

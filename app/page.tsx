@@ -21,10 +21,10 @@ import { MethodologyTeaser } from "@/components/home/methodology-teaser";
  * Section order: hero → editorial → trip ideas → state strip → popular searches →
  * deity tiles → methodology teaser. The language banner is mounted in the root layout.
  */
-export default function HomePage() {
+export default async function HomePage() {
   // Hero slides — featured first, falling back to any temples so the carousel is never empty.
-  const featured = getFeaturedTemples(6);
-  const source = featured.length ? featured : getAllTemples().slice(0, 6);
+  const featured = await getFeaturedTemples(6);
+  const source = featured.length ? featured : (await getAllTemples()).slice(0, 6);
   const slides: HeroSlideData[] = source.map((t) => ({
     id: t.id,
     name: t.name,
@@ -37,21 +37,22 @@ export default function HomePage() {
   }));
 
   // State strip — the richest states, each with its top temples for the popover.
-  const stateItems: StateStripItem[] = getStateCounts()
-    .slice(0, 6)
-    .map((sc) => ({
+  const topStateCounts = (await getStateCounts()).slice(0, 6);
+  const stateItems: StateStripItem[] = await Promise.all(
+    topStateCounts.map(async (sc) => ({
       state: sc.state,
       slug: sc.slug,
       region: sc.region,
       count: sc.count,
-      top: getTopTemplesByState(sc.state, 4).map((t) => ({
+      top: (await getTopTemplesByState(sc.state, 4)).map((t) => ({
         id: t.id,
         name: t.name,
         city: t.city,
       })),
-    }));
+    })),
+  );
 
-  const deityCounts = getDeityCounts();
+  const deityCounts = await getDeityCounts();
 
   return (
     <>

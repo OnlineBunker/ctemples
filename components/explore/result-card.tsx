@@ -4,34 +4,20 @@ import { ViewTransition } from "@/components/motion/view-transition";
 import { TempleImage } from "@/components/media/temple-image";
 import { RegionBadge, Tag } from "@/components/ui/pill";
 import { Rating } from "@/components/ui/rating";
-import { cheapestBudget, formatRupees } from "@/lib/format";
-import { cn } from "@/lib/utils";
-import type { Temple } from "@/lib/types";
+import { formatRupees } from "@/lib/format";
+import type { TempleSummary } from "@/lib/temples";
 
 /**
- * The Explore/showcase card and the source of the signature morph: its image is wrapped
- * in a shared-element <ViewTransition> whose name matches the detail hero, so navigating
- * morphs the card image into the hero. Hover is a 2D lift + zoom only — a 3D-transformed
- * ancestor would corrupt the view-transition snapshot of the morph target.
+ * Explore's result card — same visual design as components/temple/temple-card.tsx
+ * (docs/03 §6.2), but built for TempleSummary: Explore never receives a full Temple
+ * record (docs/11 §3, docs/05 §9's acceptance criterion). Shares the morph target name
+ * so navigating into a result still morphs the image into the detail hero.
  */
-export function TempleCard({
-  temple,
-  priority = false,
-  className,
-}: {
-  temple: Temple;
-  priority?: boolean;
-  className?: string;
-}) {
-  const from = cheapestBudget(temple.costEstimates);
-
+export function ResultCard({ temple, priority = false }: { temple: TempleSummary; priority?: boolean }) {
   return (
     <TransitionLink
       href={`/temples/${temple.id}`}
-      className={cn(
-        "group block h-full rounded-card outline-none transition-transform duration-500 ease-threshold hover:-translate-y-1.5",
-        className,
-      )}
+      className="group block h-full rounded-card outline-none transition-transform duration-500 ease-threshold hover:-translate-y-1.5"
       aria-label={`${temple.name}, ${temple.city} — view details`}
     >
       <article className="flex h-full flex-col overflow-hidden rounded-card border border-line bg-canvas shadow-sm transition-[border-color,box-shadow] duration-300 group-hover:border-magenta/40 group-hover:shadow-md">
@@ -39,8 +25,8 @@ export function TempleCard({
           <ViewTransition name={`temple-${temple.id}`} share="morph">
             <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-[1.03]">
               <TempleImage
-                src={temple.heroImage}
-                alt={`${temple.name}, ${temple.city}`}
+                src={temple.hero?.url ?? ""}
+                alt={temple.hero?.alt ?? `${temple.name}, ${temple.city}`}
                 region={temple.region}
                 seed={temple.id}
                 priority={priority}
@@ -52,9 +38,11 @@ export function TempleCard({
           <div className="absolute left-3 top-3 rounded-full bg-white/85 px-2.5 py-1 backdrop-blur-sm">
             <RegionBadge region={temple.region} />
           </div>
-          <div className="absolute right-3 top-3 rounded-full bg-white/85 px-2.5 py-1 backdrop-blur-sm">
-            <Rating value={temple.rating} />
-          </div>
+          {typeof temple.rating === "number" ? (
+            <div className="absolute right-3 top-3 rounded-full bg-white/85 px-2.5 py-1 backdrop-blur-sm">
+              <Rating value={temple.rating} />
+            </div>
+          ) : null}
         </div>
 
         <div className="flex flex-1 flex-col p-5">
@@ -75,9 +63,9 @@ export function TempleCard({
                 <Tag key={tag}>{tag}</Tag>
               ))}
             </div>
-            {from ? (
+            {temple.cheapestBudget ? (
               <span className="whitespace-nowrap text-right font-mono text-[0.68rem] uppercase tracking-label text-magenta-deep">
-                from {formatRupees(from)}
+                from {formatRupees(temple.cheapestBudget)}
               </span>
             ) : null}
           </div>

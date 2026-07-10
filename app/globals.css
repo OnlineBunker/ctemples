@@ -54,9 +54,10 @@
     @apply mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12;
   }
 
-  /* Festival eyebrow: mono, spaced, magenta (temple-red alias). */
+  /* Festival eyebrow: mono, spaced. magenta-deep, not magenta — small brand-colored
+     text needs the deeper shade to clear AA contrast on porcelain (docs/03 §2.2). */
   .eyebrow {
-    @apply font-mono text-[0.7rem] uppercase tracking-label text-temple-red;
+    @apply font-mono text-[0.7rem] uppercase tracking-label text-magenta-deep;
   }
 
   .hairline {
@@ -187,6 +188,22 @@
 }
 ::view-transition-new(site-header) {
   animation: none;
+}
+
+/* Radix popover entrance (docs/08 §5) — a plain keyframe, no animation plugin needed.
+   Reduced motion neutralizes it via the global animation-duration override below. */
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.popover-content[data-state="open"] {
+  animation: popover-in 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ─────────────────────── Reduced motion ─────────────────────── */

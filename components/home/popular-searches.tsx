@@ -3,17 +3,16 @@ import { Reveal } from "@/components/motion/reveal";
 import { Eyebrow } from "@/components/ui/eyebrow";
 
 /**
- * Popular searches — six chips linking to pre-canned Explore URLs (UX_SPEC §1.7).
- * The alias-aware `?q=` routes light up fully once Explore search ships (Phase 3/6);
- * the URLs are valid now. No section H2 — this is a thin chip row.
+ * Popular searches — six chips linking to pre-canned Explore URLs (docs/04 §6). List
+ * mode is the default (D4), so bare facet params are canonical — no `?view=`/`?preset=`.
  */
 const CHIPS: { label: string; href: string }[] = [
-  { label: "Shiva temples", href: "/explore?view=list&deity=shiva" },
-  { label: "Tamil Nadu", href: "/explore?view=map&state=tamil-nadu" },
-  { label: "UNESCO sites", href: "/explore?view=list&tag=unesco-world-heritage" },
-  { label: "Pilgrimage", href: "/explore?view=map&preset=pilgrimage" },
-  { label: "Himalayan temples", href: "/explore?view=list&q=himalayan" },
-  { label: "Living temples", href: "/explore?view=list&q=living" },
+  { label: "Shiva temples", href: "/explore?deity=shiva" },
+  { label: "Tamil Nadu", href: "/explore?state=tamil-nadu" },
+  { label: "UNESCO sites", href: "/explore?tag=unesco-world-heritage" },
+  { label: "Pilgrimage", href: "/explore?tag=pilgrimage" },
+  { label: "Himalayan temples", href: "/explore?q=himalayan" },
+  { label: "Living temples", href: "/explore?q=living" },
 ];
 
 export function PopularSearches() {

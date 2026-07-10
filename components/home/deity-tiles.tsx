@@ -23,7 +23,7 @@ export function DeityTiles({ counts }: { counts: Record<DeityKey, number> }) {
           return (
             <RevealItem key={key} className="h-full">
               <Link
-                href={`/explore?view=list&deity=${key}`}
+                href={`/explore?deity=${key}`}
                 className="group flex h-full min-h-[9rem] flex-col items-start justify-between rounded-card border border-line bg-canvas p-5 shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-magenta/40 hover:shadow-md"
               >
                 <span

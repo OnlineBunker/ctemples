@@ -15,13 +15,13 @@ import { Menu, X, Search, ChevronDown, Globe, Check } from "lucide-react";
 import { GopuramMark } from "@/components/brand/gopuram-mark";
 import { cn } from "@/lib/utils";
 
-/** Explore ▾ presets. The `?view`/`?preset` params are honoured once Explore
- *  map mode ships (Phase 3/4); until then the old Explore page ignores them. */
+/** Explore ▾ presets — real, resolvable list-mode filter URLs (docs/02 §2). The old
+ *  `?preset=`/unconditional `?view=map` params are retired (D4, docs/02 §3.6). */
 const EXPLORE_ITEMS = [
   { key: "all", label: "All temples", href: "/explore" },
-  { key: "pilgrimage", label: "Pilgrimage", href: "/explore?view=map&preset=pilgrimage" },
-  { key: "architecture", label: "Architecture", href: "/explore?view=map&preset=architecture" },
-  { key: "discover", label: "Discover", href: "/explore?view=map&preset=discover" },
+  { key: "pilgrimage", label: "Pilgrimage", href: "/explore?tag=pilgrimage" },
+  { key: "architecture", label: "Architecture", href: "/explore?tag=heritage" },
+  { key: "discover", label: "Discover", href: "/explore?sort=popularity" },
 ];
 
 const LANGUAGES = [

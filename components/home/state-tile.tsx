@@ -131,7 +131,7 @@ export function StateTile({
           labelId={labelId}
           stateName={item.state}
           count={item.count}
-          seeAllHref={`/explore?view=map&state=${item.slug}`}
+          seeAllHref={`/explore?state=${item.slug}`}
           items={item.top}
           align={align}
         />

@@ -16,8 +16,8 @@ import { Reveal } from "@/components/motion/reveal";
 import { Eyebrow } from "@/components/ui/eyebrow";
 
 // Static generation for every temple route — the data is static at build time.
-export function generateStaticParams() {
-  return getTempleIds().map((id) => ({ id }));
+export async function generateStaticParams() {
+  return (await getTempleIds()).map((id) => ({ id }));
 }
 
 export async function generateMetadata({
@@ -26,7 +26,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const temple = getTempleById(id);
+  const temple = await getTempleById(id);
   if (!temple) return { title: "Temple not found" };
   return {
     title: temple.name,
@@ -36,9 +36,9 @@ export async function generateMetadata({
 
 export default async function TemplePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const temple = getTempleById(id);
+  const temple = await getTempleById(id);
   if (!temple) notFound();
-  const related = getRelatedTemples(temple, 3);
+  const related = await getRelatedTemples(temple, 3);
 
   return (
     <article>
