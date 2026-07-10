@@ -43,7 +43,7 @@ export function makeTemple(overrides: Partial<Temple> = {}): Temple {
       { fromCity: "Madurai", distanceKm: 450, travelTime: "8 hrs", budget: "₹6,500 - ₹9,000 per person", midRange: "₹10,000 - ₹14,000 per person", luxury: "₹20,000+ per person" },
     ],
     nearbyAttractions: [{ name: "A fort", distanceKm: 5, description: "Nearby." }],
-    tags: ["UNESCO", "Dravidian"],
+    tags: ["UNESCO World Heritage", "Dravidian"],
     rating: 4.7,
     featured: true,
     ...overrides,

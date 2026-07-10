@@ -74,13 +74,11 @@ export function sortTemples(list: Temple[], sort: SortKey): Temple[] {
       copy.sort((a, b) => cheapest(a) - cheapest(b) || a.name.localeCompare(b.name));
       break;
     case "popularity":
-      // No real visit-count metric exists in the schema yet (a documented prototype
-      // gap — see REDESIGN_PLAN's risk notes on synthetic popularity). Until real
-      // analytics land, "Most visited" uses the same featured-then-rating signal
-      // editors already use to mean "prominent", rather than fabricating a fake number.
+      // docs/09 §4 (D12): the precomputed 0–100 ordinal (scripts/compute-popularity.ts,
+      // merged onto each Temple by lib/temples.ts). Ties: score → rating → name.
       copy.sort(
         (a, b) =>
-          Number(b.featured) - Number(a.featured) ||
+          (b.popularityScore ?? 0) - (a.popularityScore ?? 0) ||
           b.rating - a.rating ||
           a.name.localeCompare(b.name),
       );

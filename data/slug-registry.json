@@ -1,0 +1,167 @@
+[
+  {
+    "slug": "meenakshi-amman-temple",
+    "name": "Meenakshi Amman Temple",
+    "city": "Madurai",
+    "state": "Tamil Nadu",
+    "coordinates": {
+      "lat": 9.9195,
+      "lng": 78.1193
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "kashi-vishwanath-temple",
+    "name": "Kashi Vishwanath Temple",
+    "city": "Varanasi",
+    "state": "Uttar Pradesh",
+    "coordinates": {
+      "lat": 25.3109,
+      "lng": 83.0107
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "golden-temple",
+    "name": "Golden Temple (Harmandir Sahib)",
+    "city": "Amritsar",
+    "state": "Punjab",
+    "coordinates": {
+      "lat": 31.62,
+      "lng": 74.8765
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "jagannath-temple-puri",
+    "name": "Jagannath Temple",
+    "city": "Puri",
+    "state": "Odisha",
+    "coordinates": {
+      "lat": 19.8048,
+      "lng": 85.818
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "tirumala-venkateswara-temple",
+    "name": "Tirumala Venkateswara Temple",
+    "city": "Tirumala",
+    "state": "Andhra Pradesh",
+    "coordinates": {
+      "lat": 13.6833,
+      "lng": 79.3474
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "kedarnath-temple",
+    "name": "Kedarnath Temple",
+    "city": "Kedarnath",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.7346,
+      "lng": 79.0669
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "somnath-temple",
+    "name": "Somnath Temple",
+    "city": "Prabhas Patan (Veraval)",
+    "state": "Gujarat",
+    "coordinates": {
+      "lat": 20.888,
+      "lng": 70.4013
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "akshardham-delhi",
+    "name": "Swaminarayan Akshardham",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "coordinates": {
+      "lat": 28.6127,
+      "lng": 77.2773
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "konark-sun-temple",
+    "name": "Konark Sun Temple",
+    "city": "Konark",
+    "state": "Odisha",
+    "coordinates": {
+      "lat": 19.8876,
+      "lng": 86.0945
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "brihadeeswarar-temple",
+    "name": "Brihadeeswarar Temple",
+    "city": "Thanjavur",
+    "state": "Tamil Nadu",
+    "coordinates": {
+      "lat": 10.7828,
+      "lng": 79.1318
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "virupaksha-temple-hampi",
+    "name": "Virupaksha Temple",
+    "city": "Hampi",
+    "state": "Karnataka",
+    "coordinates": {
+      "lat": 15.335,
+      "lng": 76.46
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "kamakhya-temple",
+    "name": "Kamakhya Temple",
+    "city": "Guwahati",
+    "state": "Assam",
+    "coordinates": {
+      "lat": 26.1665,
+      "lng": 91.706
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "siddhivinayak-temple",
+    "name": "Siddhivinayak Temple",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "coordinates": {
+      "lat": 19.0169,
+      "lng": 72.8302
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "vaishno-devi-temple",
+    "name": "Vaishno Devi Temple",
+    "city": "Katra",
+    "state": "Jammu and Kashmir",
+    "coordinates": {
+      "lat": 33.0303,
+      "lng": 74.949
+    },
+    "mintedAt": "2026-07-08"
+  },
+  {
+    "slug": "ramanathaswamy-temple",
+    "name": "Ramanathaswamy Temple",
+    "city": "Rameswaram",
+    "state": "Tamil Nadu",
+    "coordinates": {
+      "lat": 9.2881,
+      "lng": 79.3174
+    },
+    "mintedAt": "2026-07-08"
+  }
+]

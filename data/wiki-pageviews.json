@@ -1,0 +1,102 @@
+{
+  "source": "Wikimedia Pageviews API (wikimedia.org/api/rest_v1/metrics/pageviews/per-article), en.wikipedia, all-access/all-agents",
+  "window": {
+    "start": "2025-07",
+    "end": "2026-06",
+    "months": 12
+  },
+  "fetchedAt": "2026-07-10",
+  "note": "siddhivinayak-temple has only 11 monthly data points in the window (Wikimedia omits zero-view months); the missing month contributes 0 to wikiViews.",
+  "entries": [
+    {
+      "id": "meenakshi-amman-temple",
+      "article": "Meenakshi_Amman_Temple",
+      "wikiViews": 9662,
+      "monthsWithData": 12
+    },
+    {
+      "id": "kashi-vishwanath-temple",
+      "article": "Kashi_Vishwanath_Temple",
+      "wikiViews": 397475,
+      "monthsWithData": 12
+    },
+    {
+      "id": "golden-temple",
+      "article": "Golden_Temple",
+      "wikiViews": 608724,
+      "monthsWithData": 12
+    },
+    {
+      "id": "jagannath-temple-puri",
+      "article": "Jagannath_Temple,_Puri",
+      "wikiViews": 703782,
+      "monthsWithData": 12
+    },
+    {
+      "id": "tirumala-venkateswara-temple",
+      "article": "Tirumala_Venkateswara_Temple",
+      "wikiViews": 33166,
+      "monthsWithData": 12
+    },
+    {
+      "id": "kedarnath-temple",
+      "article": "Kedarnath_Temple",
+      "wikiViews": 314486,
+      "monthsWithData": 12
+    },
+    {
+      "id": "somnath-temple",
+      "article": "Somnath_Temple",
+      "wikiViews": 80428,
+      "monthsWithData": 12
+    },
+    {
+      "id": "akshardham-delhi",
+      "article": "Akshardham_(Delhi)",
+      "wikiViews": 9630,
+      "monthsWithData": 12
+    },
+    {
+      "id": "konark-sun-temple",
+      "article": "Konark_Sun_Temple",
+      "wikiViews": 349143,
+      "monthsWithData": 12
+    },
+    {
+      "id": "brihadeeswarar-temple",
+      "article": "Brihadeeswarar_Temple",
+      "wikiViews": 13122,
+      "monthsWithData": 12
+    },
+    {
+      "id": "virupaksha-temple-hampi",
+      "article": "Virupaksha_Temple",
+      "wikiViews": 6030,
+      "monthsWithData": 12
+    },
+    {
+      "id": "kamakhya-temple",
+      "article": "Kamakhya_Temple",
+      "wikiViews": 334064,
+      "monthsWithData": 12
+    },
+    {
+      "id": "siddhivinayak-temple",
+      "article": "Siddhivinayak_Temple",
+      "wikiViews": 920,
+      "monthsWithData": 11
+    },
+    {
+      "id": "vaishno-devi-temple",
+      "article": "Vaishno_Devi_Temple",
+      "wikiViews": 208974,
+      "monthsWithData": 12
+    },
+    {
+      "id": "ramanathaswamy-temple",
+      "article": "Ramanathaswamy_Temple",
+      "wikiViews": 212183,
+      "monthsWithData": 12
+    }
+  ]
+}

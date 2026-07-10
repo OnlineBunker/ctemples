@@ -160,8 +160,11 @@ export function Gallery({
               <ChevronRight className="h-5 w-5" aria-hidden />
             </button>
 
+            {/* Interim attribution stopgap (docs/09 §8) — ships ahead of the per-image
+                MediaAttribution field (Stage B) since uncredited CC-BY-SA images are a
+                live violation today. */}
             <span className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[0.66rem] uppercase tracking-label text-limewash/60">
-              {open + 1} / {count}
+              {open + 1} / {count} · Images: Wikimedia Commons
             </span>
           </motion.div>
         ) : null}

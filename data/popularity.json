@@ -1,0 +1,92 @@
+[
+  {
+    "id": "jagannath-temple-puri",
+    "score": 95.5,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "konark-sun-temple",
+    "score": 94.88,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "kashi-vishwanath-temple",
+    "score": 92.95,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "kedarnath-temple",
+    "score": 92.91,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "kamakhya-temple",
+    "score": 91.18,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "ramanathaswamy-temple",
+    "score": 90.16,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "golden-temple",
+    "score": 85.85,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "somnath-temple",
+    "score": 85.83,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "brihadeeswarar-temple",
+    "score": 81.25,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "virupaksha-temple-hampi",
+    "score": 76.79,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "vaishno-devi-temple",
+    "score": 72.59,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "tirumala-venkateswara-temple",
+    "score": 71.89,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "meenakshi-amman-temple",
+    "score": 66.39,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "akshardham-delhi",
+    "score": 58.88,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  },
+  {
+    "id": "siddhivinayak-temple",
+    "score": 47.42,
+    "basis": "blended",
+    "computedAt": "2026-07-10"
+  }
+]

@@ -85,4 +85,11 @@ export interface Temple {
   featured: boolean;
   /** Optional "Plan around" summary line; populated for ~6 of 15 temples. */
   tripDuration?: { temples: number; days: number; km: number };
+  /**
+   * 0–100 ordinal, merged in by lib/temples.ts from data/popularity.json (docs/09 §4,
+   * D12) — never rendered as a number, never hand-authored. A lightweight stand-in for
+   * the full production `Popularity` object (docs/09 §2, Stage B). Absent (undefined)
+   * only if a record has no matching popularity.json entry.
+   */
+  popularityScore?: number;
 }

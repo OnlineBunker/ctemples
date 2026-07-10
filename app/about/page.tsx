@@ -107,6 +107,12 @@ export default function AboutPage() {
         Note · CTemples is currently a frontend prototype. Temple content shown here is placeholder,
         written to the same standard the real library will follow.
       </p>
+
+      <p className="mt-4 rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-subtle">
+        Image licensing · Photography shown across the site is sourced from Wikimedia Commons under
+        its various free licenses. Per-image credit lines are on the way; until then, this note
+        stands as the site-wide attribution.
+      </p>
     </div>
   );
 }

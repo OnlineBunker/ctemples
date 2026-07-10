@@ -62,6 +62,11 @@ describe("validateTemple", () => {
   it("accepts a temple with no tripDuration (it's optional)", () => {
     expect(validateTemple(makeTemple())).toEqual([]);
   });
+
+  it("flags a tag that isn't in the controlled registry (data/tag-registry.ts)", () => {
+    const issues = validateTemple(makeTemple({ tags: ["Dravidian", "Not A Real Tag"] }));
+    expect(issues.some((i) => i.includes('tag "Not A Real Tag"'))).toBe(true);
+  });
 });
 
 describe("validateTemples", () => {

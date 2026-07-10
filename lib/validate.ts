@@ -1,5 +1,6 @@
 import type { Temple, Region } from "./types";
 import { REGION_ORDER } from "./regions";
+import { isRegisteredTag } from "@/data/tag-registry";
 
 /**
  * Dev-time data-shape validation. Not a runtime dependency of the UI — it guards
@@ -45,6 +46,9 @@ export function validateTemple(t: Temple): string[] {
   );
   check(Array.isArray(t.gallery) && t.gallery.length >= 1, "gallery has no entries");
   check(Array.isArray(t.tags) && t.tags.length >= 1, "no tags");
+  (t.tags ?? []).forEach((tag) => {
+    check(isRegisteredTag(tag), `tag "${tag}" is not in the controlled registry (data/tag-registry.ts)`);
+  });
 
   const sentenceCount = (t.whyVisit ?? "")
     .split(/[.!?]+/)

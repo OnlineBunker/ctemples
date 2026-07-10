@@ -111,10 +111,20 @@ describe("sortTemples", () => {
     sortTemples(all, "name");
     expect(all.map((t) => t.id)).toEqual(before);
   });
-  it("'popularity' sorts featured first, then rating (same as 'featured')", () => {
-    expect(sortTemples(all, "popularity").map((t) => t.id)).toEqual(
-      sortTemples(all, "featured").map((t) => t.id),
-    );
+  it("'popularity' sorts by the precomputed score — not by featured or rating alone", () => {
+    // "high" is unfeatured with the lowest rating but the highest score: it must still
+    // rank first, proving the score (docs/09 §4) drives the order, not featured/rating.
+    const high = makeTemple({ id: "high", name: "High Score", rating: 4.0, featured: false, popularityScore: 90 });
+    const mid = makeTemple({ id: "mid", name: "Mid Score", rating: 4.9, featured: true, popularityScore: 50 });
+    const tied = makeTemple({ id: "tied", name: "Zebra Score", rating: 4.5, featured: false, popularityScore: 50 });
+    // "mid" and "tied" tie on score (50); rating (4.9 > 4.5) breaks the tie.
+    expect(sortTemples([tied, high, mid], "popularity").map((t) => t.id)).toEqual(["high", "mid", "tied"]);
+  });
+
+  it("'popularity' treats a missing score as 0", () => {
+    const scored = makeTemple({ id: "scored", popularityScore: 10, rating: 4.0 });
+    const unscored = makeTemple({ id: "unscored", popularityScore: undefined, rating: 4.9 });
+    expect(sortTemples([unscored, scored], "popularity").map((t) => t.id)).toEqual(["scored", "unscored"]);
   });
 });
 

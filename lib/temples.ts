@@ -1,5 +1,6 @@
 import { cache } from "react";
-import { temples } from "@/data/temples";
+import { temples as rawTemples } from "@/data/temples";
+import popularityScores from "@/data/popularity.json";
 import type { Temple, Region } from "./types";
 import {
   findTempleById,
@@ -29,6 +30,12 @@ import { cheapestBudget } from "./format";
  * (docs/11 §3). Pure composition logic lives in ./temple-queries and ./search; this
  * file only supplies the real array and, for queryTemples, projects to TempleSummary.
  */
+
+// Merges the precomputed popularity score (data/popularity.json, docs/09 §4) onto each
+// record — the score is derived, not hand-authored, so it lives in its own committed
+// file (scripts/compute-popularity.ts) rather than in data/temples.ts.
+const scoreById = new Map(popularityScores.map((p) => [p.id, p.score]));
+const temples: Temple[] = rawTemples.map((t) => ({ ...t, popularityScore: scoreById.get(t.id) }));
 
 export async function getAllTemples(): Promise<Temple[]> {
   return temples;
