@@ -1,5 +1,7 @@
 # CTemples — Design Rationale ("Modern Utsavam")
 
+> **ℹ️ ABSORBED (2026-07-10).** This rationale was folded into `docs/03_WORLD_CLASS_DESIGN_SYSTEM.md` §1–3, which is now canonical. Kept because code comments reference it; do not extend it.
+
 > The visual and tonal direction for CTemples. This supersedes the older dark
 > "nightstone" rationale. It records *why* the system looks the way it does; the
 > token/component specifics live in `DESIGN_SYSTEM_V2.md`, and the canonical hexes

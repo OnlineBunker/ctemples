@@ -1,5 +1,7 @@
 # CTemples — Redesign Plan
 
+> **⛔ SUPERSEDED (2026-07-10).** Retained for history only. Sequencing, scope, and effort are re-baselined in `docs/13_IMPLEMENTATION_MASTER_PLAN.md`; the file-by-file audit reflects a pre-redesign codebase that no longer exists.
+
 > An audit and migration plan that compares the current implementation with `CLAUDE.md` (project vision), `UX_SPEC.md` (UX specification), and `DESIGN_SYSTEM_V2.md` (design system V2). For every file, page, and component: keep, modify, replace, or delete. Effort estimates are in "person-days" assuming one engineer working in isolation; a small team can compress these.
 
 ---

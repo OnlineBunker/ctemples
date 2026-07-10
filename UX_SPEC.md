@@ -1,5 +1,7 @@
 # CTemples — UX Specification
 
+> **⛔ SUPERSEDED (2026-07-10).** This document is retained for history only and must not be cited as authority. Its content is replaced by the master specification: page UX → `docs/04`–`docs/06`, search → `docs/10`, map → `docs/07`, IA/URLs → `docs/02`, states/loading/errors → the relevant page blueprint. Known contradictions in this file were catalogued and resolved in `docs/01_PRODUCT_NORTH_STAR.md` §7.
+
 > A detailed UX specification for CTemples, derived from the approved architecture in `CLAUDE.md`. This document is the source of truth for layout, behavior, and edge-case handling across the prototype. No code is included; it is a written spec for designers, engineers, and reviewers.
 
 ---

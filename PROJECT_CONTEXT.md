@@ -1,16 +1,16 @@
 # CTemples — Project Context
 
-> The single permanent document that a new Claude Code session should read first to understand the project. It summarizes the project vision, sitemap, information architecture, UX decisions, page specs, design system, feature priorities, architectural constraints, implementation roadmap, and open questions.
+> **⛔ SECTIONS 1–15 SUPERSEDED (2026-07-10).** The project's normative source of truth is now the master specification in **`docs/01`–`docs/14`** (see `docs/01_PRODUCT_NORTH_STAR.md` for the decision register and precedence rules). Everything in this file below the Build-status section is retained for history only and must not be cited as authority.
 >
-> Source documents: `CLAUDE.md` (project rulebook), `UX_SPEC.md` (section-by-section UX), `DESIGN_SYSTEM_V2.md` (14-section design system), `REDESIGN_PLAN.md` (file-by-file audit), `IMPLEMENTATION_PHASES.md` (11-phase build order). This document is the index.
+> **What remains live in this file:** the **Build status** section immediately below — it is still the single source of truth for *what is actually implemented*, and is updated at every phase boundary per `docs/14` §3.
 
 ---
 
-## Build status — as of 2026-07-08
+## Build status — as of 2026-07-10
 
-> **This section is the source of truth for what is actually implemented.** Sections 1–15 below describe the *target* design and still read in the present/aspirational tense (e.g. "there is no 3D in the prototype" is a goal, not yet true for out-of-scope pages). When the two disagree, trust this section.
+> **This section is the source of truth for what is actually implemented.** For what *should* be built and how, read `docs/13_IMPLEMENTATION_MASTER_PLAN.md`.
 
-> **⚠️ PALETTE SUPERSEDED (2026-07-08).** §1 below and `CLAUDE.md`'s "Project Vision" still state the literal hex palette `temple-red #C62828` / `sand-yellow #E6C068` / `warm-gold #B8860B` as canonical. That palette has been **replaced** by an approved visual reference nicknamed **"Modern Utsavam"**: porcelain canvas, `magenta #E5006D` / `coral #FF3D6E` / `saffron #FF7A00` / `turmeric #FFC300` / `plum #3D0A40`, with Bricolage Grotesque + Inter + Space Mono + Noto Sans Telugu typography. The old token *names* (`temple-red`, `sand-yellow`, `warm-gold`) are kept as **aliases** onto the new hexes in `tailwind.config.ts` so nothing broke, but the actual canonical values now live in `DESIGN.md` (rewritten) and `tailwind.config.ts` — **not** in `CLAUDE.md`/`DESIGN_SYSTEM_V2.md` §1, which are stale and still pending a reconciliation pass.
+> **📘 MASTER SPEC ADOPTED (2026-07-10).** The 14-file master specification (`docs/01`–`14`) was authored and adopted: it reconciles all prior doc contradictions (26 catalogued, resolved via rulings D1–D27 in `docs/01` §6–7), re-baselines the remaining phases (P3–P11, ≈37 person-days, `docs/13`), and rewrites `CLAUDE.md` as a thin operating doc. Legacy docs (`UX_SPEC`, `DESIGN_SYSTEM_V2`, `REDESIGN_PLAN`, `IMPLEMENTATION_PHASES`, `DESIGN.md`) carry supersession banners. The earlier palette-supersession note that lived here is fully absorbed into `docs/03`.
 
 ### Progress at a glance
 
@@ -19,7 +19,8 @@
 | 0 — Foundation | ✅ **Complete**, with one deliberate exception (2026-07-08) | Schema, lib helpers, search, media, and the `data/temples.ts` migration are all done (see below). **Deliberately deferred:** `lib/india-geo.ts` (India state polygons) — its GeoJSON source/licensing is an open, unresolved question (§14.3) and needs real geographic accuracy for 37 states/UTs that shouldn't be hand-fabricated; do this just-in-time for Phase 4 once a real source is picked. |
 | 1 — Chrome | ✅ **Complete** | Header, footer, language banner, about/contact/404 recolor. Inherits the Modern Utsavam palette via the token aliases. |
 | 2 — Homepage | ✅ **Complete** (2026-07-08) | Hero carousel (photo, no autoplay, video-ready slide DTO for future production video), editorial paragraph, trip ideas, state strip (derived counts + accessible popover), popular searches, deity tiles (derived, keyword-matched), methodology teaser. `three`/`@react-three/fiber` removed; embers/parallax/region-explorer deleted. Verified: typecheck clean, 61/61 tests, lint clean, build 23/23 pages, manual browser check. Adversarial 4-dimension code review run; all 6 confirmed findings fixed. |
-| 3–10 | ⬜ Not started | `/explore` and `/temples/[id]` are still the pre-existing pages (untouched, out of scope). They can now proceed — Phase 0's blockers are cleared. |
+| Master spec | ✅ **Adopted** (2026-07-10) | `docs/01`–`14` written; governance edits applied (CLAUDE.md rewritten thin; legacy docs bannered). |
+| P3–P11 | ⬜ Not started | `/explore` and `/temples/[id]` are still the pre-existing pages (untouched, out of scope). **Next: P3 — Explore list mode** per `docs/13` §2 (includes the async data-seam refactor, `queryTemples`, Radix popovers, golden-query suite, and the homepage [DELTA] URL migrations from `docs/04`). |
 
 ### Files changed in the 2026-07-08 session (Phase 0 minimum + Phase 2, then full Phase 0)
 

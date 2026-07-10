@@ -1,5 +1,7 @@
 # CTemples — Design System V2
 
+> **⛔ SUPERSEDED (2026-07-10).** Retained for history only. Every token, component, and motion rule now lives in `docs/03_WORLD_CLASS_DESIGN_SYSTEM.md` and `docs/08_ANIMATION_AND_MOTION_SYSTEM.md` (Modern Utsavam palette — the hexes below are stale). Resolution log: `docs/01` §7.
+
 > A consolidated design system for CTemples, derived from `CLAUDE.md` (project vision) and `UX_SPEC.md` (UX specification). This document defines the visual language, components, and behaviors that every surface on the site must follow. No code is included; it is a written spec for designers, engineers, and reviewers.
 
 ---

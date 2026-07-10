@@ -1,5 +1,7 @@
 # CTemples — Implementation Phases
 
+> **⛔ SUPERSEDED (2026-07-10).** Retained for history only. The active plan is `docs/13_IMPLEMENTATION_MASTER_PLAN.md` (phases re-baselined after P0–P2 completed; effort discrepancies with REDESIGN_PLAN resolved there).
+
 > The redesigned website, broken into independently reviewable and testable phases. Each phase has a single, verifiable objective; a stop-and-review gate before the next phase begins; the smallest possible blast radius; and a defined exit criterion. No code in this document.
 
 The order is the same as §16 of `REDESIGN_PLAN.md`, but each phase is now its own self-contained deliverable with: scope, files touched, components touched, risks, success criteria, and review gate.
