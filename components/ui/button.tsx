@@ -27,10 +27,10 @@ const base =
 const variants: Record<Variant, string> = {
   // Gradient runs magenta -> coral-deep (not coral) so white label text clears WCAG AA
   // 4.5:1 across the whole span (coral's default is ~3.4:1 with white — fails). Hover
-  // darkens (brightness-95), matching the design system's "hover = deeper variant"
-  // convention elsewhere — lightening the gradient on hover would drop contrast further.
+  // darkens (brightness-95) and casts a saffron-tinted glow (docs/03 §2.4, Amendment A
+  // — a shadow, not a fill, so label contrast is unaffected).
   primary:
-    "bg-gradient-to-r from-magenta to-coral-deep text-white shadow-md hover:shadow-lg hover:brightness-95",
+    "bg-gradient-to-r from-magenta to-coral-deep text-white shadow-md hover:shadow-[0_8px_28px_-4px_rgba(255,122,0,0.45)] hover:brightness-95",
   secondary:
     "border border-line-strong bg-canvas text-plum hover:border-magenta hover:text-magenta",
   outline:

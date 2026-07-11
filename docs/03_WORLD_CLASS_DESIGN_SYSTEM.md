@@ -33,7 +33,7 @@ Festival energy, refined. A calm porcelain canvas carries saturated festival pig
 **Region pigments** (icon+label lead, color reinforces): North `#7A2C9E` · South `#E5006D` · East `#FF7A00` · West `#FF3D6E` · Northeast `#E0AB00` · Central `#3D0A40`.
 **Deity accents** (inline hex via `lib/deities.ts`, never dynamic Tailwind classes): Shiva `#E5006D` · Vishnu `#FF7A00` · Devi `#FFC300` · Ganesha `#2E7D32` · Murugan `#3E6CC4` · Hanuman `#FF3D6E`. Used at 100% for icon strokes and `{hex}14` (8% alpha) for icon-chip backgrounds.
 
-**Gradients:** `bg-utsavam` = `linear-gradient(135deg, #E5006D 0%, #FF3D6E 46%, #FF7A00 100%)` — decorative panels/imagery only, **never behind light text** (saffron end is 2.6:1 with white). Button gradient = `to right, magenta → coral-deep` (both ends ≥4.6:1 with white). `bg-utsavam-soft` = `#FCE0EE → #FFE9D3` for soft feature panels.
+**Gradients (Amendment A, 2026-07-11 — promoted to first-class brand language):** `bg-utsavam` = `linear-gradient(135deg, #E5006D 0%, #FF3D6E 46%, #FF7A00 100%)` — the mockup's signature festival gradient. Sanctioned uses: decorative panels and kolam-geometry tiles, active/selected accents, image scrims, section flourishes. Contrast guardrail unchanged: **never behind light text** (saffron end is 2.6:1 with white); text-carrying gradient surfaces use the AA-safe span. Button gradient = `to right, magenta → coral-deep` (both ends ≥4.6:1 with white); a saffron-tinted outer glow on hover is permitted (shadow, not fill — text contrast unaffected). `bg-utsavam-soft` = `#FCE0EE → #FFE9D3` for soft feature panels. **Kolam geometry** is the paired graphic language: gradient kolam tiles, corner motifs, and section dividers may appear wherever a decorative panel is sanctioned (static; motion only per file 08).
 
 **Legacy aliases** (`temple-red`→magenta, `sand-yellow`→turmeric, `warm-gold`→saffron) exist only so unmigrated pages keep compiling. New code must use the real names. After the last legacy page migrates (file 13, cleanup phase), the aliases are deleted and CI greps for them.
 
@@ -58,8 +58,8 @@ Festival energy, refined. A calm porcelain canvas carries saturated festival pig
 
 ### 2.3 Color usage laws
 
-1. One magenta primary CTA per viewport-height of content.
-2. Saffron/turmeric never sit behind body text; they fill chips, icons, and accents.
+1. One primary CTA per section (an H2-rooted block). *(Amendment A: was "per viewport-height of content" — the section is the natural unit and permits the richer gradient CTA language without a magenta wall.)*
+2. Saffron/turmeric never sit behind body text; they fill chips, icons, accents, and decorative panels (plum-on-turmeric badges pass at ~10:1).
 3. Plum is the only permitted dark surface (methodology panel, photo scrims, footer accents); never full-page.
 4. Functional colors are reserved for their function (danger ≠ brand emphasis).
 5. Region/deity hues appear only as dots, icon strokes, and 8%-alpha icon chips — never as text colors or large fills.
@@ -93,7 +93,7 @@ Festival energy, refined. A calm porcelain canvas carries saturated festival pig
 
 - **Shell:** `max-w-[1440px]`, padding 20/32/48px (base/sm/lg); never full-bleed text. (Widened from the original 1280px — 2026-07-10, in-chat decision — 1280px left ~15%+ empty margin on common 1440–1512px laptop screens; 1440px was already the sanctioned hero-band ceiling, now applied to the shell uniformly instead of as a hero-only exception.)
 - **Spacing:** 4px base scale. Section rhythm: `py-14 md:py-20`. Card padding 20px; popover padding 12px; gaps 16–24px.
-- **Grid columns:** cards 1/2/3 (mobile/tablet/desktop); trip ideas 1/2/4; state tiles 2/3/4/6 (…/lg/xl); deity tiles 2/2/3.
+- **Grid columns:** cards 1/2/3 (mobile/tablet/desktop); trip ideas: showcase carousel, not a grid (Amendment A — file 04 §4); state tiles 2/3/4/6 (…/lg/xl); deity tiles 2/2/3.
 - **Radius:** `card` 20px (cards, popovers, panels, images); `xl` 12px (menus, inputs); `full` (buttons, chips, pills, dots).
 - **Shadows (plum-tinted):** `sm` 0 1 2 / 6% · `md` 0 2 10 / 8% · `lg` 0 8 28 / 10% · `xl` 0 18 48 / 14%.
 - **Breakpoints:** Tailwind defaults; semantics: `sm` 640 layout relaxes, `md` 768 two-column starts, `lg` 1024 desktop nav + Explore two-pane + section index, `xl` 1280 max density.

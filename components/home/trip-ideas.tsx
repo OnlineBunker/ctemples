@@ -1,8 +1,9 @@
-import { Reveal, Stagger, RevealItem } from "@/components/motion/reveal";
+import { Reveal } from "@/components/motion/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getTempleById } from "@/lib/temples";
 import type { Region } from "@/lib/types";
-import { TripIdeaCard, type TripIdea } from "./trip-idea-card";
+import { TripShowcase } from "./trip-showcase";
+import type { TripIdea } from "./trip-idea-card";
 
 /**
  * Trip ideas — the primary CTA surface (UX_SPEC §1.5). Curated, editorial presets (not
@@ -76,13 +77,13 @@ export async function TripIdeas() {
           description="Curated routes to start planning — pick a thread and follow it into the map."
         />
       </Reveal>
-      <Stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {ideas.map((idea, i) => (
-          <RevealItem key={idea.title} className="h-full">
-            <TripIdeaCard idea={idea} priority={i === 0} />
-          </RevealItem>
-        ))}
-      </Stagger>
+      {/* Showcase carousel (docs/04 §4, Amendment A — was a 1/2/4 grid). One Reveal
+          wraps the whole carousel: per-card RevealItems would fight the carousel's own
+          scroll-linked transforms. No priority image here — the hero owns the page's
+          single priority slot (docs/04 §9). */}
+      <Reveal className="mt-10">
+        <TripShowcase ideas={ideas} />
+      </Reveal>
     </section>
   );
 }

@@ -208,10 +208,52 @@
   animation: popover-in 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Dwell-scoped hero motion (docs/08 §5#4–5, Amendment A). Both are finite runs the
+   length of the 7s dwell, restarted per slide — not loops. JS gates them off under
+   reduced motion; the global kill-switch below is the second line of defense. */
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+.animate-kenburns {
+  animation: kenburns 7s linear forwards;
+}
+@keyframes dot-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+.animate-dot-progress {
+  animation: dot-progress 7s linear forwards;
+}
+
+/* Showcase-carousel track (docs/04 §4): scrollbar hidden, wheel/drag/snap intact. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ─────────────────────── Reduced motion ─────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  /* The dwell animations use fill-mode `forwards`; the global 0.001ms override below
+     would complete them instantly and FREEZE their end state (image stuck at 1.05
+     scale). Kill them outright instead — the JS gate (useReducedMotion) also removes
+     these classes post-hydration; this covers the SSR-to-hydration window. */
+  .animate-kenburns,
+  .animate-dot-progress {
+    animation: none !important;
   }
   *,
   *::before,

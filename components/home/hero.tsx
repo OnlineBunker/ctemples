@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useCallback, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  type FocusEvent as ReactFocusEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
@@ -9,27 +15,58 @@ import { HeroSlide, type HeroSlideData } from "./hero-slide";
 import { HeroControls } from "./hero-controls";
 import { REGION_META } from "@/lib/regions";
 
+/** Autoplay dwell per slide (docs/08 §2 `--hero-dwell`). Keep in sync with the
+ *  `animate-kenburns` / `animate-dot-progress` durations in globals.css. */
+const DWELL_MS = 7000;
+
 /**
- * Homepage hero — a user-driven photo carousel (no autoplay, a locked decision).
- * The editorial block (H1 thesis + bilingual flourish + CTAs) is persistent; the photo
- * stage cross-fades between featured temples. Keyboard: ←/→ move, Home/End jump, when
- * the stage is focused. Under prefers-reduced-motion the cross-fade is instant.
+ * Homepage hero — an autoplaying photo carousel under docs/08 §6's autoplay law
+ * (Amendment A): 7s dwell with wrap-around, a visible pause/play toggle, pauses while
+ * hovered or focused, stops for the visit on any manual navigation, and never starts
+ * under prefers-reduced-motion or Save-Data. The editorial block (H1 thesis + bilingual
+ * flourish + CTAs) is persistent; the photo stage cross-fades between featured temples
+ * with a Ken Burns drift on the visible slide. Keyboard: ←/→ move, Home/End jump, when
+ * the stage is focused.
  *
  * The single <h1> is the page thesis ("Discover the sacred"); per-slide temple names are
- * <h2> inside the slide overlay — one H1 per page (DESIGN_SYSTEM §2.5).
+ * <h2> inside the slide overlay — one H1 per page (docs/03 §3).
  */
 export function Hero({ slides }: { slides: HeroSlideData[] }) {
   const reduce = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [interacted, setInteracted] = useState(false);
+  // Autoplay state: `stopped` = manual nav or the toggle; `restingPause` = hover/focus.
+  const [stopped, setStopped] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focusWithin, setFocusWithin] = useState(false);
+  const [saveData, setSaveData] = useState(false);
   const count = slides.length;
 
+  useEffect(() => {
+    // Save-Data users never get an autoplay timer (docs/08 §6 clause 5).
+    const connection = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) setSaveData(true);
+  }, []);
+
+  const autoplayEligible = !reduce && !saveData && count > 1;
+  const playing = autoplayEligible && !stopped && !hovered && !focusWithin;
+
+  useEffect(() => {
+    if (!playing) return;
+    const timer = setInterval(() => {
+      setIndex((i) => (i + 1) % count);
+    }, DWELL_MS);
+    return () => clearInterval(timer);
+  }, [playing, count]);
+
+  // Manual navigation: wraps, announces to SR, and stops autoplay for the visit
+  // (docs/08 §6 clause 4 — only the toggle restarts it).
   const go = useCallback(
     (next: number) => {
       if (count === 0) return;
-      const clamped = Math.max(0, Math.min(count - 1, next));
-      setIndex(clamped);
+      setIndex(((next % count) + count) % count);
       setInteracted(true);
+      setStopped(true);
     },
     [count],
   );
@@ -58,6 +95,10 @@ export function Hero({ slides }: { slides: HeroSlideData[] }) {
     [go, index, count],
   );
 
+  const onBlurCapture = useCallback((e: ReactFocusEvent<HTMLElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusWithin(false);
+  }, []);
+
   if (count === 0) return null;
   const slide = slides[index];
   const eyebrow = `${slide.state} · ${REGION_META[slide.region].label} India`;
@@ -68,6 +109,10 @@ export function Hero({ slides }: { slides: HeroSlideData[] }) {
       role="region"
       aria-roledescription="carousel"
       aria-label="Featured temples"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocusWithin(true)}
+      onBlurCapture={onBlurCapture}
     >
       <div
         aria-hidden
@@ -107,13 +152,14 @@ export function Hero({ slides }: { slides: HeroSlideData[] }) {
             <HeroControls
               index={index}
               count={count}
+              playing={playing}
+              intentPlaying={autoplayEligible && !stopped}
+              showToggle={autoplayEligible}
               onPrev={() => go(index - 1)}
               onNext={() => go(index + 1)}
               onSelect={go}
+              onToggle={() => setStopped((s) => !s)}
             />
-            <p className="mt-3 font-mono text-[0.6rem] uppercase tracking-label text-ink-muted">
-              Browse at your pace — no autoplay
-            </p>
           </div>
         </div>
 
@@ -136,14 +182,15 @@ export function Hero({ slides }: { slides: HeroSlideData[] }) {
                 exit={reduce ? { opacity: 1 } : { opacity: 0 }}
                 transition={{ duration: reduce ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
               >
-                <HeroSlide slide={slide} priority={index === 0} />
+                <HeroSlide slide={slide} priority={index === 0} kenBurns={!reduce} />
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
       </div>
 
-      {/* Slide announcement for assistive tech (only after the user interacts). */}
+      {/* Slide announcement for assistive tech (only after the user interacts —
+          autoplay advances stay silent, docs/08 §6 clause 5). */}
       <div className="sr-only" role="status" aria-live="polite">
         {interacted ? `Slide ${index + 1} of ${count}: ${slide.name}, ${slide.state}` : ""}
       </div>

@@ -30,18 +30,31 @@ export interface HeroSlideData {
 }
 
 /** The photo panel for a single slide (image + bottom overlay). */
-export function HeroSlide({ slide, priority }: { slide: HeroSlideData; priority: boolean }) {
+export function HeroSlide({
+  slide,
+  priority,
+  kenBurns = false,
+}: {
+  slide: HeroSlideData;
+  priority: boolean;
+  /** Dwell-scoped drift (docs/08 §5#4) — a plain 2D scale, morph-safe; off under
+   *  reduced motion (the parent passes false). Restarts naturally because the parent
+   *  remounts each slide (keyed by slide.id). */
+  kenBurns?: boolean;
+}) {
   const isVideo = slide.kind === "video" && !!slide.videoUrl;
   return (
     <div className="relative h-full w-full overflow-hidden rounded-card bg-canvas-soft">
-      <TempleImage
-        src={isVideo ? (slide.poster ?? "") : slide.image}
-        alt={`${slide.name}, ${slide.city}, ${slide.state}`}
-        region={slide.region}
-        seed={slide.id}
-        priority={priority}
-        sizes="(max-width: 1024px) 100vw, 56vw"
-      />
+      <div className={kenBurns ? "animate-kenburns absolute inset-0 origin-center" : "absolute inset-0"}>
+        <TempleImage
+          src={isVideo ? (slide.poster ?? "") : slide.image}
+          alt={`${slide.name}, ${slide.city}, ${slide.state}`}
+          region={slide.region}
+          seed={slide.id}
+          priority={priority}
+          sizes="(max-width: 1024px) 100vw, 56vw"
+        />
+      </div>
 
       {/* legibility scrim for the overlay text */}
       <div

@@ -30,7 +30,7 @@ export function TripIdeaCard({ idea, priority = false }: { idea: TripIdea; prior
             region={idea.region}
             seed={idea.seed}
             priority={priority}
-            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 25vw"
+            sizes="(max-width: 640px) 80vw, (max-width: 1024px) 26rem, 35rem"
           />
         </div>
       </div>

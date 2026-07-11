@@ -53,10 +53,10 @@ CTemples must never read, look, or behave like generated filler. These are produ
 4. Opener diversity: no sentence-opener pattern may begin more than 2% of records' `overview` fields.
 5. Numeric claims (dates, fees, heights, distances, visitor counts) require a source reference; unsourced precise claims are validation errors, and the honest alternative is omission.
 
-**Design rules**
-6. No stock-template layouts: no full-width centered-hero-with-search clichés, no three-icon "features" rows, no testimonial carousels, no gradient-mesh backgrounds.
-7. Color discipline: one magenta primary CTA per viewport-height of content; saffron/turmeric are accents, never fills behind body text; plum carries display type and depth.
-8. Motion discipline: one signature moment (the card→hero morph); zero ambient loops; nothing autoplays (see `08_ANIMATION_AND_MOTION_SYSTEM.md`).
+**Design rules** *(6–8 amended 2026-07-11 — **Amendment A**, user-directed: lean into the approved Utsavam mockup's festival energy — its gradients, autoplay hero, and showcase carousels — instead of the flattened first reading. The §5 accessibility/performance floors are deliberately untouched.)*
+6. No stock-template layouts: no full-width centered-hero-with-search clichés, no three-icon "features" rows, no testimonial carousels, no app-store badge tiles. Off-palette "mesh/aurora" gradient washes stay banned — but the **Utsavam gradient** (magenta→coral→saffron, the mockup's own signature) is a first-class brand element: sanctioned for primary CTAs (AA-safe span, file 03 §2.4), decorative/kolam panels, and image scrims.
+7. Color discipline: one primary CTA per section (an H2-rooted block); saffron/turmeric never sit behind body text (decorative fills and plum-on-turmeric badges are fine); plum carries display type and depth.
+8. Motion discipline: one signature *transition* (the card→hero morph) plus the sanctioned motion set of file 08 — **hero autoplay with a visible pause control (file 08 §6 autoplay law)**, Ken Burns slide drift, showcase carousels for curated rows, and the three micro-interactions. Flames, glow pulses, spins, marquee, particles, and parallax stay banned; `prefers-reduced-motion` always yields the calm, static site.
 9. Every image degrades to the procedural `TempleScene` SVG — the site never shows a broken frame or a gray box.
 10. Counts and copy derive from data; no hardcoded "15 temples", "29 states", or fabricated "12,431 visitors" anywhere, ever.
 
@@ -85,7 +85,7 @@ These rulings resolve every known conflict in the legacy docs. Implementation mu
 
 **Identity & direction**
 - **D1. Palette & type = Modern Utsavam.** Porcelain `#FBF6F0` canvas; magenta `#E5006D` / coral `#FF3D6E` / saffron `#FF7A00` / turmeric `#FFC300` / plum `#3D0A40`; Bricolage Grotesque (display) / Inter (body) / Space Mono (data) / Noto Sans Telugu (accent). Supersedes every temple-red/sand-yellow/warm-gold hex and the Fraunces/Hanken pairing in legacy docs. Legacy token names live on only as Tailwind aliases until the last legacy-styled page migrates, then are deleted (CI grep enforces). → file 03.
-- **D2. Homepage hero = split editorial layout** (persistent editorial column: H1 thesis "Discover the sacred" + Telugu accent + two CTAs; photo stage: per-slide H2 temple card, crossfade, prev/next/dots/counter, **no autoplay**). Supersedes UX_SPEC §1.3's full-bleed hero. Slide eyebrow = "State · Region India"; dynasty/era dropped (unreliable at 20k). → file 04.
+- **D2. Homepage hero = split editorial layout** (persistent editorial column: H1 thesis "Discover the sacred" + Telugu accent + two CTAs; photo stage: per-slide H2 temple card, crossfade, prev/next/dots/counter). **Amended 2026-07-11 (Amendment A):** the hero **autoplays** under file 08 §6's autoplay law — 7s dwell, visible pause/play control, pauses on hover/focus, stops permanently on manual navigation, fully disabled under `prefers-reduced-motion`/Save-Data (originally "no autoplay"). Supersedes UX_SPEC §1.3's full-bleed hero. Slide eyebrow = "State · Region India"; dynasty/era dropped (unreliable at 20k). → file 04.
 - **D3. 3D policy: real-time WebGL is banned in all core UI** — hero, map, cards, backgrounds, cursors, dividers. The one memorable moment is the 2D card→hero shared-element morph. Sanctioned future 3D (production only, never prototype): (a) 360° "virtual darshan" panoramas inside the gallery lightbox, (b) photogrammetry viewers for monuments with real scans (e.g. ASI partnerships). Both require: real captured assets (no fabricated models), explicit user gesture to load, `next/dynamic` import, and gyro/drag treated as motion under `prefers-reduced-motion`. Decorative 3D (globes, particles, shaders, card flips, parallax depth) is permanently banned. → file 08 §8.
 
 **IA & URL contracts**
@@ -112,7 +112,7 @@ These rulings resolve every known conflict in the legacy docs. Implementation mu
 - **D20. Temple-page navigation:** desktop (lg+) sticky "On this page" section index with scroll-spy; mobile gets a collapsed in-flow "On this page" disclosure at top + a back-to-top button after two viewport-heights of scroll. Homepage gets neither. → file 06 §4.
 - **D21. Cmd/Ctrl-K opens the search overlay** (no-op when focus is in an editable element; the shortcut is hinted on the trigger). → file 10 §6.
 - **D22. Three signature micro-interactions** (≤400 ms, gesture-triggered, instant under reduced motion): deity-icon stroke-draw on hover/focus (280 ms), selected-state boundary trace on the map (350 ms), section-index caret slide (200 ms). → file 08 §5.
-- **D23. Bricolage is permitted in card titles** (no H1 in cards). "Plan around this temple" is a scroll row/grid — the homepage hero remains the only carousel on the site. → file 03 §6.2, file 06 §5, file 08 §6.
+- **D23. Bricolage is permitted in card titles** (no H1 in cards). **Amended 2026-07-11 (Amendment A):** the hero is the only *autoplaying* carousel; **curated editorial rows** (trip ideas and future hand-curated sets) **may** use user-driven showcase carousels (center-emphasis, peeking neighbors, drag/arrows/snap — file 08 §6); **computed/data-driven lists stay grids or scroll rows** — Explore results and the temple page's computed "Plan around this temple" sections are not curated, so file 06 §12's related-section-carousel ban stands (originally "hero = the only carousel"). → file 03 §6.2, file 06 §5, file 08 §6.
 
 **Backend & scale**
 - **D24. Staged backend evolution** A→B→C→D with explicit triggers: A = static TS array (now, ≤200 records); B = JSON-per-temple + Zod + image ingestion to R2/CDN (≤2k); C = Payload CMS on Postgres + ISR (prerender ~2–3k pages, `dynamicParams`, tag-based revalidation) + Meilisearch (≤10k); D = 20k tuning (sharded sitemaps, facet snapshots, popularity cron). → file 11.
@@ -164,7 +164,7 @@ Every known conflict in the legacy docs, with its ruling. Verified against exact
 
 - Re-opening a D-ruling inside an implementation PR ("wouldn't map-default be nicer?") — amendments go through file 14's process.
 - Citing UX_SPEC/DESIGN_SYSTEM_V2 as authority for anything this set covers.
-- Adding a "small" carousel, autoplay, ambient animation, fabricated stat, or hardcoded count because a single surface seems to want one.
+- Adding motion, carousels, gradients, fabricated stats, or hardcoded counts *beyond the sanctioned sets in files 03/08* because a single surface seems to want them — extensions go through the amendment process, not improvisation.
 
 ## 10. What Sonnet does next
 

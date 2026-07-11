@@ -1,13 +1,14 @@
 # 08 — Animation & Motion System
 
 > **CTemples Master Specification, file 8 of 14.** Status: **normative**. Precedence per `01_PRODUCT_NORTH_STAR.md`.
-> Supersedes: DESIGN_SYSTEM_V2 §11, UX_SPEC motion clauses, CLAUDE.md "Carousels and autoplay" (absorbed). Rulings carried: D2 (no autoplay), D3 (3D policy), D22 (micro-interactions), D23 (one carousel).
+> Supersedes: DESIGN_SYSTEM_V2 §11, UX_SPEC motion clauses, CLAUDE.md "Carousels and autoplay" (absorbed). Rulings carried: D2 (autoplay per §6, as amended), D3 (3D policy), D22 (micro-interactions), D23 (carousel law, as amended).
+> **Amended 2026-07-11 (Amendment A, user-directed):** hero autoplay sanctioned (§6 autoplay law), Ken Burns slide drift sanctioned (§5), showcase carousels for curated rows sanctioned (§6), two-tier duration ceiling (§2). Reduced-motion behavior is unchanged: it always yields the calm, static site.
 
 ---
 
 ## 1. Philosophy
 
-Motion is punctuation, not decoration. The site has exactly **one signature moment** (the card→hero morph), a quiet scroll-reveal grammar, three sanctioned micro-interactions, and nothing else. If a proposed animation isn't in this file, it doesn't ship.
+Motion is the festival's rhythm, not noise. The site has **one signature transition** (the card→hero morph), a living hero (autoplay + Ken Burns under a visible pause control), a quiet scroll-reveal grammar, showcase carousels for curated editorial rows, and three sanctioned micro-interactions — and nothing else. If a proposed animation isn't in this file, it doesn't ship.
 
 ## 2. Motion tokens
 
@@ -21,8 +22,9 @@ Motion is punctuation, not decoration. The site has exactly **one signature mome
 | stagger | 60ms | children within a revealed group |
 | micro | 150–400ms | hovers, fills, micro-interactions |
 | crossfade | 300ms | hero slide changes |
+| `--hero-dwell` | 7000ms | autoplay dwell per hero slide; also the Ken Burns and dot-progress duration |
 
-Hard ceiling: **400ms** for any single animation. Nothing loops. Nothing plays without a user gesture or a scroll-into-view trigger.
+Two-tier ceiling *(Amendment A — was a single 400ms ceiling)*: **interaction motion** (hover, popovers, filters, navigation) stays ≤400ms; **dwell-scoped motion** (Ken Burns drift, the autoplay progress dot) runs the length of `--hero-dwell` — it is progress indication and cinematic drift, not UI response. Nothing loops infinitely (each dwell animation is a finite run, restarted per slide). Motion starts only from a user gesture, a scroll-into-view trigger, or the hero's autoplay clock — which always ships with its visible pause control (§6).
 
 ## 3. The signature moment — card→hero shared-element morph
 
@@ -48,12 +50,29 @@ Hard ceiling: **400ms** for any single animation. Nothing loops. Nothing plays w
 | 2 | State boundary trace | selecting a map state | one-shot `stroke-dasharray` trace of the selected polygon's outline, 350ms | instant selected fill, no trace |
 | 3 | Section-index caret | scroll-spy target change | caret translateY to active item, 200ms | instant jump |
 
-Plus the ambient-free standard set: card lift/zoom on hover (file 03 §5), button `active:scale-[0.98]`, link-draw underline (200ms background-size), popover fade/scale-in ≤150ms, hero crossfade 300ms, map-state fill transitions 150ms, bottom-sheet spring (Framer default, damped — no bounce past target).
+Plus the standard set: card lift/zoom on hover (file 03 §5), button `active:scale-[0.98]`, link-draw underline (200ms background-size), popover fade/scale-in ≤150ms, hero crossfade 300ms, map-state fill transitions 150ms, bottom-sheet spring (Framer default, damped — no bounce past target).
 
-## 6. Carousel & autoplay law (absorbed from the locked decisions)
+**Sanctioned dwell-scoped motion (Amendment A):**
+| # | Motion | Spec | Reduced motion |
+|---|---|---|---|
+| 4 | Hero Ken Burns drift | visible slide's image scales 1.0→1.05, linear, over `--hero-dwell`; restarts on slide change; plain 2D scale (morph-safe) | none — static image |
+| 5 | Autoplay progress dot | active hero dot fills 0→100% width over `--hero-dwell` while autoplay runs; static bar when paused/stopped | static bar |
 
-- The homepage hero is the **only** carousel: user-driven (arrows/dots/keyboard ←→ Home/End/swipe), crossfade 300ms, **no autoplay in any form** — no auto-advance, no autoplay-paused-on-hover, no kinetic drift.
-- Every other multi-item surface is a grid or a native horizontal scroll (momentum scrolling, right-edge fade hint, no JS carousel, no arrows/dots).
+Still banned, unchanged: flames, glow pulses, slow spins, marquee text, particle systems, parallax, and any infinite loop.
+
+## 6. Carousel & autoplay law *(rewritten 2026-07-11, Amendment A — was "no autoplay in any form")*
+
+**The hero autoplay law** — the homepage hero is the only autoplaying surface, and its autoplay must satisfy ALL of:
+1. **Dwell 7s** (`--hero-dwell`), wrap-around advance, crossfade 300ms.
+2. **Visible pause/play toggle** (≥44px, correct `aria-label` both states) — the WCAG 2.2.2 pause mechanism; it must work for touch and keyboard users, not just hover.
+3. **Pauses** while the pointer is over the carousel region or focus is inside it; **resumes** when both leave.
+4. **Stops for the visit** on any manual navigation (arrow, dot, keyboard, swipe); only the toggle restarts it.
+5. **Never starts** under `prefers-reduced-motion` or Save-Data; never steals focus; never triggers SR announcements (the polite live region speaks only after user interaction).
+6. Ships with the progress-dot affordance (§5#5) so auto-advance is visible, not surprising.
+
+**Showcase carousels (curated rows only):** trip ideas and future hand-curated editorial sets may be center-emphasis, **user-driven** carousels — native horizontal scroll + `scroll-snap` (center-aligned), peeking neighbors at reduced scale/opacity, prev/next buttons (≥44px), drag/swipe. No autoplay, no timers. Computed/data-driven lists stay grids or plain scroll rows — Explore results and the temple page's computed "Plan around" sections are not curated (file 06 §12's ban stands); a filter tap must never animate a carousel.
+
+- Any other multi-item surface remains a grid or plain native horizontal scroll (momentum, right-edge fade hint, no arrows/dots).
 - Video (when it exists): `muted` + `playsInline`, poster shown, plays only on explicit tap; visible "Tap to unmute" is the only path to sound. `prefers-reduced-data`: no video preload.
 
 ## 7. Reduced-motion matrix (every animation × its reduced behavior)
@@ -64,6 +83,9 @@ Global CSS forces `animation-duration/transition-duration → 0.001ms` under `pr
 |---|---|
 | View-transition morph + slides | disabled; instant navigation |
 | Scroll reveals / stagger | content visible immediately (no transform, no blur; opacity-only 200ms fade permitted) |
+| Hero autoplay | never starts (manual navigation only) |
+| Hero Ken Burns | none — static image |
+| Trip showcase carousel | scroll-linked scale/opacity emphasis off (uniform cards); snap + arrows still work |
 | Hero crossfade | instant slide swap |
 | Card hover lift/zoom | color/border feedback only |
 | Micro-interactions 1–3 | per table §5 |
@@ -83,13 +105,15 @@ Global CSS forces `animation-duration/transition-duration → 0.001ms` under `pr
 Both are additive `MediaItem.kind` values in the future (`"panorama"`, `"model"`); the schema anticipates extension, nothing implements them now. Any other 3D proposal requires a file-14 amendment with a named user benefit that photography cannot deliver.
 
 ## 9. Acceptance criteria
-- Zero `animation-iteration-count: infinite` (or equivalent loops) anywhere; grep for `repeat: Infinity` returns nothing.
-- With `prefers-reduced-motion: reduce`: no element transforms on scroll or hover; navigation is instant; the site remains fully functional and visually complete.
-- No animation exceeds 400ms; no animation fires without gesture/scroll trigger.
+- Zero `animation-iteration-count: infinite` (or equivalent loops) anywhere; grep for `repeat: Infinity` returns nothing. (Ken Burns and the progress dot are finite per-dwell runs, restarted per slide — not loops.)
+- With `prefers-reduced-motion: reduce`: no element transforms on scroll or hover; navigation is instant; autoplay never starts; the site remains fully functional and visually complete.
+- No **interaction** animation exceeds 400ms; dwell-scoped motion (§5#4–5) runs exactly `--hero-dwell`; nothing else fires without gesture/scroll trigger.
+- The hero autoplay law (§6) passes all six clauses, verified in-browser (hover-pause, focus-pause, manual-stop, toggle, reduced-motion off, progress dot).
 - The morph survives: card image → hero image is a single continuous element transition on supporting browsers.
 
 ## 10. Anti-patterns
-- "Tasteful" ambient loops (flames, glows, slow spins, marquee text) — the answer is no.
+- Ambient loops (flames, glows, slow spins, marquee text, particles) — the sanctioned set in §5 is exhaustive; the answer to "one more tasteful loop" is no.
+- Autoplay anywhere but the hero, or hero autoplay missing any clause of the §6 law (an autoplay without a working pause control is an accessibility defect, not a style choice).
 - Reveal-wrapping Explore results or anything a filter tap re-renders.
 - Skeleton shimmer animations for server-rendered content (content arrives with the page; skeletons are for genuinely async islands only).
 - Re-adding parallax (component was deleted; stays deleted).
