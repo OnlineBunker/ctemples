@@ -91,7 +91,7 @@ Festival energy, refined. A calm porcelain canvas carries saturated festival pig
 
 ## 4. Layout, space, radius, shadow, z
 
-- **Shell:** `max-w-[1280px]`, padding 20/32/48px (base/sm/lg). Hero band may use 1440px; never full-bleed text.
+- **Shell:** `max-w-[1440px]`, padding 20/32/48px (base/sm/lg); never full-bleed text. (Widened from the original 1280px — 2026-07-10, in-chat decision — 1280px left ~15%+ empty margin on common 1440–1512px laptop screens; 1440px was already the sanctioned hero-band ceiling, now applied to the shell uniformly instead of as a hero-only exception.)
 - **Spacing:** 4px base scale. Section rhythm: `py-14 md:py-20`. Card padding 20px; popover padding 12px; gaps 16–24px.
 - **Grid columns:** cards 1/2/3 (mobile/tablet/desktop); trip ideas 1/2/4; state tiles 2/3/4/6 (…/lg/xl); deity tiles 2/2/3.
 - **Radius:** `card` 20px (cards, popovers, panels, images); `xl` 12px (menus, inputs); `full` (buttons, chips, pills, dots).
