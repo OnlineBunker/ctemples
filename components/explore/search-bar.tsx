@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, useTransition, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, Loader2 } from "lucide-react";
 import { buildExploreHref, withQuery, type ParsedExploreParams } from "@/lib/explore-url";
@@ -10,8 +10,19 @@ import { buildExploreHref, withQuery, type ParsedExploreParams } from "@/lib/exp
  * `router.replace` (App Router — re-runs the server component, docs/02 §3.1); Enter
  * commits immediately via `router.push`. Never client-side filtering (docs/10 §1).
  */
-export function SearchBar({ current }: { current: ParsedExploreParams }) {
+export function SearchBar({
+  current,
+  placeholder = "Search temples, deities, places…",
+}: {
+  current: ParsedExploreParams;
+  /** Map mode scopes the copy to the selected state (docs/05 §6). */
+  placeholder?: string;
+}) {
   const router = useRouter();
+  // Map mode mounts two SearchBars at once (desktop pane + mobile sheet, toggled by CSS),
+  // so a hardcoded id would collide — useId() keeps input/label association unique per
+  // instance and valid.
+  const inputId = useId();
   const [value, setValue] = useState(current.q);
   const [isPending, startTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -67,16 +78,16 @@ export function SearchBar({ current }: { current: ParsedExploreParams }) {
         className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
         aria-hidden
       />
-      <label htmlFor="explore-search" className="sr-only">
+      <label htmlFor={inputId} className="sr-only">
         Search temples, deities, places
       </label>
       <input
-        id="explore-search"
+        id={inputId}
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder="Search temples, deities, places…"
+        placeholder={placeholder}
         className="h-12 w-full rounded-full border border-line-strong bg-canvas pl-11 pr-11 text-base text-ink placeholder:text-ink-muted focus-visible:outline-none focus-visible:border-magenta"
       />
       {isPending ? (

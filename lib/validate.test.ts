@@ -21,6 +21,13 @@ describe("validateTemple", () => {
     expect(issues.some((i) => i.includes("lat") || i.includes("lng"))).toBe(true);
   });
 
+  it("flags coordinates inside India but in the wrong state (docs/07 §2.3)", () => {
+    // Fixture's state is "Tamil Nadu" (south India); these coordinates are Amritsar,
+    // Punjab (north India) — inside India's bounding box, but nowhere near Tamil Nadu.
+    const issues = validateTemple(makeTemple({ coordinates: { lat: 31.62, lng: 74.8765 } }));
+    expect(issues.some((i) => i.includes("mapped boundary"))).toBe(true);
+  });
+
   it("requires 3–4 cost estimates", () => {
     const tooFew = makeTemple({ costEstimates: makeTemple().costEstimates.slice(0, 1) });
     expect(validateTemple(tooFew).some((i) => i.includes("cost estimates"))).toBe(true);

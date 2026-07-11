@@ -11,6 +11,10 @@ export interface StateStripItem {
   slug: string;
   region: Region;
   count: number;
+  /** The state's 48×48-normalized silhouette path (docs/07 §8), resolved server-side and
+   *  passed down so this client component never imports the map geometry. `null` → the
+   *  gopuram mark stands in (callout-marker states, or a missing silhouette). */
+  silhouette: string | null;
   top: StatePopoverItem[];
 }
 
@@ -18,14 +22,25 @@ export interface StateStripItem {
  * A state tile: a button that opens a popover of the state's top temples. Owns the
  * popover's focus management — focuses the first item on open, traps Tab, closes on Esc
  * (restoring focus to the button) and on outside pointer. Single-open is enforced by the
- * parent (StateStrip). State silhouettes (Phase 4 GeoJSON) aren't ready, so a small
- * region-tinted gopuram mark stands in — the Phase 2 fallback.
+ * parent (StateStrip). The icon is the state's actual silhouette (docs/07 §8), region-tinted;
+ * the gopuram mark stands in only where a silhouette is missing or too degenerate at 48px
+ * (the callout-marker states).
  *
  * Popover alignment is measured at click time (not derived from the tile's index): the
  * grid's column count changes per breakpoint (2/3/4/6-up), so index parity doesn't
  * reliably predict which half of the viewport a tile sits in. Measuring the tile's
  * actual position is breakpoint-agnostic and keeps the popover on-screen.
  */
+function StateIcon({ silhouette }: { silhouette: string | null }) {
+  if (!silhouette) {
+    return <GopuramMark className="h-6 w-6" />;
+  }
+  return (
+    <svg viewBox="0 0 48 48" className="h-6 w-6" aria-hidden>
+      <path d={silhouette} fill="currentColor" />
+    </svg>
+  );
+}
 export function StateTile({
   item,
   isOpen,
@@ -113,7 +128,7 @@ export function StateTile({
           className="inline-flex h-10 w-10 items-center justify-center rounded-full"
           style={{ color: pigment, backgroundColor: `${pigment}14` }}
         >
-          <GopuramMark className="h-6 w-6" />
+          <StateIcon silhouette={item.silhouette} />
         </span>
         <span>
           <span className="block font-display text-base font-semibold leading-tight text-plum">

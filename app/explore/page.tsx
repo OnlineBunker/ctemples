@@ -13,9 +13,13 @@ import { SmartMatchBanner } from "@/components/explore/smart-match-banner";
 import { ResultGrid } from "@/components/explore/result-grid";
 import { Pagination } from "@/components/explore/pagination";
 import { ModeToggle } from "@/components/explore/mode-toggle";
-import { MapModeNotice } from "@/components/explore/map-mode-notice";
 import { YourStatePill } from "@/components/explore/your-state-pill";
 import { EmptyState } from "@/components/explore/empty-state";
+// The map bundle (IndiaMap geometry + region pills + Framer Motion sheet) loads only under
+// ?view=map (docs/05 §6's last bullet) — list mode never pays for it. The client-side
+// lazy boundary (ssr:false) is what actually keeps it out of the /explore page chunk; a
+// server-side next/dynamic here did not.
+import { ExploreMapViewLazy as ExploreMapView } from "@/components/explore/explore-map-view.lazy";
 
 type SearchParamsInput = Promise<Record<string, string | string[] | undefined>>;
 
@@ -93,36 +97,45 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
         stateOptions={allStates.map((s) => ({ state: s.state, slug: s.slug }))}
       />
 
-      <div className="mt-8">
-        <SearchBar current={parsed} />
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-3">
-        <StateFilter current={parsed} options={result.facets.states} selectedLabel={stateLabel} />
-        <DeityFilter current={parsed} counts={result.facets.deities} />
-        <TagFilter current={parsed} options={result.facets.tags} />
-        <SortFilter current={parsed} />
-      </div>
-
-      <ActiveFilterChips current={parsed} stateLabel={stateLabel} tagLabels={tagLabels} />
-
-      {result.matchedAliases.length > 0 && !parsed.exact ? (
-        <SmartMatchBanner current={parsed} matchedAliases={result.matchedAliases} />
-      ) : null}
-
-      <p className="mt-6 font-mono text-[0.68rem] uppercase tracking-label text-ink-muted" aria-live="polite">
-        {countLine}
-      </p>
-
-      {parsed.view === "map" ? <MapModeNotice /> : null}
-
-      {result.items.length > 0 ? (
+      {parsed.view === "map" ? (
         <>
-          <ResultGrid items={result.items} />
-          <Pagination current={parsed} page={result.page} totalPages={result.totalPages} />
+          <p className="mt-6 font-mono text-[0.68rem] uppercase tracking-label text-ink-muted" aria-live="polite">
+            {countLine}
+          </p>
+          <ExploreMapView current={parsed} result={result} allStates={allStates} stateLabel={stateLabel} />
         </>
       ) : (
-        <EmptyState current={parsed} />
+        <>
+          <div className="mt-8">
+            <SearchBar current={parsed} />
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <StateFilter current={parsed} options={result.facets.states} selectedLabel={stateLabel} />
+            <DeityFilter current={parsed} counts={result.facets.deities} />
+            <TagFilter current={parsed} options={result.facets.tags} />
+            <SortFilter current={parsed} />
+          </div>
+
+          <ActiveFilterChips current={parsed} stateLabel={stateLabel} tagLabels={tagLabels} />
+
+          {result.matchedAliases.length > 0 && !parsed.exact ? (
+            <SmartMatchBanner current={parsed} matchedAliases={result.matchedAliases} />
+          ) : null}
+
+          <p className="mt-6 font-mono text-[0.68rem] uppercase tracking-label text-ink-muted" aria-live="polite">
+            {countLine}
+          </p>
+
+          {result.items.length > 0 ? (
+            <>
+              <ResultGrid items={result.items} />
+              <Pagination current={parsed} page={result.page} totalPages={result.totalPages} />
+            </>
+          ) : (
+            <EmptyState current={parsed} />
+          )}
+        </>
       )}
     </div>
   );

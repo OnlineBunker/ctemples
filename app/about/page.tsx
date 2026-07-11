@@ -113,6 +113,19 @@ export default function AboutPage() {
         its various free licenses. Per-image credit lines are on the way; until then, this note
         stands as the site-wide attribution.
       </p>
+
+      <p className="mt-4 rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-subtle">
+        Map data ©{" "}
+        <a
+          href="https://github.com/datameet/maps"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline decoration-line-strong underline-offset-2 hover:text-ink"
+        >
+          DataMeet community maps
+        </a>{" "}
+        (CC BY 4.0). State boundaries in Explore&rsquo;s map mode are simplified from this dataset.
+      </p>
     </div>
   );
 }

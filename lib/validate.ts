@@ -1,6 +1,8 @@
 import type { Temple, Region } from "./types";
 import { REGION_ORDER } from "./regions";
 import { isRegisteredTag } from "@/data/tag-registry";
+import { slugify } from "./utils";
+import { checkCoordinateInState } from "./geo";
 
 /**
  * Dev-time data-shape validation. Not a runtime dependency of the UI — it guards
@@ -39,6 +41,12 @@ export function validateTemple(t: Temple): string[] {
     lng >= INDIA_BOUNDS.lngMin && lng <= INDIA_BOUNDS.lngMax,
     `lng ${lng} is outside India's bounds`,
   );
+  if (t.state && Number.isFinite(lat) && Number.isFinite(lng)) {
+    check(
+      checkCoordinateInState({ lat, lng }, slugify(t.state)),
+      `coordinates (${lat}, ${lng}) fall outside "${t.state}"'s mapped boundary (docs/07 §2.3) — the map and the data must never disagree`,
+    );
+  }
 
   check(
     Array.isArray(t.costEstimates) && t.costEstimates.length >= 3 && t.costEstimates.length <= 4,

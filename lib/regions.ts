@@ -98,3 +98,59 @@ export const REGION_ICON_PATHS: Record<Region, string> = {
 export function regionIconPath(region: Region): string {
   return REGION_ICON_PATHS[region];
 }
+
+/**
+ * Every one of the 36 states/UTs' cultural region (docs/07 §3's region pills, D9) — a
+ * fixed geographic fact, unlike `Temple.region` (hand-set per record). Zero-temple
+ * states still need a region for the map's region-pill dimming to work at all 36, not
+ * just the ones with data. Consistent with every temple record's own `region` field for
+ * the 12 states currently in data/temples.ts (this is not derived from it — a state's
+ * region can't depend on whether it happens to have a temple yet).
+ */
+export const STATE_REGION: Record<string, Region> = {
+  "Jammu and Kashmir": "North",
+  Ladakh: "North",
+  "Himachal Pradesh": "North",
+  Punjab: "North",
+  Haryana: "North",
+  Delhi: "North",
+  Uttarakhand: "North",
+  Chandigarh: "North",
+  "Uttar Pradesh": "North",
+
+  "Tamil Nadu": "South",
+  Kerala: "South",
+  Karnataka: "South",
+  "Andhra Pradesh": "South",
+  Telangana: "South",
+  Puducherry: "South",
+  Lakshadweep: "South",
+
+  Odisha: "East",
+  "West Bengal": "East",
+  Jharkhand: "East",
+  Bihar: "East",
+  "Andaman and Nicobar Islands": "East",
+
+  Gujarat: "West",
+  Maharashtra: "West",
+  Rajasthan: "West",
+  Goa: "West",
+  "Dadra and Nagar Haveli and Daman and Diu": "West",
+
+  Assam: "Northeast",
+  "Arunachal Pradesh": "Northeast",
+  Meghalaya: "Northeast",
+  Manipur: "Northeast",
+  Mizoram: "Northeast",
+  Nagaland: "Northeast",
+  Tripura: "Northeast",
+  Sikkim: "Northeast",
+
+  "Madhya Pradesh": "Central",
+  Chhattisgarh: "Central",
+};
+
+export function regionForState(stateName: string): Region | undefined {
+  return STATE_REGION[stateName];
+}

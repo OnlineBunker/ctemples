@@ -12,22 +12,24 @@ An inline SVG of India with 36 interactive state/UT polygons and a region-cluste
 ## 2. Geometry pipeline (D16)
 
 ### 2.1 Source
-**datameet/maps** (github.com/datameet/maps) state boundaries — community-standard, **Survey-of-India-aligned** (full J&K/Ladakh depiction, which is the legally required representation for an India-market product; Natural Earth is rejected because it draws de-facto international lines). License: **CC-BY 2.5 IN** → attribution is mandatory (§2.4).
+**datameet/maps** (github.com/datameet/maps) state boundaries — community-standard, **Survey-of-India-aligned** (full J&K/Ladakh depiction, which is the legally required representation for an India-market product; Natural Earth is rejected because it draws de-facto international lines). License: **CC BY 4.0**, per the repository's own README (corrected 2026-07-11 at Phase 4 build time — the repo states CC BY 4.0, not the CC-BY 2.5 IN this file originally assumed) → attribution is mandatory (§2.4).
 
 ### 2.2 Build pipeline (one-time script, committed output)
-`scripts/build-india-geo.mjs`:
-1. Input: datameet states GeoJSON (post-2019 reorganization: 28 states + 8 UTs = 36 features; merge/rename to match the canonical state names used in `data/temples.ts` — e.g. "Jammu and Kashmir", "Ladakh").
-2. Simplify: mapshaper, Visvalingam weighted, **keep-shapes**, retain ~4–5% of points.
-3. Project once (equirectangular with lat-correction is sufficient at this display size), scale into a **1000×1100 viewBox** (portrait aspect fits India), round coordinates to 1 decimal.
-4. Emit `lib/india-geo.ts`: `INDIA_VIEWBOX`, and `INDIA_STATES: { slug, name, path, labelPoint: [x,y], area: number }[]` — slugs must equal `slugify(stateName)` so they join `getStateCounts()` output directly.
-5. Budget: generated file ≤80KB raw. If over, drop to 3% retention before any other measure.
-Also emit `stateCentroids` for the detail-page plot (§7) and tile silhouettes (§8).
+Two stages, both committed (docs/13's "checked-in output" rule) since Node has no shapefile reader:
+
+**Stage A (manual, one-time, mapshaper CLI):** `Admin2.shp` (datameet/maps `States/`, 36 features) → `mapshaper Admin2.shp -simplify visvalingam keep-shapes 0.2% -filter-fields ST_NM -rename-fields state=ST_NM -o format=geojson precision=0.001` → committed to `scripts/geo-src/india-states-simplified.geojson`. **0.2%, not the originally-planned ~4–5%** — 5% alone produced a >1MB output; 0.2% was the retention level that actually held the 80KB budget (§2.2 step 5) while staying visually recognizable (verified by rendering it before proceeding).
+
+**Stage B (`node scripts/build-india-geo.mjs`, re-run whenever Stage A's input changes):**
+1. Rename the 2 states whose datameet spelling doesn't match `data/temples.ts`'s convention ("Jammu & Kashmir" → "Jammu and Kashmir", "Andaman & Nicobar" → "Andaman and Nicobar Islands").
+2. Project (equirectangular + `cos(meanLat)` longitude correction, one shared global scale/offset so relative state sizes stay geographically honest), scale into a **1000×1100 viewBox**, round coordinates to 1 decimal.
+3. Emit `lib/india-geo.ts`: `INDIA_VIEWBOX`, `INDIA_STATES: { slug, name, path, labelPoint: [x,y], area: number }[]` (slugs = `slugify(stateName)`, joining `getStateCounts()` directly), `STATE_CENTROIDS` (real lng/lat per slug, for §7), `STATE_SILHOUETTES` (per-state 48×48-normalized paths, for §8), `CALLOUT_STATE_SLUGS` (computed from `area`, not hardcoded — §5#1), and `GEO_PROJECTION` (the projection constants, re-consumed by `lib/geo.ts` for §2.3's point-in-polygon check without duplicating ring coordinates).
+4. Budget: generated file ≤80KB raw (actual: 65KB at 0.2% retention).
 
 ### 2.3 Coordinate → state integrity
-`checkCoordinateInState` (point-in-polygon against these polygons) joins the validation suite (file 09 §6) — the map and the data can never disagree silently.
+`checkCoordinateInState` (point-in-polygon against these polygons, implemented in `lib/geo.ts`) joins the validation suite (file 09 §6) — the map and the data can never disagree silently. A small tolerance (12 viewBox-units, ~1–2% of the map's width) accepts points just outside a boundary: the 0.2% simplification pass needed to hold the 80KB budget (§2.2) occasionally pinches off thin peninsulas/islands by a few units (observed: Rameswaram's Pamban Island, ~8 units outside the simplified Tamil Nadu boundary despite correct coordinates) — this is the map being a "navigation instrument, not GIS" (§1), not a data error. A coordinate placed in the wrong state entirely misses by tens-to-hundreds of units and still fails.
 
 ### 2.4 Attribution (license obligation)
-- Map-mode caption (mono micro, ink-muted): "Map data © DataMeet community maps (CC-BY 2.5 IN)" with a link.
+- Map-mode caption (mono micro, ink-muted): "Map data © DataMeet community maps (CC BY 4.0)" with a link.
 - A matching credit line on `/about` and in the README. This ships **with** the map, not later.
 
 ## 3. Anatomy of map mode
@@ -60,7 +62,7 @@ Also emit `stateCentroids` for the detail-page plot (§7) and tile silhouettes (
 
 ## 5. Touch & small-geometry strategy
 
-1. **Callout markers for sub-target geographies:** any state/UT whose rendered area < 44px² at the default desktop size (Delhi, Chandigarh, Puducherry, Lakshadweep, Andaman & Nicobar, Goa, Sikkim, Dadra & Nagar Haveli and Daman & Diu — final list computed from `area` at build) renders a fixed 12px circle marker at `labelPoint` with a leader line, styled by the same state matrix; the marker (not the sliver polygon) is the interactive element with an invisible 44×44 hit area.
+1. **Callout markers for sub-target geographies:** any state/UT whose rendered area < 44px² at the default desktop size (final list computed from `area` at build — as implemented: Chandigarh, Dadra & Nagar Haveli and Daman & Diu, Lakshadweep, Puducherry) renders a fixed 12px circle marker at `labelPoint`, styled by the same state matrix; the marker (not the sliver polygon) is the interactive element, carrying an enlarged transparent hit circle whose clicks bubble to the state `<g>`. **Leader line — clarified at Phase 4 build time (2026-07-11):** the marker renders *at* `labelPoint`, coincident with the geography, so no leader line is drawn (there is nothing to bridge; a connector to a marker sitting on top of the sliver would be zero-length). An offset marker + connector was rejected because a 44px hit area offset into neighbouring land would steal the neighbour's taps in this dense viewBox.
 2. **Expanded hit paths:** every polygon gets `stroke-width: 8; stroke: transparent; pointer-events: stroke` on a duplicate hit-path so borders are forgiving on touch.
 3. **The map never stands alone:** the results column (or bottom sheet) always offers the same selection via a state list/select — the guaranteed path for touch, zoom, and screen-reader users.
 
@@ -98,6 +100,8 @@ SVG-over-tiles holds at every scale because the map answers "which state?", neve
 - Leaflet/Mapbox/Google "just for zoom"; raster India images; per-temple dots on the national map (20k dots is soup — clusters + state selection is the model).
 - Writing labels inside selected fills; tinting states by region pigment at rest (rest is neutral; color = interaction state).
 - A tab stop per polygon *plus* per list item without coordination (the hidden list and polygons must not double-announce; the SVG is `aria-hidden` **only if** the team chooses list-only SR strategy — default is both wired, tested with VoiceOver, whichever announces cleanly wins and is recorded here via amendment).
+
+**A11y-strategy amendment (2026-07-11, Phase 4 build):** shipped **both wired** — the visually-hidden parallel `<ul>` (the SR contract, §6) *and* the interactive SVG `<g>` polygons, accepting the double tab-stop for sighted keyboard users (~72 stops for 36 states). This is the spec's stated default; the VoiceOver A/B that would let us collapse to a single path (list-only, `aria-hidden` on the SVG) was **not run** — no VoiceOver/AT environment was available at build time, so no listening result exists to justify overriding the default. Both paths carry identical labels and behaviour (including the region-lens dimmed gate, which now disables the matching list buttons too). A future AT pass should run the A/B and, if list-only announces more cleanly, `aria-hidden` the SVG and record that here. Note the visible `MapStateSelect` (§5#3) is an *additional* touch/zoom/pointer path, not the SR contract — it does not replace the parallel list.
 
 ## 13. What Sonnet does next
 Phase 4 (file 13): run the geometry script (checked-in output), build `IndiaMap` + region pills + cluster layer + callout markers against §3–6 verbatim, wire `?state=`/results column per file 05, add the boundary-trace micro-interaction, ship the attribution caption, and add `checkCoordinateInState` to the validators. The silhouette upgrade (§8) is a separate line item in the same phase.

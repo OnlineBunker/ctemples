@@ -142,6 +142,10 @@ On Render: a Docker web service, port `3000`, no other config required.
 
 ## Notes
 
+- **Map data.** Explore's map mode (`?view=map`) uses state/UT boundaries from
+  [DataMeet community maps](https://github.com/datameet/maps) (CC BY 4.0), simplified at build
+  time by `scripts/build-india-geo.mjs` into `lib/india-geo.ts`. Attribution appears in map mode
+  and on `/about`.
 - **No backend.** The Partner form (`/contact`) is UI-only and says so — it never pretends
   to send anything.
 - **`npm audit`** reports advisories in **dev-only tooling** (esbuild/vite via vitest, and a

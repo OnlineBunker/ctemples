@@ -14,6 +14,18 @@ import type { StateStripItem } from "@/components/home/state-tile";
 import { PopularSearches } from "@/components/home/popular-searches";
 import { DeityTiles } from "@/components/home/deity-tiles";
 import { MethodologyTeaser } from "@/components/home/methodology-teaser";
+import { STATE_SILHOUETTES, CALLOUT_STATE_SLUGS } from "@/lib/india-geo";
+
+// Resolve each tile's silhouette on the SERVER and pass the path string down, rather than
+// importing the (36KB) geometry into the client StateTile — that static client import
+// would drag the whole map dataset onto the home route's bundle (docs/05 §6: list/home
+// never pays for the map). Callout-marker states are too small/thin to read at 48px, so
+// they fall back to the gopuram mark (silhouette = null), same as a missing entry.
+const CALLOUT_SLUG_SET = new Set(CALLOUT_STATE_SLUGS);
+function silhouetteFor(slug: string): string | null {
+  if (CALLOUT_SLUG_SET.has(slug)) return null;
+  return STATE_SILHOUETTES[slug] ?? null;
+}
 
 /**
  * Homepage (UX_SPEC §5.1). Everything below is derived from data/temples.ts — no count
@@ -44,6 +56,7 @@ export default async function HomePage() {
       slug: sc.slug,
       region: sc.region,
       count: sc.count,
+      silhouette: silhouetteFor(sc.slug),
       top: (await getTopTemplesByState(sc.state, 4)).map((t) => ({
         id: t.id,
         name: t.name,
