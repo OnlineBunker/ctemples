@@ -1,6 +1,7 @@
 import type { Temple } from "./types";
 import { DEITY_ORDER, matchesDeity, type DeityKey } from "./deities";
-import { SEARCH_ALIASES } from "./search-aliases";
+import { slugify } from "./utils";
+import { matchAliases, type AliasTarget } from "./search-aliases";
 
 export interface SearchOptions {
   limit?: number;
@@ -25,11 +26,32 @@ function isDeityKey(s: string): s is DeityKey {
 }
 
 /**
- * Alias-aware ranked search over a temple array. Pure and server-safe — per UX_SPEC
- * §4.1 ("no client-side search computation"), this is meant to be called from a server
- * component, never shipped to the client. Ranking formula from UX_SPEC §4.2:
+ * One fired alias's target's contribution to a temple's score (docs/10 §4 weights:
+ * temple +2.5 pins the target; deity/place +2.0; tag +1.5).
+ */
+function targetScore(t: Temple, target: AliasTarget): number {
+  switch (target.type) {
+    case "deity":
+      return matchesDeity(t, target.key) ? 2.0 : 0;
+    case "temple":
+      return t.id === target.slug ? 2.5 : 0;
+    case "place": {
+      const cityHit = !!target.city && t.city.toLowerCase() === target.city.toLowerCase();
+      const stateHit = !!target.stateSlug && slugify(t.state) === target.stateSlug;
+      return cityHit || stateHit ? 2.0 : 0;
+    }
+    case "tag":
+      return t.tags.some((tag) => tag.toLowerCase() === target.tag.toLowerCase()) ? 1.5 : 0;
+  }
+}
+
+/**
+ * Alias-aware ranked search over a temple array. Pure and server-safe — per docs/10 §1
+ * ("no client-side search computation, ever"), this is meant to be called from a server
+ * component or server action, never shipped to the client. Ranking formula (docs/10 §2):
  *
- *   score = 2.0*(alias hit) + 1.5*(deity match) + 1.2*(name match) + 0.8*(city/state)
+ *   score = 2.0*(alias hit: deity/place) + 2.5*(alias hit: temple) + 1.5*(alias hit: tag)
+ *         + 1.5*(deity match) + 1.2*(name match) + 0.8*(city/state)
  *         + 0.5*(tag) + 0.3*(overview/history) + rating_bonus
  *
  * An empty query returns the full list sorted by rating (the default Explore order).
@@ -48,13 +70,20 @@ export function searchTemples(
     return { results: applyLimit(results, options), matchedAliases: [] };
   }
 
-  const aliasCanonical = options.disableAliases ? undefined : SEARCH_ALIASES[q];
-  const matchedAliases = aliasCanonical ? [q] : [];
+  // Per-token (word-boundary) matching, not a whole-query lookup (docs/10 §4) — a fired
+  // alias's targets can each contribute (composable, D10), and more than one alias can
+  // fire in the same query.
+  const firedAliases = options.disableAliases ? [] : matchAliases(q);
+  const matchedAliases = firedAliases.map((a) => a.alias);
 
   const scored = list.map((t) => {
     let score = 0;
 
-    if (aliasCanonical && matchesDeity(t, aliasCanonical)) score += 2.0;
+    for (const alias of firedAliases) {
+      for (const target of alias.targets) {
+        score += targetScore(t, target);
+      }
+    }
 
     const deityHit =
       (isDeityKey(q) && matchesDeity(t, q)) ||

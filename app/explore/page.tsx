@@ -119,8 +119,8 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
 
           <ActiveFilterChips current={parsed} stateLabel={stateLabel} tagLabels={tagLabels} />
 
-          {result.matchedAliases.length > 0 && !parsed.exact ? (
-            <SmartMatchBanner current={parsed} matchedAliases={result.matchedAliases} />
+          {result.matchedAliasLabel && !parsed.exact ? (
+            <SmartMatchBanner current={parsed} label={result.matchedAliasLabel} />
           ) : null}
 
           <p className="mt-6 font-mono text-[0.68rem] uppercase tracking-label text-ink-muted" aria-live="polite">

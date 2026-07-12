@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { searchTemples } from "./search";
-import { SEARCH_ALIASES } from "./search-aliases";
 import { makeTemple } from "./__fixtures__/temple";
 
 const kashi = makeTemple({
@@ -90,15 +89,15 @@ describe("searchTemples", () => {
   it("is case-insensitive and trims whitespace", () => {
     expect(searchTemples(all, "  SHIVA  ").results.map((t) => t.id)).toEqual(["kashi"]);
   });
-});
 
-describe("SEARCH_ALIASES", () => {
-  it("has at least 8 entries, each resolving to a canonical deity key", () => {
-    const entries = Object.entries(SEARCH_ALIASES);
-    expect(entries.length).toBeGreaterThanOrEqual(8);
-    const validKeys = new Set(["shiva", "vishnu", "devi", "ganesha", "murugan", "hanuman"]);
-    for (const [, canonical] of entries) {
-      expect(validKeys.has(canonical)).toBe(true);
-    }
+  it("fires an alias embedded in a longer query, not just a bare match (docs/10 §4 per-token fix)", () => {
+    // "kashi" is a Shiva temple purely via its own deity/name fields — the fixture doesn't
+    // need to mention "mahadev" at all for the alias to fire; this only asserts that
+    // matchedAliases still reports the hit when "mahadev" isn't the entire query string.
+    const { matchedAliases } = searchTemples(all, "mahadev temple somewhere");
+    expect(matchedAliases).toContain("mahadev");
   });
 });
+
+// Full alias-shape/target-resolution coverage lives in lib/search-aliases.test.ts (the
+// CI gate) — this file stays focused on searchTemples()'s own ranking behavior.

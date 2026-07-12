@@ -11,8 +11,9 @@ import {
   type ReactNode,
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Menu, X, Search, ChevronDown, Globe, Check } from "lucide-react";
+import { Menu, X, ChevronDown, Globe, Check } from "lucide-react";
 import { GopuramMark } from "@/components/brand/gopuram-mark";
+import { SearchOverlay } from "@/components/layout/search-overlay";
 import { cn } from "@/lib/utils";
 
 /** Explore ▾ presets — real, resolvable list-mode filter URLs (docs/02 §2). The old
@@ -434,10 +435,7 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Search: navigates to Explore for now; Phase 6 wires the overlay. */}
-          <Link href="/explore" aria-label="Search temples" className={cn(iconButton, "hidden md:inline-flex")}>
-            <Search className="h-5 w-5" aria-hidden />
-          </Link>
+          <SearchOverlay />
 
           <div className="hidden md:block">
             <Dropdown
@@ -455,9 +453,6 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-1 md:hidden">
-            <Link href="/explore" aria-label="Search temples" className={iconButton}>
-              <Search className="h-5 w-5" aria-hidden />
-            </Link>
             <button
               ref={hamburgerRef}
               type="button"

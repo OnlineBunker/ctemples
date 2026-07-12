@@ -10,12 +10,13 @@ One engine, every entry point. Server-side only — no client-side search comput
 
 ## 2. Ranking formula (canonical)
 ```
-score = 2.0×(alias hit: deity/place/tag)  + 2.5×(alias hit: temple — pins the target)
+score = 2.0×(alias hit: deity/place)  + 2.5×(alias hit: temple — pins the target)  + 1.5×(alias hit: tag)
       + 1.5×(deity match)  + 1.2×(name exact/prefix)
       + 0.8×(city|state contains)  + 0.5×(tag contains)
       + 0.3×(overview|history contains)
       + rating_bonus  // clamp((rating−3.5)×0.5, 0, 0.5); 0 when unrated
 ```
+Per-target-type alias weights are broken out fully in §4 — this line and that table must agree (Phase 6 build note, 2026-07-12: the two had drifted, tag was listed at 2.0 here vs 1.5 there; §4's more granular breakdown is authoritative).
 Zero-score records are excluded. Ties: score → rating → name. Empty query = full list by rating (Explore default order). At the engine swap (§7) these weights become *behavioral* targets, not literal transplants — the golden-query suite (§8) is the contract.
 
 ## 3. Search fields — the `SearchDoc` projection **[NOW at Stage B, design now]**

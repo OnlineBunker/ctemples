@@ -1,28 +1,23 @@
 import Link from "next/link";
 import { X } from "lucide-react";
-import { DEITY_META } from "@/lib/deities";
-import { SEARCH_ALIASES } from "@/lib/search-aliases";
 import { buildExploreHref, type ParsedExploreParams } from "@/lib/explore-url";
 
 /**
  * Alias-hit banner (docs/05 §3.4). Dismissing navigates to the same URL + `exact=1`
  * (docs/02 §3.1) — a plain link, so it works without client JS and keeps the state in
- * the URL rather than hidden component state.
+ * the URL rather than hidden component state. `label` is pre-resolved server-side by
+ * the seam (`resolveAliasLabel`, docs/10 §4) — this component has no alias/deity lookup
+ * of its own, since a temple/place-type alias target needs the full temple list to
+ * resolve a real name, which only the seam holds (D25).
  */
 export function SmartMatchBanner({
   current,
-  matchedAliases,
+  label,
 }: {
   current: ParsedExploreParams;
-  matchedAliases: string[];
+  label: string | null;
 }) {
-  const alias = matchedAliases[0];
-  if (!alias) return null;
-
-  // matchedAliases carries the alias KEY that fired (e.g. "mahadev"), not the canonical
-  // deity — resolve it back through the same alias map that produced the match.
-  const canonicalKey = SEARCH_ALIASES[alias];
-  const label = canonicalKey ? DEITY_META[canonicalKey].label : alias;
+  if (!label) return null;
 
   return (
     <div

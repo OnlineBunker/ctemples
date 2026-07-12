@@ -174,6 +174,7 @@ export interface PagedTemples {
   perPage: number;
   totalPages: number;
   matchedAliases: string[];
+  matchedAliasLabel: string | null;
   facets: ExploreFacets;
 }
 
@@ -202,6 +203,7 @@ export async function queryTemples(query: TempleQuery): Promise<PagedTemples> {
     perPage: result.perPage,
     totalPages: result.totalPages,
     matchedAliases: result.matchedAliases,
+    matchedAliasLabel: result.matchedAliasLabel,
     facets: result.facets,
   };
 }

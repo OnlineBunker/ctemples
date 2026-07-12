@@ -6,7 +6,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
  * Popular searches — six chips linking to pre-canned Explore URLs (docs/04 §6). List
  * mode is the default (D4), so bare facet params are canonical — no `?view=`/`?preset=`.
  */
-const CHIPS: { label: string; href: string }[] = [
+export const POPULAR_SEARCH_CHIPS: { label: string; href: string }[] = [
   { label: "Shiva temples", href: "/explore?deity=shiva" },
   { label: "Tamil Nadu", href: "/explore?state=tamil-nadu" },
   { label: "UNESCO sites", href: "/explore?tag=unesco-world-heritage" },
@@ -21,7 +21,7 @@ export function PopularSearches() {
       <Reveal>
         <Eyebrow className="mb-5">Popular searches</Eyebrow>
         <ul className="flex flex-wrap gap-3">
-          {CHIPS.map((chip) => (
+          {POPULAR_SEARCH_CHIPS.map((chip) => (
             <li key={chip.label}>
               <Link
                 href={chip.href}

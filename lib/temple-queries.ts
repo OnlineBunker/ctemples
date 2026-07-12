@@ -1,10 +1,11 @@
 import type { Temple, Region } from "./types";
 import { REGION_ORDER } from "./regions";
 import { slugify } from "./utils";
-import { DEITY_ORDER, matchesDeity, countByDeity, type DeityKey } from "./deities";
+import { DEITY_ORDER, DEITY_META, matchesDeity, countByDeity, type DeityKey } from "./deities";
 import { haversineKm } from "./distance";
 import { sortTemples, type SortKey } from "./filter";
 import { searchTemples } from "./search";
+import { resolveAliasLabel } from "./search-aliases";
 
 /**
  * Pure query helpers over a temple array. Kept free of any data import so they can be
@@ -205,6 +206,10 @@ export interface ExploreResult {
   perPage: number;
   totalPages: number;
   matchedAliases: string[];
+  /** Resolved display label for the first fired alias (docs/10 §4), or null when none
+   *  fired — computed here (not in the page) since only the seam holds the full temple
+   *  list a temple/place alias target needs to resolve a real name (D25). */
+  matchedAliasLabel: string | null;
   facets: ExploreFacets;
 }
 
@@ -293,6 +298,10 @@ export function runExploreQuery(list: Temple[], query: ExploreQuery): ExploreRes
     matched = sortTemples(matched, sort);
   }
 
+  const matchedAliasLabel = matchedAliases[0]
+    ? resolveAliasLabel(matchedAliases[0], list, (key) => DEITY_META[key].label)
+    : null;
+
   const total = matched.length;
   const perPageClamped = perPage > 0 ? perPage : 24;
   const totalPages = Math.max(1, Math.ceil(total / perPageClamped));
@@ -306,6 +315,7 @@ export function runExploreQuery(list: Temple[], query: ExploreQuery): ExploreRes
     perPage: perPageClamped,
     totalPages,
     matchedAliases,
+    matchedAliasLabel,
     facets,
   };
 }
