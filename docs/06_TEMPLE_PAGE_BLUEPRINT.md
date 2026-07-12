@@ -57,7 +57,7 @@ File 07 §7 verbatim (state-scale plot + attraction dots + directions). H2 "Find
 `@media print`: hide chrome, hero photo, gallery, action row, section index; sections flow as text; cost table prints fully; URL printed after external links. One page-break rule: avoid breaking inside cards/tables.
 
 ## 10. Metadata (prototype)
-Title `"{Name}, {City} — CTemples"`; description = tagline (or first 155ch of overview); OG image = hero URL. JSON-LD and index flips are production (file 12) — prototype stays noindex.
+Title and description follow **file 12 §2**'s canonical templates — the single source for metadata, verified/completed in this phase (file 12 §12). Title `"{Name}, {City} — history, timings & how to visit"`, ≤60ch, dropping the city before the name is ever truncated; description = first 155ch of `whyVisit`, falling back to tagline then overview. Set the title via `title.absolute`: the descriptive template is already the complete ≤60ch value, so it must not inherit the site-wide `· CTemples` suffix. OG image = hero URL. JSON-LD and index flips are production (file 12) — prototype stays noindex.
 
 ## 11. Acceptance criteria
 - Renders correctly for: a full Tier-1 record; a record with only the §1 floor fields; a record with zero media (TempleScene everywhere). No empty H2s, no "undefined", no zero-item sections.

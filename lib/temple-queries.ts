@@ -140,6 +140,18 @@ export function pickByArchitecturalStyle(list: Temple[], temple: Temple, limit =
     .slice(0, limit);
 }
 
+/**
+ * Same-region temples, highest rating first, excluding self. Fallback source for the
+ * detail page's "Within 100 km" section when nothing is actually nearby (docs/06 §7 row
+ * 15: "This temple is fairly remote — the nearest are further afield").
+ */
+export function pickSameRegionTopRated(list: Temple[], temple: Temple, limit = 3): Temple[] {
+  return list
+    .filter((t) => t.id !== temple.id && t.region === temple.region)
+    .sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name))
+    .slice(0, limit);
+}
+
 export interface NearbyResult {
   temple: Temple;
   distanceKm: number;

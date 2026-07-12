@@ -1,19 +1,26 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getTempleById, getTempleIds, getRelatedTemples } from "@/lib/temples";
+import { getTempleById, getTempleIds, getAllTemples } from "@/lib/temples";
+import { computeRelatedSections, visibleSections, reachModes } from "@/lib/detail-sections";
+import { buildTempleTitle, buildTempleDescription } from "@/lib/seo";
+import { getHero } from "@/lib/media";
+
+import { BackLink } from "@/components/temple/detail/back-link";
 import { DetailHero } from "@/components/temple/detail/detail-hero";
 import { QuickFacts } from "@/components/temple/detail/quick-facts";
+import { MobileSectionNav } from "@/components/temple/detail/mobile-section-nav";
+import { SectionIndex } from "@/components/temple/detail/section-index";
+import { BackToTop } from "@/components/temple/detail/back-to-top";
 import { DetailSection } from "@/components/temple/detail/detail-section";
 import { Prose } from "@/components/temple/detail/prose";
-import { FactRows } from "@/components/temple/detail/fact-rows";
+import { PlanAround } from "@/components/temple/detail/plan-around";
+import { BestTime } from "@/components/temple/detail/best-time";
+import { HowToReach } from "@/components/temple/detail/how-to-reach";
 import { CostTable } from "@/components/temple/detail/cost-table";
 import { Gallery } from "@/components/temple/detail/gallery";
 import { TempleMap } from "@/components/temple/detail/temple-map";
-import { BestTime } from "@/components/temple/detail/best-time";
+import { RelatedGrid } from "@/components/temple/detail/related-grid";
 import { Nearby } from "@/components/temple/detail/nearby";
-import { TempleCard } from "@/components/temple/temple-card";
-import { Reveal } from "@/components/motion/reveal";
-import { Eyebrow } from "@/components/ui/eyebrow";
 
 // Static generation for every temple route — the data is static at build time.
 export async function generateStaticParams() {
@@ -28,9 +35,14 @@ export async function generateMetadata({
   const { id } = await params;
   const temple = await getTempleById(id);
   if (!temple) return { title: "Temple not found" };
+
+  const hero = getHero(temple.media);
   return {
-    title: temple.name,
-    description: temple.overview.slice(0, 155),
+    // `{ absolute }` bypasses the root layout's "%s · CTemples" template — docs/12 §2's
+    // per-route title is already the complete, ≤60-char `<title>` value.
+    title: { absolute: buildTempleTitle(temple.name, temple.city) },
+    description: buildTempleDescription(temple),
+    openGraph: hero ? { images: [{ url: hero.url }] } : undefined,
   };
 }
 
@@ -38,116 +50,183 @@ export default async function TemplePage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const temple = await getTempleById(id);
   if (!temple) notFound();
-  const related = await getRelatedTemples(temple, 3);
+
+  const allTemples = await getAllTemples();
+  const related = computeRelatedSections(temple, allTemples);
+  const sections = visibleSections(temple, related);
+  const modes = reachModes(temple);
+
+  function meta(sectionId: string) {
+    return sections.find((s) => s.id === sectionId) ?? null;
+  }
+
+  const whyVisit = meta("why-visit");
+  const planAround = meta("plan-around");
+  const bestTime = meta("best-time");
+  const overview = meta("overview")!; // always present (docs/06 §1 floor)
+  const howToReach = meta("how-to-reach");
+  const history = meta("history");
+  const legends = meta("legends");
+  const architecture = meta("architecture");
+  const spiritualSignificance = meta("spiritual-significance");
+  const cost = meta("cost");
+  const gallery = meta("gallery");
+  const map = meta("map")!; // always present (docs/06 §1 floor)
+  const within100km = meta("within-100km");
+  const sameDeity = meta("same-deity");
+  const sameStyle = meta("same-style");
+  const nearbyAttractions = meta("nearby-attractions");
 
   return (
     <article>
-      <DetailHero temple={temple} />
+      <div className="shell pt-8">
+        <BackLink state={temple.state} />
+      </div>
+
+      <div className="mt-6">
+        <DetailHero temple={temple} />
+      </div>
 
       <div className="shell">
-        {/* Quick facts strip overlaps the hero's lower edge */}
-        <div className="relative z-10 -mt-10">
+        {/* Quick-facts is `sticky` inside THIS container only — it naturally stops
+            sticking once the container's bottom edge (the end of section 5) scrolls past,
+            a plain CSS consequence of `position: sticky`'s containing block, no JS needed
+            (docs/06 §5 row 2: "sticky within page until section 5 scrolls past"). */}
+        <div className="relative mt-10">
           <QuickFacts temple={temple} />
+
+          <div className="mt-8">
+            <MobileSectionNav sections={sections} />
+          </div>
+
+          <div className="mt-10 space-y-16 md:mt-14 md:space-y-20">
+            {whyVisit ? (
+              <DetailSection id="why-visit" index={whyVisit.index} eyebrow="Why visit" title={whyVisit.label}>
+                <Prose text={temple.whyVisit} className="text-lg md:text-xl" />
+              </DetailSection>
+            ) : null}
+
+            {planAround && temple.tripDuration ? (
+              <DetailSection id="plan-around" index={planAround.index} eyebrow="Plan around" title="Plan around this temple">
+                <PlanAround tripDuration={temple.tripDuration} nearest={related.within100km.slice(0, 3)} />
+              </DetailSection>
+            ) : null}
+
+            {bestTime ? (
+              <DetailSection id="best-time" index={bestTime.index} eyebrow="Best time to visit" title={bestTime.label}>
+                <BestTime best={temple.bestTimeToVisit} />
+              </DetailSection>
+            ) : null}
+          </div>
         </div>
 
-        {/* Overview lead */}
-        <div className="mt-16 md:mt-24">
-          <Reveal>
-            <Prose
-              text={temple.overview}
-              className="max-w-3xl text-xl leading-relaxed text-limewash/90 md:text-2xl md:leading-relaxed"
-            />
-          </Reveal>
-        </div>
+        {/* Sections 6+ live outside the sticky-quick-facts container above, and inside a
+            two-column grid with the section index (D20) as the right rail — the nav's own
+            `sticky` element stretches (the grid default) to match this column's full
+            height, so it sticks all the way through section 18, not just its own row. */}
+        <div className="mt-16 space-y-16 md:mt-20 md:space-y-20 lg:grid lg:grid-cols-[1fr_220px] lg:items-start lg:gap-16 lg:space-y-0">
+          <div className="space-y-16 md:space-y-20">
+            <DetailSection id="overview" index={overview.index} eyebrow="Overview" title={overview.label}>
+              <Prose text={temple.overview} />
+            </DetailSection>
 
-        <div className="mt-20 space-y-20 md:mt-24 md:space-y-28">
-          <DetailSection id="history" index="01" eyebrow="History" title="How it came to be">
-            <Prose text={temple.history} />
-          </DetailSection>
+            {howToReach ? (
+              <DetailSection id="how-to-reach" index={howToReach.index} eyebrow="How to reach" title={howToReach.label}>
+                <HowToReach modes={modes} />
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="legends" index="02" eyebrow="Legends & mythology" title="The stories it carries">
-            <Prose text={temple.legendsAndMythology} />
-          </DetailSection>
+            {history ? (
+              <DetailSection id="history" index={history.index} eyebrow="History" title={history.label}>
+                <Prose text={temple.history} />
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="architecture" index="03" eyebrow="Architecture" title="How it was built">
-            <Prose text={temple.architecture} />
-          </DetailSection>
+            {legends ? (
+              <DetailSection id="legends" index={legends.index} eyebrow="Legends & mythology" title={legends.label}>
+                <Prose text={temple.legendsAndMythology} />
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="significance" index="04" eyebrow="Spiritual significance" title="Why it matters">
-            <Prose text={temple.spiritualSignificance} />
-          </DetailSection>
+            {architecture ? (
+              <DetailSection id="architecture" index={architecture.index} eyebrow="Architecture" title={architecture.label}>
+                <Prose text={temple.architecture} />
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="best-time" index="05" eyebrow="Best time to visit" title="When to go">
-            <BestTime best={temple.bestTimeToVisit} />
-          </DetailSection>
+            {spiritualSignificance ? (
+              <DetailSection
+                id="spiritual-significance"
+                index={spiritualSignificance.index}
+                eyebrow="Spiritual significance"
+                title={spiritualSignificance.label}
+              >
+                <Prose text={temple.spiritualSignificance} />
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="visit" index="06" eyebrow="Timings & entry" title="Before you arrive">
-            <div className="grid gap-10 md:grid-cols-2">
-              <FactRows
-                rows={[
-                  { label: "Opening", value: temple.timings.opening },
-                  { label: "Closing", value: temple.timings.closing },
-                  ...(temple.timings.notes ? [{ label: "Good to know", value: temple.timings.notes }] : []),
-                ]}
-              />
-              <FactRows
-                rows={[
-                  { label: "Entry · Indian", value: temple.entryFee.indian },
-                  ...(temple.entryFee.foreign ? [{ label: "Entry · Foreign", value: temple.entryFee.foreign }] : []),
-                  ...(temple.entryFee.cameraOrPhoneFee
-                    ? [{ label: "Camera / phone", value: temple.entryFee.cameraOrPhoneFee }]
-                    : []),
-                ]}
-              />
-            </div>
-          </DetailSection>
+            {cost ? (
+              <DetailSection id="cost" index={cost.index} eyebrow="Cost to visit" title={cost.label}>
+                <CostTable estimates={temple.costEstimates} />
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="reach" index="07" eyebrow="How to reach" title="Getting there">
-            <FactRows
-              rows={[
-                { label: "By air", value: temple.howToReach.byAir },
-                { label: "By train", value: temple.howToReach.byTrain },
-                { label: "By road", value: temple.howToReach.byRoad },
-              ]}
-            />
-          </DetailSection>
+            {gallery ? (
+              <DetailSection id="gallery" index={gallery.index} eyebrow="Gallery" title={gallery.label} className="print:hidden">
+                <Gallery media={temple.media} templeName={temple.name} region={temple.region} seed={temple.id} />
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="cost" index="08" eyebrow="Cost to visit" title="What a trip costs">
-            <CostTable estimates={temple.costEstimates} />
-          </DetailSection>
+            <DetailSection id="map" index={map.index} eyebrow="Location" title={map.label}>
+              <TempleMap temple={temple} />
+            </DetailSection>
 
-          <DetailSection id="gallery" index="09" eyebrow="Gallery" title="In pictures">
-            <Gallery
-              images={temple.gallery}
-              templeName={temple.name}
-              region={temple.region}
-              seed={temple.id}
-            />
-          </DetailSection>
+            {within100km ? (
+              <DetailSection id="within-100km" index={within100km.index} eyebrow="Nearby temples" title={within100km.label}>
+                {related.within100km.length > 0 ? (
+                  <RelatedGrid
+                    items={related.within100km.map((r) => ({ temple: r.temple, distanceKm: r.distanceKm }))}
+                  />
+                ) : (
+                  <>
+                    <p className="mb-6 text-ink-muted">
+                      This temple is fairly remote — the nearest are further afield.
+                    </p>
+                    <RelatedGrid items={related.remoteFallback.map((t) => ({ temple: t }))} />
+                  </>
+                )}
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="nearby" index="10" eyebrow="Nearby" title="Also worth your time">
-            <Nearby items={temple.nearbyAttractions} />
-          </DetailSection>
+            {sameDeity ? (
+              <DetailSection id="same-deity" index={sameDeity.index} eyebrow="Same deity" title={sameDeity.label}>
+                <RelatedGrid items={related.sameDeity.map((t) => ({ temple: t }))} />
+              </DetailSection>
+            ) : null}
 
-          <DetailSection id="map" index="11" eyebrow="Location" title="On the map">
-            <TempleMap temple={temple} />
-          </DetailSection>
+            {sameStyle ? (
+              <DetailSection id="same-style" index={sameStyle.index} eyebrow="Architecture" title={sameStyle.label}>
+                <RelatedGrid items={related.sameStyle.map((t) => ({ temple: t }))} />
+              </DetailSection>
+            ) : null}
+
+            {nearbyAttractions ? (
+              <DetailSection
+                id="nearby-attractions"
+                index={nearbyAttractions.index}
+                eyebrow="Nearby attractions"
+                title={nearbyAttractions.label}
+              >
+                <Nearby items={temple.nearbyAttractions} />
+              </DetailSection>
+            ) : null}
+          </div>
+
+          <SectionIndex sections={sections} />
         </div>
       </div>
 
-      {related.length ? (
-        <section className="shell mt-24 md:mt-32">
-          <Reveal>
-            <Eyebrow>Related temples</Eyebrow>
-            <h2 className="mt-4 font-display text-display-md text-limewash">Continue the journey</h2>
-          </Reveal>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {related.map((t) => (
-              <TempleCard key={t.id} temple={t} />
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <BackToTop />
     </article>
   );
 }

@@ -270,3 +270,25 @@
     animation-delay: 0s !important;
   }
 }
+
+/* ─────────────────────── Print (docs/06 §9) ─────────────────────── */
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
+  /* Cards/tables never split across a page break. `.rounded-card` is a real utility
+     class (borderRadius.card in tailwind.config.ts), so this reaches every card-shaped
+     surface site-wide without touching each component. */
+  .rounded-card,
+  tr {
+    break-inside: avoid;
+  }
+  /* External links print their destination — the reader can't click a paper page. */
+  a[target="_blank"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    word-break: break-all;
+  }
+}
+

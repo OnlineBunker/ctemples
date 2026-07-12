@@ -1,54 +1,71 @@
-import { ArrowLeft, MapPin } from "lucide-react";
 import { ViewTransition } from "@/components/motion/view-transition";
-import { TransitionLink } from "@/components/motion/transition-link";
 import { TempleImage } from "@/components/media/temple-image";
-import { RegionBadge } from "@/components/ui/pill";
 import { Rating } from "@/components/ui/rating";
+import { ActionRow } from "./action-row";
+import { getHero } from "@/lib/media";
 import type { Temple } from "@/lib/types";
 
-/** Full-bleed hero and the landing side of the shared-element morph. */
+/**
+ * Section 1 — Hero (docs/06 §2). A contained 16:9 (4:3 mobile, max 60vh) card, not a
+ * full-bleed banner — `rounded-card` like every other media surface (docs/03 §5's
+ * elevation doctrine is HTML-surface only, so the crop, not the viewport, is the frame).
+ * The landing side of the shared-element morph: `share="morph"` + the same
+ * `temple-{id}` name the source card used, reading the same `getHero(media)` image so the
+ * morph doesn't visibly swap sources on arrival.
+ */
 export function DetailHero({ temple }: { temple: Temple }) {
+  const hero = getHero(temple.media);
+  const { lat, lng } = temple.coordinates;
+  const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
   return (
-    <section className="relative flex min-h-[78svh] items-end overflow-hidden">
-      <ViewTransition name={`temple-${temple.id}`} share="morph">
-        <div className="absolute inset-0">
-          <TempleImage
-            src={temple.heroImage}
-            alt={`${temple.name}, ${temple.city}`}
-            region={temple.region}
-            seed={temple.id}
-            priority
-            sizes="100vw"
-          />
+    <section className="shell">
+      <div className="relative aspect-[4/3] max-h-[60vh] w-full overflow-hidden rounded-card print:hidden sm:aspect-[16/9]">
+        <ViewTransition name={`temple-${temple.id}`} share="morph">
+          <div className="absolute inset-0">
+            <TempleImage
+              src={hero?.url ?? ""}
+              alt={hero?.alt ?? `${temple.name}, ${temple.city}`}
+              region={temple.region}
+              seed={temple.id}
+              priority
+              sizes="100vw"
+            />
+          </div>
+        </ViewTransition>
+
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-t from-plum/90 via-plum/30 to-transparent"
+        />
+
+        <div className="absolute inset-x-0 bottom-0 flex flex-col-reverse items-start justify-between gap-5 p-5 sm:flex-row sm:items-end sm:p-8">
+          <div className="min-w-0">
+            <p className="font-mono text-[0.68rem] uppercase tracking-label text-white/70">
+              {temple.state} · {temple.region} India
+            </p>
+            <h1 className="mt-2 max-w-2xl font-display text-display-lg leading-[1.05] text-white">
+              {temple.name}
+            </h1>
+            <p className="mt-3 max-w-xl text-lg leading-relaxed text-white/80">{temple.tagline}</p>
+            {typeof temple.rating === "number" ? (
+              <div className="mt-3">
+                <Rating value={temple.rating} tone="overlay" />
+              </div>
+            ) : null}
+          </div>
+
+          <ActionRow getDirectionsHref={directionsHref} className="shrink-0" />
         </div>
-      </ViewTransition>
+      </div>
 
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-gradient-to-t from-nightstone-900 via-nightstone-900/45 to-nightstone-900/25"
-      />
-      <div aria-hidden className="absolute inset-0 bg-grain opacity-[0.1] mix-blend-overlay" />
-
-      <div className="shell relative z-10 pb-14 pt-28">
-        <TransitionLink
-          href="/explore"
-          type="nav-back"
-          className="inline-flex items-center gap-2 font-mono text-[0.66rem] uppercase tracking-label text-limewash/70 transition-colors hover:text-limewash"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          All temples
-        </TransitionLink>
-
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <RegionBadge region={temple.region} />
-          <span aria-hidden className="h-3 w-px bg-limewash/25" />
-          <Rating value={temple.rating} />
-        </div>
-
-        <h1 className="mt-4 max-w-4xl font-display text-display-lg text-limewash">{temple.name}</h1>
-        <p className="mt-4 max-w-2xl text-xl leading-relaxed text-limewash/80">{temple.tagline}</p>
-        <p className="mt-4 inline-flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-label text-limewash/55">
-          <MapPin className="h-3.5 w-3.5" aria-hidden />
+      {/* Print-only text fallback (docs/06 §9: the hero photo and action row are hidden
+          when printed). Never rendered alongside the photo hero's own H1 — one is always
+          `display: none` depending on media, so the page keeps exactly one H1 either way. */}
+      <div className="hidden print:block">
+        <h1 className="font-display text-3xl text-plum">{temple.name}</h1>
+        <p className="mt-2 text-ink-muted">{temple.tagline}</p>
+        <p className="mt-1 text-sm text-ink-muted">
           {temple.city}, {temple.state}
         </p>
       </div>

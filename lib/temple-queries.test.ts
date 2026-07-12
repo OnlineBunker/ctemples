@@ -8,6 +8,7 @@ import {
   topByState,
   pickByDeity,
   pickByArchitecturalStyle,
+  pickSameRegionTopRated,
   pickWithinRadius,
   runExploreQuery,
 } from "./temple-queries";
@@ -149,6 +150,21 @@ describe("pickByArchitecturalStyle", () => {
   });
   it("returns [] when no other temple shares the style", () => {
     expect(pickByArchitecturalStyle([dravidianA, dravidianB, kalinga], kalinga)).toEqual([]);
+  });
+});
+
+describe("pickSameRegionTopRated", () => {
+  it("returns same-region temples, excluding self, highest rating first", () => {
+    // south1 (4.9, self, excluded), south3 (4.4) and south2... south2 is Kerala/South too.
+    const result = pickSameRegionTopRated([south1, south2, east1, central1, south3], south1);
+    expect(result.map((t) => t.id)).toEqual(["s2", "s3"]);
+  });
+  it("returns [] when no other temple shares the region", () => {
+    expect(pickSameRegionTopRated([east1, south1], east1)).toEqual([]);
+  });
+  it("respects the limit", () => {
+    const result = pickSameRegionTopRated([south1, south2, south3], south1, 1);
+    expect(result.map((t) => t.id)).toEqual(["s2"]);
   });
 });
 

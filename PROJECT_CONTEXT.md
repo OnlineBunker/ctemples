@@ -6,7 +6,7 @@
 
 ---
 
-## Build status — as of 2026-07-10
+## Build status — as of 2026-07-12
 
 > **This section is the source of truth for what is actually implemented.** For what *should* be built and how, read `docs/13_IMPLEMENTATION_MASTER_PLAN.md`.
 
@@ -24,7 +24,8 @@
 | 3.5 — Content foundations | ✅ **Complete** (2026-07-10) | Tag registry + validator wiring, slug registry + `lib/slug.ts` minting, real-data popularity model + `lib/filter.ts` switch, anti-slop lint (2 real violations found & fixed in `data/temples.ts`; 21 WARN-level whyVisit voice-contract issues left as documented content debt), interim image attribution credit. See below for details and the adversarial-review findings fixed. |
 | Amendment A — Utsavam amplification | ✅ **Complete** (2026-07-11) | User-directed spec amendment + implementation in one commit (docs/14 §3 process). **Spec:** docs/01 §3 rules 6–8, D2, D23; docs/03 §2.3–2.4, §4; docs/04 §2/§4/§9–12; docs/08 (autoplay law, dwell-scoped motion, two-tier ceiling); CLAUDE.md digest. **Code:** hero autoplay (7s dwell, wrap, pause/play toggle, hover/focus pause, stop-on-manual-nav, reduced-motion/Save-Data never start it, progress-fill active dot), Ken Burns drift on the visible slide, saffron hover glow on the primary CTA, and the trip-ideas **showcase carousel** (center-emphasis scroll-snap, peeking neighbors, arrows + drag; replaces the 1/2/4 grid). Kept deliberately: 3D ban, a11y floors, perf budgets, content-integrity rules. **Review note:** the multi-agent adversarial workflow died on a session rate limit (0 agents completed — recorded as *no review*, not a pass); a frontier-model inline review was performed instead across the same three lenses and found 4 real issues, all fixed: play-toggle icon reflected effective state instead of intent (appeared dead when clicked), offsetLeft-based carousel math broke centering at >1440px viewports (switched to rect-based), amended D23 contradicted docs/06 §12's related-carousel ban ("Plan around" is computed, not curated — removed from the sanctioned list), docs/03 §4 still said "trip ideas 1/2/4". Verified live: dwell exactly 7s with wrap, manual-nav stop + toggle restart, SR silence until interaction, carousel centering at 0px offset, 375px no overflow; typecheck/188 tests/lint/build green. |
 | 4 — Explore map mode | ✅ **Complete** (2026-07-11) | `?view=map` fully built per `docs/07` + `docs/05` §6: geometry pipeline (`scripts/build-india-geo.mjs` → `lib/india-geo.ts`, datameet/maps CC BY 4.0, 0.2% simplification, 65KB), `IndiaMap` (interaction matrix, region-cluster layer, callout markers, boundary-trace), region pills, results column with compact cards + scoped search/sort/pagination + always-visible state selector, mobile bottom sheet (3 snaps, drag + keyboard, aria-modal with inert background), `checkCoordinateInState` validator, state-silhouette home tiles, attribution (map caption + `/about` + README). See below for the adversarial-review findings fixed. |
-| P5–P11 | ⬜ Not started | **Next: P5 — Temple page rebuild** per `docs/13` §2. `/temples/[id]` is still the pre-existing page (untouched, out of scope until P5). |
+| 5 — Temple page rebuild | ✅ **Complete** (2026-07-12) | `/temples/[id]` + `components/temple/detail/*` rebuilt end-to-end against `docs/06` (18-section `visibleSections` engine, D13), `docs/12` §2 (metadata), `docs/07` §7 (state-scale map), `docs/03` §6.7 (lightbox), `docs/08` §4 (reveals). See below for details, the three build-time gallery bug-fixes, and the adversarial-review findings fixed. |
+| P6–P11 | ⬜ Not started | **Next: P6 — Search system** per `docs/13`. |
 
 ### Phase 3 — complete (2026-07-10)
 
@@ -120,13 +121,9 @@ Phase 0 was originally split (token subset first, to unblock Phase 1), then fini
 
 ### Current state of the running app (transitional)
 
-On the **new light palette:** all chrome (header/footer/banner) site-wide, plus `/about`, `/contact`, 404, and now the **full homepage** (Phase 2).
+On the **new Modern Utsavam palette:** all chrome (header/footer/banner) site-wide, `/about`, `/contact`, 404, the **full homepage** (Phase 2), **`/explore`** list + map modes (Phases 3/4), and now **`/temples/[id]`** + `components/temple/detail/*` (Phase 5). No core surface remains on the old nightstone look.
 
-Still on the **old nightstone look — intended, uniform breakage (do not "fix" piecemeal; the owning phase converts each):**
-- `/explore` + `components/explore/*` — Phase 3/4. (Confirmed still compiles/renders correctly against the expanded schema — `heroImage`/`gallery` were kept, not removed.)
-- `/temples/[id]` + `components/temple/*` — Phase 5. (Same — renders correctly, e.g. quick-facts, but visually still uses now-undefined `text-limewash`/`text-brass` classes, which resolve to no styling and fall through to the global `h1 { text-plum }` base rule. Confirmed via live browser check, no console errors, no crash.)
-
-Every Phase 0 blocker for Phases 3/5/6/7 is now cleared except `lib/india-geo.ts` (Phase 4 only).
+Not-yet-built routes (new surfaces, not recolors): the header **search overlay** (Phase 6), **`/methodology`** and **`/suggest`** (Phase 8 — the footer link to `/suggest` 404s until then). Every Phase 0 blocker for the remaining phases is cleared.
 
 ### Environment & repo
 
@@ -134,15 +131,33 @@ Every Phase 0 blocker for Phases 3/5/6/7 is now cleared except `lib/india-geo.ts
 - `node_modules` is installed. Dev server: `npm run dev` → http://localhost:3000. Per-phase gate: `npm run typecheck && npm run test && npm run lint && npm run build`.
 - `npm audit fix --force` remains forbidden (it downgrades Next and breaks the app).
 
+### Phase 5 — Temple page rebuild — complete (2026-07-12)
+
+**Delivered** (docs/06 in full, docs/12 §2, docs/07 §7, docs/03 §6.7, docs/08 §4):
+- **Section engine (`lib/detail-sections.ts`, D13).** `visibleSections(temple, related)` computes which of the 18 fixed-order sections render purely on data presence — never on `editorial.tier` — and assigns 1-based display indices over only the visible set, so removing a section renumbers the rest with no gaps. `computeRelatedSections` resolves the computed-discovery sections (15–17) with cross-section dedup ("a temple appears once, first section wins", docs/06 §7) and the within-100km → same-region-top-rated fallback. `reachModes` filters how-to-reach to modes with real text. Unit-tested (`lib/detail-sections.test.ts`, 18 tests): renumber-with-gaps, dedup order, always-present floor (overview + map), architecturalStyleSlug-absent guarding.
+- **SEO helpers (`lib/seo.ts`, docs/12 §2 [NOW]).** `buildTempleTitle` (≤60ch, drops the city before ever truncating the name) and `buildTempleDescription` (155ch, whyVisit → tagline → overview). 6 tests.
+- **`pickSameRegionTopRated`** added to `lib/temple-queries.ts` for section 15's remote fallback (+3 tests, suite now 32).
+- **Components (`components/temple/detail/*`)** all rebuilt off the dead nightstone tokens onto Modern Utsavam: back link (D8), contained 16:9 hero + morph target + action row (Save / Share / Get directions), sticky quick-facts bar (absorbs timings + entry fee, docs/06 §5 B2), desktop scroll-spy section index (D20) + mobile `<details>` disclosure + back-to-top, plan-around (grid, not carousel, D23), best-time, how-to-reach (lucide transport icons), cost table (From-city / Distance / Time / Budget / Mid-range / Luxury columns), gallery + portaled focus-trapped lightbox (docs/03 §6.7), state-scale map (docs/07 §7, reuses the Phase 4 `INDIA_STATES`/`projectLngLat` geometry re-windowed to the temple's state bbox), and the three related-content grids. Print stylesheet appended to `app/globals.css` (docs/06 §9). `app/temples/[id]/page.tsx` rewritten to render sections from the `visibleSections` array with `title.absolute` metadata (docs/12 §2). Begins `media[]` consumption via `lib/media.ts`.
+
+**New files:** `lib/detail-sections.ts` (+ test), `lib/seo.ts` (+ test), `components/temple/detail/{action-row,back-link,back-to-top,how-to-reach,mobile-section-nav,plan-around,related-grid,section-index}.tsx`. **Modified:** `app/temples/[id]/page.tsx`, `app/globals.css`, `lib/temple-queries.ts` (+ test), `components/temple/detail/{best-time,cost-table,detail-hero,detail-section,fact-rows,gallery,nearby,quick-facts,temple-map}.tsx`, `docs/06` §10 + `docs/07` §7 (spec reconciliations, below).
+
+**Verification:** typecheck clean · 228/229 tests (1 intentionally skipped) · lint clean · build 23/23 pages. Browser-verified (Meenakshi Amman, 7 gallery images): gallery focus-trap keeps focus inside the dialog across all three transitions (container / first / last → Shift+Tab / Tab), festival grid caps at 2 columns, section ordinal renders `ink-muted` (not sub-AA magenta), coordinates render in Space Mono, and the lightbox closes without leaving a click-blocking backdrop (`aria-hidden` / `pointer-events:none` / `opacity:0`).
+
+**Three gallery lightbox bugs found & fixed during build-time browser verification** (before the adversarial pass): (1) the `position:fixed` lightbox rendered offset rather than viewport-covering, because a `Reveal`-animated ancestor's resting `transform` created a CSS containing block — fixed by portaling to `document.body`; (2) that portal then crashed SSR (`document is not defined`) — fixed with a post-mount `mounted` gate; (3) after close, `AnimatePresence` never fired its unmount, leaving an invisible `pointer-events:auto` backdrop that silently blocked every page click — fixed by never unmounting the backdrop and driving visibility purely via `opacity`/`pointer-events`/`aria-hidden` with a `displayItem` freeze.
+
+**Adversarial review (5-dimension workflow — engine-correctness, page-wiring, spec-section-conformance, map-conformance, a11y-motion-gallery; each finding independently re-verified by a skeptic agent) — 4 confirmed findings fixed, 1 rejected:** the gallery focus trap could be escaped by the *initial* Shift+Tab (focus starts on the dialog container, which the Tab handler didn't treat as a boundary — the one substantive fix, docs/06 §6/§11); festival cards used `lg:grid-cols-3` vs docs/06 §5's "2-col cards"; the section ordinal used `text-magenta/60` (below AA) vs docs/03 §2.2's rule that small brand-colored text use magenta-deep (switched to `ink-muted`); the map coordinates rendered in the body face vs docs/07 §7's "mono coordinates caption". **Rejected (correctly):** a claim that the section index must be visible beside sections 1–3 — refuted as a UX preference with no cited spec requirement (every attribute docs/06 §4 actually specifies is implemented). The engine-correctness and page-wiring dimensions returned zero findings.
+
+**Two spec reconciliations recorded in the same commit** (docs/14 §3 — code deviations get written back into the canonical spec): (a) **docs/07 §7** — the "up to 5 nearbyAttractions dots" map element is *deferred* with a dated amendment, because the `NearbyAttraction` schema carries no coordinates and inventing dot positions would fabricate geography (D12's spirit); the dots return unchanged once the schema gains coordinates. (b) **docs/06 §10** — the temple-page title/description template contradicted `docs/12 §2` (the metadata authority, which self-declares "canonical" and is marked complete-in-Phase-5); §10 now defers to §2 (`"{Name}, {City} — history, timings & how to visit"`, ≤60ch, city dropped first).
+
 ### Recommended next step
 
-**Proceed to Phase 5 — Temple page rebuild** per `docs/13_IMPLEMENTATION_MASTER_PLAN.md` §2. Start sequence for a future session:
+**Proceed to Phase 6 — Search system** per `docs/13_IMPLEMENTATION_MASTER_PLAN.md`. Start sequence for a future session:
 
-1. Read this **Build status** section, then `docs/06_TEMPLE_PAGE_BLUEPRINT.md` in full (18 sections, `visibleSections`, tier degradation map), `docs/12_SEO_AND_CONTENT_STRATEGY.md` §2 (metadata templates), and `docs/07 §7` (the state-scale detail-page map — the P4 geometry seam is now available to reuse).
-2. Rebuild `/temples/[id]` + `components/temple/*` under the Modern Utsavam identity (currently still the pre-existing nightstone page): quick-facts bar, hero + action row + back link, the desktop section index + mobile disclosure + back-to-top (D20), the 4 computed related sections, the state-scale map (D18, reusing `lib/india-geo.ts`/`lib/geo.ts`), print stylesheet, heading tree. Begins `media[]` consumption.
+1. Read this **Build status** section, then `docs/10_SEARCH_AND_DISCOVERY_SYSTEM.md` (ranking formula, D10 alias architecture, typeahead spec) and the header-overlay / Cmd-K spec (D21, docs/02 + docs/03). The smart-match banner already ships from Phase 3.
+2. Build the header search overlay (Cmd/Ctrl-K, guarded in editable elements per D21), wiring alias-aware search through the existing `searchTemples` seam and its golden-query suite; integrate the smart-match banner.
 3. Finish on `typecheck && test && lint && build` green, browser verification (desktop + 375px, keyboard pass), and an adversarial review pass, per `docs/14_CLAUDE_CODE_OPERATING_SYSTEM.md`.
 
-**One open product decision surfaced during P4's review (not blocking P5):** the D17 rest-map palette gives ~1.19:1 boundary contrast between adjacent unselected states (`#F4EADF` fill + `#FFFFFF` stroke), below WCAG 1.4.11's 3:1 for meaningful graphical boundaries. It is exactly what D17 specifies, so changing it is a D17 amendment — decide whether to darken the rest stroke.
+**One open product decision, carried from P4 and still unresolved (not blocking P6):** the D17 rest-map palette gives ~1.19:1 boundary contrast between adjacent unselected states (`#F4EADF` fill + `#FFFFFF` stroke), below WCAG 1.4.11's 3:1 for meaningful graphical boundaries. It is exactly what D17 specifies, so changing it is a D17 amendment — decide whether to darken the rest stroke.
 
 ---
 
