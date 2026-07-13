@@ -1,6 +1,7 @@
 import { Reveal } from "@/components/motion/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getTempleById } from "@/lib/temples";
+import { getHero } from "@/lib/media";
 import type { Region } from "@/lib/types";
 import { TripShowcase } from "./trip-showcase";
 import type { TripIdea } from "./trip-idea-card";
@@ -61,7 +62,7 @@ export async function TripIdeas() {
         description: preset.description,
         meta: preset.meta,
         href: preset.href,
-        image: temple?.heroImage ?? "",
+        image: temple ? getHero(temple.media)?.url ?? "" : "",
         region: temple?.region ?? preset.fallbackRegion,
         seed: preset.representativeId,
       };

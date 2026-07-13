@@ -52,7 +52,6 @@ export function validateTemple(t: Temple): string[] {
     Array.isArray(t.costEstimates) && t.costEstimates.length >= 3 && t.costEstimates.length <= 4,
     `expected 3–4 cost estimates, got ${t.costEstimates?.length ?? 0}`,
   );
-  check(Array.isArray(t.gallery) && t.gallery.length >= 1, "gallery has no entries");
   check(Array.isArray(t.tags) && t.tags.length >= 1, "no tags");
   (t.tags ?? []).forEach((tag) => {
     check(isRegisteredTag(tag), `tag "${tag}" is not in the controlled registry (data/tag-registry.ts)`);

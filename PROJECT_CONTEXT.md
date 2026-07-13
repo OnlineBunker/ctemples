@@ -6,7 +6,7 @@
 
 ---
 
-## Build status — as of 2026-07-12 (Phase 6)
+## Build status — as of 2026-07-12 (Phase 7)
 
 > **This section is the source of truth for what is actually implemented.** For what *should* be built and how, read `docs/13_IMPLEMENTATION_MASTER_PLAN.md`.
 
@@ -26,7 +26,8 @@
 | 4 — Explore map mode | ✅ **Complete** (2026-07-11) | `?view=map` fully built per `docs/07` + `docs/05` §6: geometry pipeline (`scripts/build-india-geo.mjs` → `lib/india-geo.ts`, datameet/maps CC BY 4.0, 0.2% simplification, 65KB), `IndiaMap` (interaction matrix, region-cluster layer, callout markers, boundary-trace), region pills, results column with compact cards + scoped search/sort/pagination + always-visible state selector, mobile bottom sheet (3 snaps, drag + keyboard, aria-modal with inert background), `checkCoordinateInState` validator, state-silhouette home tiles, attribution (map caption + `/about` + README). See below for the adversarial-review findings fixed. |
 | 5 — Temple page rebuild | ✅ **Complete** (2026-07-12) | `/temples/[id]` + `components/temple/detail/*` rebuilt end-to-end against `docs/06` (18-section `visibleSections` engine, D13), `docs/12` §2 (metadata), `docs/07` §7 (state-scale map), `docs/03` §6.7 (lightbox), `docs/08` §4 (reveals). See below for details, the three build-time gallery bug-fixes, and the adversarial-review findings fixed. |
 | 6 — Search system | ✅ **Complete** (2026-07-12) | Header search overlay + Cmd/Ctrl-K (docs/10 §6, D21), D10 alias upgrade (composable `AliasTarget` union + per-token matching), `matchedAliasLabel` seam threading. See below for details and the adversarial-review findings fixed. |
-| P7–P11 | ⬜ Not started | **Next: P7 — Media migration completion** per `docs/13`. |
+| 7 — Media migration completion | ✅ **Complete** (2026-07-12) | Deleted the legacy `heroImage`/`gallery`/`videoUrl` fields from `lib/types.ts` and all 15 `data/temples.ts` records; migrated the last 3 consumers (homepage hero carousel, trip-ideas, `TempleCard`) onto `getHero(media)`. See below for details. |
+| P8–P11 | ⬜ Not started | **Next: P8 — /suggest + /methodology** per `docs/13`. |
 
 ### Phase 3 — complete (2026-07-10)
 
@@ -165,15 +166,29 @@ Not-yet-built routes (new surfaces, not recolors): the header **search overlay**
 
 **Adversarial review (4-dimension workflow — alias-engine-correctness, seam-data-flow, overlay-spec-conformance, a11y-keyboard-focus; each finding independently re-verified) — 2 confirmed findings fixed, 2 rejected:** `aria-controls`/`aria-expanded` on the overlay's input were computed independently of each other and of the listbox's actual mount condition, so `aria-controls` referenced a nonexistent id in 2 of 4 render states (empty query, no-results) and `aria-expanded` could read `false` while an empty listbox was genuinely mounted (the pending-just-crossed-2-chars window) — fixed by deriving both from one shared `listboxRendered` boolean; the typeahead's request-id guard only bumped at debounce-*fire* time, so a fast edit-then-revert (e.g. "shiv"→"shiva"→"shi") could still apply a stale in-flight response over a since-changed query — fixed by bumping the id on every keystroke instead. **Rejected (correctly):** a claim that `resolveAliasLabel`'s place/stateSlug branch never compares state (refuted — I had already independently found and fixed this exact bug during my own recon, before the review even ran, and added dedicated `resolveTargetLabel` unit tests proving it); a claim that docs/10 §6's "alias chip" wording requires a per-result badge rather than the existing single list-level banner (refuted — §4/§7's "banner unchanged"/"banner behavior... never change" is the more authoritative, D10-governing text, and matches the already-shipped `SmartMatchBanner` precedent).
 
+### Phase 7 — Media migration completion — complete (2026-07-12)
+
+**Delivered** (docs/13 P7 scope):
+- **Consumer migration finished.** The last 3 remaining `Temple.heroImage` readers — `app/page.tsx`'s homepage hero carousel, `components/home/trip-ideas.tsx`'s representative-photo lookup, and `components/temple/temple-card.tsx`'s card image — now all read `getHero(temple.media)?.url ?? ""` via `lib/media.ts`, the same seam every other surface (Explore, temple detail, related grids) has used since Phases 3 and 5. `components/home/hero-slide.tsx`'s own `HeroSlideData.videoUrl` field is untouched — confirmed independent of `Temple.videoUrl`, never fed from it.
+- **Legacy fields deleted.** `heroImage: string`, `gallery: string[]`, `videoUrl: string` removed from `Temple` in `lib/types.ts`, and from all 15 records in `data/temples.ts` — `media: MediaItem[]` (already complete and correct for every record since Phase 0) is the sole image source now. `lib/validate.ts`'s now-redundant `t.gallery` length check removed (the `media[]` check a few lines below already covers it). `lib/__fixtures__/temple.ts`'s test fixture no longer sets the dead fields.
+- **Lightbox attribution + video handling** (docs/06 §6, docs/03 §6.7): already fully satisfied by Phase 5's `components/temple/detail/gallery.tsx` (interim "Images: Wikimedia Commons" credit, `kind==="video"` poster+tap-to-play+muted branch) — confirmed unchanged and untouched this phase; docs/09 §8 is explicit that the *real* per-image `MediaAttribution` field is Stage B/production, not due now, so there was no lightbox code to add.
+- **Zero visual/behavioral change, verified two ways:** (a) a read-only script confirmed `media[0].url === heroImage` for all 15 records *before* the legacy fields were deleted — the substitution is byte-identical; (b) post-migration, DOM-level checks (`img.src`/`complete`/`naturalWidth`) confirmed every migrated consumer resolves the correct photo URL live in the browser (homepage hero carousel, all 4 Trip Ideas cards, and `TempleCard` instances in a temple detail page's related-grids).
+
+**Modified files:** `lib/types.ts`, `data/temples.ts`, `app/page.tsx`, `components/home/trip-ideas.tsx`, `components/temple/temple-card.tsx`, `lib/validate.ts`, `lib/__fixtures__/temple.ts`. No new files.
+
+**Verification:** typecheck clean · 291/292 tests (1 intentionally skipped) · lint clean · build 23/23 pages. Browser-verified live (homepage hero carousel, Trip Ideas, a temple detail page's related-temple cards) — all render the correct photos with zero regressions.
+
+**Adversarial review (3-dimension workflow — data-integrity, consumer-migration-completeness, spec-conformance-and-docs; each finding independently re-verified) — 0 confirmed findings, 2 rejected:** both rejected findings correctly identified as out-of-scope documentation-staleness in files this diff never touches (`docs/13`'s P7 row and `docs/09` §2's own forward-reference sentence both still describe already-shipped Phase 5 work / the now-completed migration in future tense) — consistent with this project's established precedent of never retroactively editing a spec file's "what Sonnet does next" section after the phase it describes ships; `PROJECT_CONTEXT.md` alone is the live "what's actually done" tracker per `docs/14`. Two full review dimensions (data-file integrity across all 15 records; exhaustive consumer-migration completeness) returned zero findings.
+
 ### Recommended next step
 
-**Proceed to Phase 7 — Media migration completion** per `docs/13_IMPLEMENTATION_MASTER_PLAN.md`. Start sequence for a future session:
+**Proceed to Phase 8 — /suggest + /methodology** per `docs/13_IMPLEMENTATION_MASTER_PLAN.md`. Start sequence for a future session:
 
-1. Read this **Build status** section, then `docs/06 §6` + `docs/03 §6.7` (lightbox + attribution line), and `docs/09` (media/attribution schema fields).
-2. Migrate every remaining `heroImage`/`gallery`/`videoUrl` consumer onto `lib/media.ts`'s `MediaItem[]` model; rebuild the lightbox's attribution line (author · license, linked) once attribution fields exist; delete the legacy fields from `lib/types.ts` and `data/temples.ts` once nothing reads them; update validators/fixtures accordingly.
+1. Read this **Build status** section, then `docs/02 §1.1` (route reservations) and `docs/12 §6` (E-E-A-T / methodology page requirements, D7).
+2. Build both UI-only pages: `/suggest` (currently 404s — the footer/homepage links were sanctioned to ship early per docs/13's Phase-1 note) and `/methodology` (D7 — a permanent citable URL that mirrors the `/about` content). Flip the footer/teaser links from `/about` to `/methodology` once it exists.
 3. Finish on `typecheck && test && lint && build` green, browser verification (desktop + 375px, keyboard pass), and an adversarial review pass, per `docs/14_CLAUDE_CODE_OPERATING_SYSTEM.md`.
 
-**One open product decision, carried from P4 and still unresolved (not blocking P7):** the D17 rest-map palette gives ~1.19:1 boundary contrast between adjacent unselected states (`#F4EADF` fill + `#FFFFFF` stroke), below WCAG 1.4.11's 3:1 for meaningful graphical boundaries. It is exactly what D17 specifies, so changing it is a D17 amendment — decide whether to darken the rest stroke.
+**One open product decision, carried from P4 and still unresolved (not blocking P8):** the D17 rest-map palette gives ~1.19:1 boundary contrast between adjacent unselected states (`#F4EADF` fill + `#FFFFFF` stroke), below WCAG 1.4.11's 3:1 for meaningful graphical boundaries. It is exactly what D17 specifies, so changing it is a D17 amendment — decide whether to darken the rest stroke.
 
 ---
 

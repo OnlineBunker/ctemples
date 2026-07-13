@@ -5,6 +5,7 @@ import {
   getTopTemplesByState,
   getDeityCounts,
 } from "@/lib/temples";
+import { getHero } from "@/lib/media";
 import { Hero } from "@/components/home/hero";
 import type { HeroSlideData } from "@/components/home/hero-slide";
 import { EditorialParagraph } from "@/components/home/editorial-paragraph";
@@ -45,7 +46,7 @@ export default async function HomePage() {
     region: t.region,
     rating: t.rating,
     kind: "image",
-    image: t.heroImage,
+    image: getHero(t.media)?.url ?? "",
   }));
 
   // State strip — the richest states, each with its top temples for the popover.

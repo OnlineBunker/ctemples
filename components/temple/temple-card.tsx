@@ -5,6 +5,7 @@ import { TempleImage } from "@/components/media/temple-image";
 import { RegionBadge, Tag } from "@/components/ui/pill";
 import { Rating } from "@/components/ui/rating";
 import { cheapestBudget, formatRupees } from "@/lib/format";
+import { getHero } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import type { Temple } from "@/lib/types";
 
@@ -24,6 +25,7 @@ export function TempleCard({
   className?: string;
 }) {
   const from = cheapestBudget(temple.costEstimates);
+  const hero = getHero(temple.media);
 
   return (
     <TransitionLink
@@ -39,7 +41,7 @@ export function TempleCard({
           <ViewTransition name={`temple-${temple.id}`} share="morph">
             <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-[1.03]">
               <TempleImage
-                src={temple.heroImage}
+                src={hero?.url ?? ""}
                 alt={`${temple.name}, ${temple.city}`}
                 region={temple.region}
                 seed={temple.id}

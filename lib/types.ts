@@ -46,14 +46,9 @@ export interface Temple {
   deity: string;
   tagline: string;
   whyVisit: string; // 3-4 editorial sentences — not auto-generated from overview
-  heroImage: string;
-  gallery: string[];
-  // `media` is the refactor target for heroImage+gallery (locked schema addition, see
-  // CLAUDE.md "Schema additions"). heroImage/gallery are kept alongside it for backward
-  // compatibility with the not-yet-migrated Explore/detail-page consumers (Phase 5/7
-  // territory) — media[0] is always the hero image, per lib/media.ts's getHero().
+  // media[0] is always the hero image, per lib/media.ts's getHero() (Phase 7 completed
+  // the heroImage/gallery/videoUrl -> media[] migration; the legacy fields are gone).
   media: MediaItem[];
-  videoUrl: string; // "" placeholder - real videos added later
   coordinates: { lat: number; lng: number };
   overview: string;
   history: string; // long-form, \n\n-separated paragraphs
