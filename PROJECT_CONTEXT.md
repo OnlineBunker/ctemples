@@ -6,7 +6,7 @@
 
 ---
 
-## Build status — as of 2026-07-12 (Phase 7)
+## Build status — as of 2026-07-12 (Phase 8)
 
 > **This section is the source of truth for what is actually implemented.** For what *should* be built and how, read `docs/13_IMPLEMENTATION_MASTER_PLAN.md`.
 
@@ -27,7 +27,8 @@
 | 5 — Temple page rebuild | ✅ **Complete** (2026-07-12) | `/temples/[id]` + `components/temple/detail/*` rebuilt end-to-end against `docs/06` (18-section `visibleSections` engine, D13), `docs/12` §2 (metadata), `docs/07` §7 (state-scale map), `docs/03` §6.7 (lightbox), `docs/08` §4 (reveals). See below for details, the three build-time gallery bug-fixes, and the adversarial-review findings fixed. |
 | 6 — Search system | ✅ **Complete** (2026-07-12) | Header search overlay + Cmd/Ctrl-K (docs/10 §6, D21), D10 alias upgrade (composable `AliasTarget` union + per-token matching), `matchedAliasLabel` seam threading. See below for details and the adversarial-review findings fixed. |
 | 7 — Media migration completion | ✅ **Complete** (2026-07-12) | Deleted the legacy `heroImage`/`gallery`/`videoUrl` fields from `lib/types.ts` and all 15 `data/temples.ts` records; migrated the last 3 consumers (homepage hero carousel, trip-ideas, `TempleCard`) onto `getHero(media)`. See below for details. |
-| P8–P11 | ⬜ Not started | **Next: P8 — /suggest + /methodology** per `docs/13`. |
+| 8 — /suggest + /methodology | ✅ **Complete** (2026-07-12) | Two new UI-only pages (`/suggest`, `/methodology`, D7); footer + homepage teaser links flipped from `/about` to the new routes. See below for details. |
+| P9–P11 | ⬜ Not started | **Next: P9 — Consistency cleanup** per `docs/13`. |
 
 ### Phase 3 — complete (2026-07-10)
 
@@ -180,15 +181,31 @@ Not-yet-built routes (new surfaces, not recolors): the header **search overlay**
 
 **Adversarial review (3-dimension workflow — data-integrity, consumer-migration-completeness, spec-conformance-and-docs; each finding independently re-verified) — 0 confirmed findings, 2 rejected:** both rejected findings correctly identified as out-of-scope documentation-staleness in files this diff never touches (`docs/13`'s P7 row and `docs/09` §2's own forward-reference sentence both still describe already-shipped Phase 5 work / the now-completed migration in future tense) — consistent with this project's established precedent of never retroactively editing a spec file's "what Sonnet does next" section after the phase it describes ships; `PROJECT_CONTEXT.md` alone is the live "what's actually done" tracker per `docs/14`. Two full review dimensions (data-file integrity across all 15 records; exhaustive consumer-migration completeness) returned zero findings.
 
+### Phase 8 — /suggest + /methodology — complete (2026-07-12)
+
+**Delivered** (docs/02 §1.1/§2, docs/12 §6, D7):
+- **`app/methodology/page.tsx` (new).** A thin route (D7 — "same content the About page embeds") rendering a new shared `MethodologyContent` component under its own H1/intro.
+- **`components/methodology/methodology-content.tsx` (new).** The methodology prose lives in exactly one place, rendered on both `/about` and `/methodology` — satisfies D7's "same content" literally rather than duplicating similar-but-drifting text in two files. Covers docs/12 §6's four required beats: how entries are researched (hand-written from freely-licensed public sources), the no-fabrication policy (omission over guessing; every claim checked against a source; screened for banned marketing phrases and duplicated passages — verified these checks are real, existing code in `lib/anti-slop.ts`, not aspirational), the licensing note (reused verbatim from the pre-existing `/about` paragraphs — image licensing + map-data attribution), and a link to `/suggest`. Deliberately does **not** claim a live CI-enforced pipeline, a tier system, or verification badges the prototype doesn't have (`lint:content` is a real but standalone script, not wired into build/CI) — honest about the current stage, consistent with D12/the anti-slop charter's own spirit applied to the methodology copy itself.
+- **`app/about/page.tsx` (modified).** Its 3 trailing note-paragraphs replaced with the shared `MethodologyContent` under a new "How we choose" section — so `/about` and `/methodology` render identical prose from one source, not two copies that could drift.
+- **`components/suggest/suggest-form.tsx` + `app/suggest/page.tsx` (new).** Modeled directly on the existing `ContactForm`/`/contact` pattern (docs/02 §1.1: "Forms never submit anywhere — visible 'prototype — nothing was sent' notice, no fake success"): a prototype disclaimer, `e.preventDefault()` + an honest non-submission status message (verified both the name-populated and empty-name interpolation branches live), never a fake success. Fields: temple name, city/state, optional email, why it belongs.
+- **Link flips.** `components/home/methodology-teaser.tsx`'s "How we choose →" now points to `/methodology` (was `/about`, with a code comment noting the route didn't exist yet — now stale, removed). `components/layout/footer.tsx` gained a "Methodology" → `/methodology` link alongside the existing "About the project" → `/about` (docs/02 §2's exact footer spec); the stale "`/suggest` ships in Phase 8" forward-reference comment removed since the page now exists.
+- **Self-caught fix before the review even ran:** `MethodologyContent`'s three section headings were `<h3>` with no `<h2>` above them on either consuming page (`Eyebrow` renders a `<p>` by default, not a heading) — a skipped heading level (h1→h3). Promoted to `<h2>`, matching how every other section on `/about` already uses h2.
+
+**New files:** `app/methodology/page.tsx`, `app/suggest/page.tsx`, `components/methodology/methodology-content.tsx`, `components/suggest/suggest-form.tsx`. **Modified:** `app/about/page.tsx`, `components/home/methodology-teaser.tsx`, `components/layout/footer.tsx`.
+
+**Verification:** typecheck clean · 291/292 tests (1 intentionally skipped) · lint clean · build 25/25 pages (up from 23 — the two new routes). Browser-verified live: both new pages render correctly desktop + 375px; the shared methodology prose is byte-identical on `/about` and `/methodology`; footer and homepage-teaser links resolve to the right routes; the suggest form's honest non-submission message correctly interpolates the temple name when provided and falls back cleanly when not; zero console errors.
+
+**Adversarial review (3-dimension workflow — content-honesty-spec-conformance, ia-and-link-completeness, form-a11y-and-behavior; each dimension independently investigated) — 0 confirmed findings, 0 rejected:** all three dimensions returned genuinely empty findings (confirmed via the workflow journal, not just the summary) — no fabricated claims in the methodology copy, no stale `/about`-as-methodology-stand-in references left anywhere else in the repo, well-formed heading hierarchy on both `/about` and `/methodology` after the pre-emptive fix above, and the `SuggestForm` correctly mirrors `ContactForm`'s accessible-label/honest-status pattern with no drift.
+
 ### Recommended next step
 
-**Proceed to Phase 8 — /suggest + /methodology** per `docs/13_IMPLEMENTATION_MASTER_PLAN.md`. Start sequence for a future session:
+**Proceed to Phase 9 — Consistency cleanup** per `docs/13_IMPLEMENTATION_MASTER_PLAN.md`. Start sequence for a future session:
 
-1. Read this **Build status** section, then `docs/02 §1.1` (route reservations) and `docs/12 §6` (E-E-A-T / methodology page requirements, D7).
-2. Build both UI-only pages: `/suggest` (currently 404s — the footer/homepage links were sanctioned to ship early per docs/13's Phase-1 note) and `/methodology` (D7 — a permanent citable URL that mirrors the `/about` content). Flip the footer/teaser links from `/about` to `/methodology` once it exists.
+1. Read this **Build status** section, then D19 (Radix popover migration) and D1 (legacy token aliases) in `docs/01_PRODUCT_NORTH_STAR.md`, and `docs/08 §5#1` (deity-icon stroke-draw micro-interaction).
+2. Migrate the remaining hand-rolled popovers (header dropdowns, state-tile popovers) to Radix; **delete the legacy Tailwind color-alias tokens** (`temple-red`, `sand-yellow`, `warm-gold`, etc. — still present across nearly every page today, intentionally, per D1) now that every page has migrated to Modern Utsavam, and add the CI grep D1 calls for; ship the deity-icon stroke-draw hover/focus micro-interaction; sweep for stale classes/emoji/z-index values outside the docs/03 scale.
 3. Finish on `typecheck && test && lint && build` green, browser verification (desktop + 375px, keyboard pass), and an adversarial review pass, per `docs/14_CLAUDE_CODE_OPERATING_SYSTEM.md`.
 
-**One open product decision, carried from P4 and still unresolved (not blocking P8):** the D17 rest-map palette gives ~1.19:1 boundary contrast between adjacent unselected states (`#F4EADF` fill + `#FFFFFF` stroke), below WCAG 1.4.11's 3:1 for meaningful graphical boundaries. It is exactly what D17 specifies, so changing it is a D17 amendment — decide whether to darken the rest stroke.
+**One open product decision, carried from P4 and still unresolved (not blocking P9):** the D17 rest-map palette gives ~1.19:1 boundary contrast between adjacent unselected states (`#F4EADF` fill + `#FFFFFF` stroke), below WCAG 1.4.11's 3:1 for meaningful graphical boundaries. It is exactly what D17 specifies, so changing it is a D17 amendment — decide whether to darken the rest stroke.
 
 ---
 

@@ -5,9 +5,9 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { KolamMotif } from "@/components/brand/kolam-motif";
 
 /**
- * Methodology teaser — a short paragraph + "How we choose →" (UX_SPEC §5.7). Links to
- * /about (there is no /methodology route yet — an open question in PROJECT_CONTEXT §14).
- * Reuses the kolam motif as a decorative flourish.
+ * Methodology teaser — a short paragraph + "How we choose →" (UX_SPEC §5.7), linking to the
+ * permanent /methodology route (D7, docs/13 P8). Reuses the kolam motif as a decorative
+ * flourish.
  */
 export function MethodologyTeaser() {
   return (
@@ -28,7 +28,7 @@ export function MethodologyTeaser() {
               freely-licensed material. No sponsored rankings, no pay-to-feature.
             </p>
             <Link
-              href="/about"
+              href="/methodology"
               className="mt-7 inline-flex items-center gap-1.5 font-semibold text-turmeric transition-colors hover:text-white"
             >
               How we choose

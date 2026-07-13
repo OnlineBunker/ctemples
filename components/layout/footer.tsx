@@ -27,7 +27,6 @@ export function Footer() {
           <nav aria-label="Contribute">
             <h2 className="eyebrow mb-4">Contribute</h2>
             <ul className="space-y-2.5 text-sm text-ink-muted">
-              {/* /suggest ships in Phase 8; the link is placed now per the plan. */}
               <li>
                 <Link href="/suggest" className="transition-colors hover:text-temple-red">
                   Suggest a temple →
@@ -52,6 +51,11 @@ export function Footer() {
               <li>
                 <Link href="/about" className="transition-colors hover:text-temple-red">
                   About the project
+                </Link>
+              </li>
+              <li>
+                <Link href="/methodology" className="transition-colors hover:text-temple-red">
+                  Methodology
                 </Link>
               </li>
             </ul>

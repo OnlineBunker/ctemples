@@ -4,6 +4,7 @@ import { Reveal, Stagger, RevealItem } from "@/components/motion/reveal";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Divider } from "@/components/brand/divider";
 import { Stat } from "@/components/ui/stat";
+import { MethodologyContent } from "@/components/methodology/methodology-content";
 
 export const metadata: Metadata = {
   title: "About",
@@ -103,29 +104,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <p className="mt-16 rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-subtle">
-        Note · CTemples is currently a frontend prototype. Temple content shown here is placeholder,
-        written to the same standard the real library will follow.
-      </p>
-
-      <p className="mt-4 rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-subtle">
-        Image licensing · Photography shown across the site is sourced from Wikimedia Commons under
-        its various free licenses. Per-image credit lines are on the way; until then, this note
-        stands as the site-wide attribution.
-      </p>
-
-      <p className="mt-4 rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-subtle">
-        Map data ©{" "}
-        <a
-          href="https://github.com/datameet/maps"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline decoration-line-strong underline-offset-2 hover:text-ink"
-        >
-          DataMeet community maps
-        </a>{" "}
-        (CC BY 4.0). State boundaries in Explore&rsquo;s map mode are simplified from this dataset.
-      </p>
+      <div className="mt-16">
+        <Eyebrow>How we choose</Eyebrow>
+        <div className="mt-7">
+          <MethodologyContent />
+        </div>
+      </div>
     </div>
   );
 }
