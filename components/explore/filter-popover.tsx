@@ -1,14 +1,14 @@
 "use client";
 
-import * as Popover from "@radix-ui/react-popover";
 import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
+import { PopoverShell } from "@/components/ui/popover-shell";
 import { cn } from "@/lib/utils";
 
 /**
- * Shared Radix Popover shell for the four Explore filter triggers (docs/03 §6.4,
- * docs/05 §3.2). Radix owns focus trap, Esc, outside-click, and collision-aware
- * positioning — the one sanctioned new dependency (D19).
+ * The Explore filter-pill trigger (docs/05 §3.2), wrapping the shared PopoverShell
+ * (docs/03 §6.4) — the one sanctioned new dependency (D19). All four filter triggers
+ * (State/Deity/Tag/Sort) share this exact pill styling; only the panel content differs.
  */
 export function FilterPopover({
   label,
@@ -22,8 +22,10 @@ export function FilterPopover({
   children: ReactNode;
 }) {
   return (
-    <Popover.Root>
-      <Popover.Trigger asChild>
+    <PopoverShell
+      className="w-72"
+      panelLabel={panelLabel}
+      trigger={
         <button
           type="button"
           className={cn(
@@ -37,18 +39,9 @@ export function FilterPopover({
           <span className="whitespace-nowrap">{label}</span>
           <ChevronDown className="h-4 w-4 shrink-0" aria-hidden />
         </button>
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content
-          aria-label={panelLabel}
-          align="start"
-          sideOffset={8}
-          collisionPadding={16}
-          className="popover-content z-40 w-72 max-w-[calc(100vw-2.5rem)] rounded-card border border-line bg-canvas p-3 shadow-lg focus:outline-none"
-        >
-          {children}
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+      }
+    >
+      {children}
+    </PopoverShell>
   );
 }

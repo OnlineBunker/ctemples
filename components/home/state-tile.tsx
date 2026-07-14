@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { GopuramMark } from "@/components/brand/gopuram-mark";
 import { REGION_META } from "@/lib/regions";
 import type { Region } from "@/lib/types";
-import { StatePopover, type StatePopoverItem } from "./state-popover";
+import type { StatePopoverItem } from "./state-popover";
 
 export interface StateStripItem {
   state: string;
@@ -19,17 +19,10 @@ export interface StateStripItem {
 }
 
 /**
- * A state tile: a button that opens a popover of the state's top temples. Owns the
- * popover's focus management — focuses the first item on open, traps Tab, closes on Esc
- * (restoring focus to the button) and on outside pointer. Single-open is enforced by the
- * parent (StateStrip). The icon is the state's actual silhouette (docs/07 §8), region-tinted;
- * the gopuram mark stands in only where a silhouette is missing or too degenerate at 48px
- * (the callout-marker states).
- *
- * Popover alignment is measured at click time (not derived from the tile's index): the
- * grid's column count changes per breakpoint (2/3/4/6-up), so index parity doesn't
- * reliably predict which half of the viewport a tile sits in. Measuring the tile's
- * actual position is breakpoint-agnostic and keeps the popover on-screen.
+ * A state tile: a button that opens the parent's shared popover of the state's top
+ * temples (docs/03 §6.4, D19). The popover itself lives in the parent (`StateStrip`),
+ * anchored to whichever tile was last clicked — this component only renders the
+ * trigger and reports its own DOM node up on click.
  */
 function StateIcon({ silhouette }: { silhouette: string | null }) {
   if (!silhouette) {
@@ -41,116 +34,46 @@ function StateIcon({ silhouette }: { silhouette: string | null }) {
     </svg>
   );
 }
+
 export function StateTile({
   item,
   isOpen,
-  onOpen,
-  onClose,
+  contentId,
+  onToggle,
 }: {
   item: StateStripItem;
   isOpen: boolean;
-  onOpen: () => void;
-  onClose: () => void;
+  contentId: string;
+  onToggle: (trigger: HTMLButtonElement) => void;
 }) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [align, setAlign] = useState<"left" | "right">("left");
-  const popId = `state-pop-${item.slug}`;
-  const labelId = `state-pop-label-${item.slug}`;
   const pigment = REGION_META[item.region].pigment;
-
-  function handleToggle() {
-    if (isOpen) {
-      onClose();
-      return;
-    }
-    const rect = wrapperRef.current?.getBoundingClientRect();
-    if (rect) {
-      const tileCenter = rect.left + rect.width / 2;
-      setAlign(tileCenter < window.innerWidth / 2 ? "left" : "right");
-    }
-    onOpen();
-  }
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const wrapper = wrapperRef.current;
-    wrapper?.querySelector<HTMLElement>('[role="dialog"] a')?.focus();
-
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-        buttonRef.current?.focus();
-        return;
-      }
-      if (e.key === "Tab") {
-        const dialog = wrapper?.querySelector<HTMLElement>('[role="dialog"]');
-        if (!dialog) return;
-        const f = Array.from(
-          dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'),
-        );
-        if (!f.length) return;
-        const first = f[0];
-        const last = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    }
-    function onPointer(e: PointerEvent) {
-      if (!wrapper?.contains(e.target as Node)) onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPointer);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onPointer);
-    };
-  }, [isOpen, onClose]);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   return (
-    <div ref={wrapperRef} className="relative">
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-haspopup="dialog"
-        aria-expanded={isOpen}
-        aria-controls={popId}
-        onClick={handleToggle}
-        className="flex h-full w-full flex-col items-start gap-3 rounded-card border border-line bg-canvas p-4 text-left shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-magenta/40 hover:shadow-md aria-expanded:border-magenta"
+    <button
+      ref={buttonRef}
+      type="button"
+      data-state-tile
+      aria-haspopup="dialog"
+      aria-expanded={isOpen}
+      aria-controls={isOpen ? contentId : undefined}
+      onClick={() => buttonRef.current && onToggle(buttonRef.current)}
+      className="flex h-full w-full flex-col items-start gap-3 rounded-card border border-line bg-canvas p-4 text-left shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-magenta/40 hover:shadow-md aria-expanded:border-magenta"
+    >
+      <span
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full"
+        style={{ color: pigment, backgroundColor: `${pigment}14` }}
       >
-        <span
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full"
-          style={{ color: pigment, backgroundColor: `${pigment}14` }}
-        >
-          <StateIcon silhouette={item.silhouette} />
+        <StateIcon silhouette={item.silhouette} />
+      </span>
+      <span>
+        <span className="block font-display text-base font-semibold leading-tight text-plum">
+          {item.state}
         </span>
-        <span>
-          <span className="block font-display text-base font-semibold leading-tight text-plum">
-            {item.state}
-          </span>
-          <span className="mt-0.5 block font-mono text-[0.62rem] uppercase tracking-label text-ink-muted">
-            {item.count === 1 ? "1 temple" : `${item.count} temples`}
-          </span>
+        <span className="mt-0.5 block font-mono text-[0.62rem] uppercase tracking-label text-ink-muted">
+          {item.count === 1 ? "1 temple" : `${item.count} temples`}
         </span>
-      </button>
-
-      {isOpen ? (
-        <StatePopover
-          id={popId}
-          labelId={labelId}
-          stateName={item.state}
-          count={item.count}
-          seeAllHref={`/explore?state=${item.slug}`}
-          items={item.top}
-          align={align}
-        />
-      ) : null}
-    </div>
+      </span>
+    </button>
   );
 }

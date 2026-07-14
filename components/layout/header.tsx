@@ -2,18 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import * as Popover from "@radix-ui/react-popover";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, X, ChevronDown, Globe, Check } from "lucide-react";
 import { GopuramMark } from "@/components/brand/gopuram-mark";
 import { SearchOverlay } from "@/components/layout/search-overlay";
+import { PopoverShell } from "@/components/ui/popover-shell";
 import { cn } from "@/lib/utils";
 
 /** Explore ▾ presets — real, resolvable list-mode filter URLs (docs/02 §2). The old
@@ -44,7 +39,7 @@ const navTrigger =
   "inline-flex items-center gap-1 rounded-full px-4 py-2 font-mono text-[0.7rem] uppercase tracking-label transition-colors";
 
 const iconButton =
-  "inline-flex h-10 w-10 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-canvas-soft hover:text-temple-red";
+  "inline-flex h-10 w-10 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-canvas-soft hover:text-magenta";
 
 type MenuItem = {
   key: string;
@@ -55,168 +50,82 @@ type MenuItem = {
   note?: string;
 };
 
-/** Accessible menu-button dropdown: opens on click, closes on Esc (restoring
- *  focus) and outside click, roves with ↑/↓/Home/End, and traps Tab. */
-function Dropdown({
-  id,
-  menuLabel,
-  items,
-  align = "left",
-  triggerClassName,
-  triggerAriaLabel,
-  children,
-}: {
-  id: string;
-  menuLabel: string;
-  items: MenuItem[];
-  align?: "left" | "right";
-  triggerClassName?: string;
-  triggerAriaLabel?: string;
-  children: ReactNode;
-}) {
-  const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
+const menuItemBase = "flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm";
+const menuItemInteractive = "text-ink transition-colors hover:bg-magenta-soft focus:bg-magenta-soft focus:outline-none";
 
-  // Close whenever the route changes (e.g. after selecting a link item).
-  useEffect(() => setOpen(false), [pathname]);
+/** A single dropdown item — a real Link for a real destination, a disabled note-only row
+ *  for the not-yet-available languages. Every interactive row is wrapped in `Popover.Close`
+ *  so selecting it dismisses the panel (docs/03 §6.4's behavior contract), without the
+ *  hand-rolled pathname-effect the old implementation needed for the same result. */
+function DropdownItem({ item }: { item: MenuItem }) {
+  const content = (
+    <>
+      <span className="flex items-center gap-2">
+        {item.label}
+        {item.current ? <Check className="h-4 w-4 text-magenta" aria-hidden /> : null}
+      </span>
+      {item.note ? (
+        <span className="font-mono text-[0.6rem] uppercase tracking-label text-ink-subtle">{item.note}</span>
+      ) : null}
+    </>
+  );
 
-  // Move focus into the menu when it opens.
-  useEffect(() => {
-    if (open) menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
-  }, [open]);
-
-  // Dismiss on outside pointer.
-  useEffect(() => {
-    if (!open) return;
-    function onPointer(e: PointerEvent) {
-      const t = e.target as Node;
-      if (!menuRef.current?.contains(t) && !triggerRef.current?.contains(t)) setOpen(false);
-    }
-    document.addEventListener("pointerdown", onPointer);
-    return () => document.removeEventListener("pointerdown", onPointer);
-  }, [open]);
-
-  function close(restoreFocus = true) {
-    setOpen(false);
-    if (restoreFocus) triggerRef.current?.focus();
+  if (item.disabled) {
+    return (
+      <button
+        type="button"
+        aria-disabled="true"
+        aria-current={item.current ? "true" : undefined}
+        className={cn(menuItemBase, "cursor-default text-ink-subtle")}
+      >
+        {content}
+      </button>
+    );
   }
 
-  function onMenuKeyDown(e: ReactKeyboardEvent<HTMLDivElement>) {
-    const menuEl = menuRef.current;
-    if (!menuEl) return;
-    const els = Array.from(menuEl.querySelectorAll<HTMLElement>('[role="menuitem"]'));
-    if (!els.length) return;
-    const idx = els.indexOf(document.activeElement as HTMLElement);
-    const focusAt = (i: number) => els[(i + els.length) % els.length].focus();
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        focusAt(idx + 1);
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        focusAt(idx - 1);
-        break;
-      case "Home":
-        e.preventDefault();
-        focusAt(0);
-        break;
-      case "End":
-        e.preventDefault();
-        focusAt(els.length - 1);
-        break;
-      case "Tab": // trap focus within the menu
-        e.preventDefault();
-        focusAt(idx + (e.shiftKey ? -1 : 1));
-        break;
-      case "Escape":
-        e.preventDefault();
-        close();
-        break;
-    }
+  if (item.href) {
+    return (
+      <Popover.Close asChild>
+        <Link
+          href={item.href}
+          aria-current={item.current ? "page" : undefined}
+          className={cn(menuItemBase, menuItemInteractive)}
+        >
+          {content}
+        </Link>
+      </Popover.Close>
+    );
   }
 
   return (
-    <div className="relative">
-      <button
-        ref={triggerRef}
-        type="button"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={id}
-        aria-label={triggerAriaLabel}
-        onClick={() => setOpen((v) => !v)}
-        onKeyDown={(e) => {
-          if (!open && e.key === "ArrowDown") {
-            e.preventDefault();
-            setOpen(true);
-          }
-        }}
-        className={triggerClassName}
-      >
-        {children}
+    <Popover.Close asChild>
+      <button type="button" aria-current={item.current ? "true" : undefined} className={cn(menuItemBase, menuItemInteractive)}>
+        {content}
       </button>
+    </Popover.Close>
+  );
+}
 
-      {open ? (
-        <div
-          id={id}
-          ref={menuRef}
-          role="menu"
-          aria-label={menuLabel}
-          onKeyDown={onMenuKeyDown}
-          className={cn(
-            "absolute z-50 mt-2 min-w-[13rem] rounded-xl border border-line bg-canvas p-1.5 shadow-md",
-            align === "right" ? "right-0" : "left-0",
-          )}
-        >
-          {items.map((item) =>
-            item.href && !item.disabled ? (
-              <Link
-                key={item.key}
-                href={item.href}
-                role="menuitem"
-                tabIndex={-1}
-                aria-current={item.current ? "page" : undefined}
-                className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-ink transition-colors hover:bg-sand-yellow-soft focus:bg-sand-yellow-soft focus:outline-none"
-              >
-                {item.label}
-                {item.current ? <Check className="h-4 w-4 text-temple-red" aria-hidden /> : null}
-              </Link>
-            ) : (
-              <button
-                key={item.key}
-                type="button"
-                role="menuitem"
-                tabIndex={-1}
-                aria-disabled={item.disabled || undefined}
-                aria-current={item.current ? "true" : undefined}
-                onClick={() => {
-                  if (!item.disabled) close();
-                }}
-                className={cn(
-                  "flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors focus:outline-none",
-                  item.disabled
-                    ? "cursor-default text-ink-subtle"
-                    : "text-ink hover:bg-sand-yellow-soft focus:bg-sand-yellow-soft",
-                )}
-              >
-                <span className="flex items-center gap-2">
-                  {item.label}
-                  {item.current ? <Check className="h-4 w-4 text-temple-red" aria-hidden /> : null}
-                </span>
-                {item.note ? (
-                  <span className="font-mono text-[0.6rem] uppercase tracking-label text-ink-subtle">
-                    {item.note}
-                  </span>
-                ) : null}
-              </button>
-            ),
-          )}
-        </div>
-      ) : null}
-    </div>
+/** Header nav dropdown (Explore presets, Language) on the shared Radix Popover shell
+ *  (docs/03 §6.4, D19) — focus-in-on-open, Tab-trap, Esc-close-and-restore, and
+ *  outside-pointer-dismiss all come from Radix, not hand-rolled. */
+function Dropdown({
+  items,
+  align = "start",
+  panelLabel,
+  trigger,
+}: {
+  items: MenuItem[];
+  align?: "start" | "end";
+  panelLabel: string;
+  trigger: ReactNode;
+}) {
+  return (
+    <PopoverShell trigger={trigger} panelLabel={panelLabel} align={align} className="w-auto min-w-[13rem] p-1.5">
+      {items.map((item) => (
+        <DropdownItem key={item.key} item={item} />
+      ))}
+    </PopoverShell>
   );
 }
 
@@ -260,7 +169,7 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
   }, [onClose]);
 
   const sheetLink =
-    "block rounded-lg px-3 py-3 text-base text-ink transition-colors hover:bg-sand-yellow-soft";
+    "block rounded-lg px-3 py-3 text-base text-ink transition-colors hover:bg-turmeric-soft";
 
   return (
     <motion.div
@@ -274,11 +183,11 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
       exit={{ opacity: 0, y: reduce ? 0 : -8 }}
       transition={{ duration: reduce ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="shell flex h-16 items-center justify-between border-b border-warm-gold/25">
+      <div className="shell flex h-16 items-center justify-between border-b border-saffron/25">
         <Link href="/" onClick={onClose} className="flex items-center gap-2.5" aria-label="CTemples home">
-          <GopuramMark className="h-7 w-7 text-temple-red" />
+          <GopuramMark className="h-7 w-7 text-magenta" />
           <span className="font-display text-lg text-ink">
-            C<span className="text-temple-red">temples</span>
+            C<span className="text-magenta">temples</span>
           </span>
         </Link>
         <button
@@ -299,7 +208,7 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
             aria-expanded={exploreOpen}
             aria-controls="m-explore"
             onClick={() => setExploreOpen((v) => !v)}
-            className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-base text-ink transition-colors hover:bg-sand-yellow-soft"
+            className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-base text-ink transition-colors hover:bg-turmeric-soft"
           >
             Explore
             <ChevronDown
@@ -341,14 +250,14 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
                   className={cn(
                     "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
                     lang.current
-                      ? "text-ink hover:bg-sand-yellow-soft"
+                      ? "text-ink hover:bg-turmeric-soft"
                       : "cursor-default text-ink-subtle",
                   )}
                 >
                   <span className="flex items-center gap-2">
                     {lang.label}
                     {lang.current ? (
-                      <Check className="h-4 w-4 text-temple-red" aria-hidden />
+                      <Check className="h-4 w-4 text-magenta" aria-hidden />
                     ) : null}
                   </span>
                   {lang.current ? null : (
@@ -395,38 +304,39 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-50 border-b border-warm-gold/25 bg-canvas/90 backdrop-blur-md"
+      className="sticky top-0 z-50 border-b border-saffron/25 bg-canvas/90 backdrop-blur-md"
       style={{ viewTransitionName: "site-header" } as CSSProperties}
     >
       <div className="shell flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-5">
           <Link href="/" className="group flex items-center gap-2.5" aria-label="CTemples home">
-            <GopuramMark className="h-7 w-7 text-temple-red transition-transform duration-500 ease-threshold group-hover:-translate-y-0.5" />
+            <GopuramMark className="h-7 w-7 text-magenta transition-transform duration-500 ease-threshold group-hover:-translate-y-0.5" />
             <span className="font-display text-lg tracking-tight text-ink">
-              C<span className="text-temple-red">temples</span>
+              C<span className="text-magenta">temples</span>
             </span>
           </Link>
 
           <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
             <Dropdown
-              id="explore-menu"
-              menuLabel="Explore presets"
+              panelLabel="Explore presets"
               items={EXPLORE_ITEMS}
-              triggerAriaLabel="Explore"
-              triggerClassName={cn(
-                navTrigger,
-                exploreActive ? "text-temple-red" : "text-ink-muted hover:text-ink",
-              )}
-            >
-              Explore
-              <ChevronDown className="h-4 w-4" aria-hidden />
-            </Dropdown>
+              trigger={
+                <button
+                  type="button"
+                  aria-label="Explore"
+                  className={cn(navTrigger, exploreActive ? "text-magenta" : "text-ink-muted hover:text-ink")}
+                >
+                  Explore
+                  <ChevronDown className="h-4 w-4" aria-hidden />
+                </button>
+              }
+            />
             <Link
               href="/about"
               aria-current={aboutActive ? "page" : undefined}
               className={cn(
                 navTrigger,
-                aboutActive ? "text-temple-red" : "text-ink-muted hover:text-ink",
+                aboutActive ? "text-magenta" : "text-ink-muted hover:text-ink",
               )}
             >
               About
@@ -439,17 +349,21 @@ export function Header() {
 
           <div className="hidden md:block">
             <Dropdown
-              id="language-menu"
-              menuLabel="Choose language"
+              panelLabel="Choose language"
               items={languageItems}
-              align="right"
-              triggerAriaLabel="Language: English"
-              triggerClassName="inline-flex h-10 items-center gap-1.5 rounded-full border border-line px-3 font-mono text-[0.7rem] uppercase tracking-label text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
-            >
-              <Globe className="h-4 w-4" aria-hidden />
-              EN
-              <ChevronDown className="h-4 w-4" aria-hidden />
-            </Dropdown>
+              align="end"
+              trigger={
+                <button
+                  type="button"
+                  aria-label="Language: English"
+                  className="inline-flex h-10 items-center gap-1.5 rounded-full border border-line px-3 font-mono text-[0.7rem] uppercase tracking-label text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
+                >
+                  <Globe className="h-4 w-4" aria-hidden />
+                  EN
+                  <ChevronDown className="h-4 w-4" aria-hidden />
+                </button>
+              }
+            />
           </div>
 
           <div className="flex items-center gap-1 md:hidden">

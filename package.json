@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "popularity": "tsx scripts/compute-popularity.ts",
-    "lint:content": "tsx scripts/lint-anti-slop.ts"
+    "lint:content": "tsx scripts/lint-anti-slop.ts",
+    "lint:tokens": "tsx scripts/check-legacy-tokens.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.19",

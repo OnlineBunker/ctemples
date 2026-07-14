@@ -30,7 +30,7 @@ export default function ContactPage() {
           <ul className="mt-10 space-y-4">
             {PERKS.map((perk) => (
               <li key={perk} className="flex gap-3 text-ink-muted">
-                <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-temple-red" />
+                <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-magenta" />
                 <span className="leading-relaxed">{perk}</span>
               </li>
             ))}

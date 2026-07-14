@@ -5,15 +5,6 @@ import type { Config } from "tailwindcss";
  *
  * Reference palette (see DESIGN.md and the approved visual reference):
  *   porcelain canvas · magenta · coral · saffron · turmeric · plum.
- *
- * ALIASING NOTE — the Phase-1 chrome (header/footer/banner/about/contact/404) was
- * built on the earlier semantic names (temple-red / sand-yellow / warm-gold). Those
- * names are kept here as ALIASES onto the new reference hues so the existing chrome
- * adopts the palette with zero edits:
- *     temple-red  -> magenta
- *     sand-yellow -> turmeric
- *     warm-gold   -> saffron
- * New code should prefer the reference names (magenta/coral/saffron/turmeric/plum).
  */
 
 const magenta = { DEFAULT: "#E5006D", soft: "#FCE0EE", deep: "#B80057" } as const;
@@ -44,11 +35,6 @@ const config: Config = {
         saffron,
         turmeric,
         plum,
-
-        // Semantic aliases kept for the Phase-1 chrome (see ALIASING NOTE above).
-        "temple-red": magenta,
-        "sand-yellow": turmeric,
-        "warm-gold": saffron,
 
         // Functional — danger decoupled to a true red (errors must not read as brand).
         success: { DEFAULT: "#2E7D32", soft: "#E8F5E9" },

@@ -30,7 +30,7 @@ export function DeityTiles({ counts }: { counts: Record<DeityKey, number> }) {
                   className="inline-flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-105"
                   style={{ color: meta.accent, backgroundColor: `${meta.accent}14` }}
                 >
-                  <DeityIcon icon={meta.icon} className="h-7 w-7" />
+                  <DeityIcon icon={meta.icon} className="h-7 w-7" animated />
                 </span>
                 <span className="mt-4">
                   <span className="block font-display text-xl font-semibold text-plum">

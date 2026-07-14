@@ -4,13 +4,13 @@ import { useState } from "react";
 import { Info, CheckCircle2 } from "lucide-react";
 
 const FIELD =
-  "w-full rounded-xl border border-line-strong bg-canvas px-4 py-3 text-ink placeholder:text-ink-subtle focus:border-temple-red focus-visible:outline-none";
+  "w-full rounded-xl border border-line-strong bg-canvas px-4 py-3 text-ink placeholder:text-ink-subtle focus:border-magenta focus-visible:outline-none";
 
 const LABEL = "mb-2 block font-mono text-[0.66rem] uppercase tracking-label text-ink-muted";
 
 // Transitional inline submit; the shared Button primitive is rebuilt in Phase 2.
 const submitButton =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-temple-red px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-canvas transition-colors hover:bg-temple-red-deep";
+  "inline-flex items-center justify-center gap-2 rounded-full bg-magenta px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-canvas transition-colors hover:bg-magenta-deep";
 
 export function SuggestForm() {
   const [templeName, setTempleName] = useState("");
@@ -31,9 +31,9 @@ export function SuggestForm() {
     >
       <p
         role="note"
-        className="mb-8 flex items-start gap-3 rounded-xl border border-sand-yellow-deep/30 bg-sand-yellow-soft p-4 text-sm leading-relaxed text-ink/80"
+        className="mb-8 flex items-start gap-3 rounded-xl border border-turmeric-deep/30 bg-turmeric-soft p-4 text-sm leading-relaxed text-ink/80"
       >
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-temple-red" aria-hidden />
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-magenta" aria-hidden />
         This is a frontend prototype. The form isn&apos;t connected to a backend yet, so submitting
         it won&apos;t send anything anywhere — it&apos;s here to show the flow.
       </p>

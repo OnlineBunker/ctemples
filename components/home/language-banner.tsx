@@ -48,13 +48,13 @@ export function LanguageBanner() {
   if (!visible) return null;
 
   return (
-    <div className="border-b border-warm-gold/25 bg-warm-gold-soft/60 text-ink">
+    <div className="border-b border-saffron/25 bg-saffron-soft/60 text-ink">
       <div className="shell flex items-center justify-between gap-4 py-2">
         <p className="text-sm leading-snug text-ink/80">
           Available in 8 Indian languages — coming soon.{" "}
           <Link
             href="/contact"
-            className="font-medium text-temple-red underline-offset-2 hover:underline"
+            className="font-medium text-magenta underline-offset-2 hover:underline"
           >
             Notify me →
           </Link>
@@ -63,7 +63,7 @@ export function LanguageBanner() {
           type="button"
           onClick={dismiss}
           aria-label="Dismiss language announcement"
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-warm-gold/15 hover:text-ink"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-saffron/15 hover:text-ink"
         >
           <X className="h-4 w-4" aria-hidden />
         </button>

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 // Transitional inline CTAs; the shared Button primitive is rebuilt in Phase 2.
 const ctaPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-temple-red px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-canvas transition-colors hover:bg-temple-red-deep";
+  "inline-flex items-center justify-center gap-2 rounded-full bg-magenta px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-canvas transition-colors hover:bg-magenta-deep";
 const ctaSecondary =
   "inline-flex items-center justify-center gap-2 rounded-full border border-line-strong bg-canvas px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-ink transition-colors hover:bg-canvas-soft";
 
@@ -62,7 +62,7 @@ export default function AboutPage() {
           {APPROACH.map((item, i) => (
             <RevealItem key={item.title}>
               <div className="border-t border-line pt-6">
-                <span className="font-mono text-xs text-temple-red">0{i + 1}</span>
+                <span className="font-mono text-xs text-magenta">0{i + 1}</span>
                 <h3 className="mt-3 font-display text-2xl text-ink">{item.title}</h3>
                 <p className="mt-3 leading-relaxed text-ink-muted">{item.body}</p>
               </div>

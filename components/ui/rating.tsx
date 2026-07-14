@@ -20,7 +20,7 @@ export function Rating({
         className,
       )}
     >
-      <Star className="h-3.5 w-3.5 fill-sand-yellow text-sand-yellow" aria-hidden />
+      <Star className="h-3.5 w-3.5 fill-turmeric text-turmeric" aria-hidden />
       <span aria-label={`Rated ${formatRating(value)} out of 5`}>{formatRating(value)}</span>
     </span>
   );
