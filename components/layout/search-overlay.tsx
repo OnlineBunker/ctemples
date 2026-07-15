@@ -187,7 +187,7 @@ export function SearchOverlay() {
         >
           <Search className="h-5 w-5 md:h-4 md:w-4" aria-hidden />
           <span className="hidden md:inline">Search</span>
-          <kbd className="hidden rounded-md border border-line px-1.5 py-0.5 font-mono text-[0.62rem] normal-case text-ink-subtle md:inline">
+          <kbd className="hidden rounded-md border border-line px-1.5 py-0.5 font-mono text-[0.62rem] normal-case text-ink-muted md:inline">
             ⌘K
           </kbd>
         </button>

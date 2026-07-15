@@ -164,10 +164,10 @@ function Sheet({
         data-sheet-autofocus={isModal ? true : undefined}
         onClick={cycleHandle}
         className="flex shrink-0 flex-col items-center gap-2 py-2.5"
-        aria-label={snap === "full" ? "Collapse results" : "Expand results"}
+        aria-label={`${peekLabel} — ${snap === "full" ? "collapse" : "expand"} results`}
       >
         <span className="h-1 w-8 rounded-full bg-line-strong" aria-hidden />
-        <span className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-label text-plum">
+        <span className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-label text-plum" aria-hidden>
           {peekLabel}
           {snap === "full" ? (
             <ChevronDown className="h-3.5 w-3.5" aria-hidden />

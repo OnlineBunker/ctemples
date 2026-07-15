@@ -4,7 +4,7 @@ import { ViewTransition } from "@/components/motion/view-transition";
 import { TempleImage } from "@/components/media/temple-image";
 import { RegionBadge, Tag } from "@/components/ui/pill";
 import { Rating } from "@/components/ui/rating";
-import { cheapestBudget, formatRupees } from "@/lib/format";
+import { cheapestBudget, formatRating, formatRupees } from "@/lib/format";
 import { getHero } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import type { Temple } from "@/lib/types";
@@ -26,20 +26,30 @@ export function TempleCard({
 }) {
   const from = cheapestBudget(temple.costEstimates);
   const hero = getHero(temple.media);
+  // The whole card is one link, so its aria-label fully replaces the computed accessible
+  // name — fold the rating in explicitly (it would otherwise be silently dropped, since a
+  // labelled ancestor overrides every descendant's own accessible name, including the
+  // nested Rating's), and mark the rest of the card `aria-hidden` so the extra visible
+  // copy (region, tagline, tags, price) isn't flagged as unlabelled content sighted users
+  // can see but the accessible name never mentions.
+  const ratingPart = `, rated ${formatRating(temple.rating)} out of 5`;
 
   return (
     <TransitionLink
       href={`/temples/${temple.id}`}
       className={cn(
-        "group block h-full rounded-card outline-none transition-transform duration-500 ease-threshold hover:-translate-y-1.5",
+        "group block h-full rounded-card outline-none transition-transform duration-500 ease-threshold hover:-translate-y-1.5 motion-reduce:!transform-none",
         className,
       )}
-      aria-label={`${temple.name}, ${temple.city} — view details`}
+      aria-label={`${temple.name}, ${temple.city}${ratingPart} — view details`}
     >
-      <article className="flex h-full flex-col overflow-hidden rounded-card border border-line bg-canvas shadow-sm transition-[border-color,box-shadow] duration-300 group-hover:border-magenta/40 group-hover:shadow-md">
+      <article
+        aria-hidden="true"
+        className="flex h-full flex-col overflow-hidden rounded-card border border-line bg-canvas shadow-sm transition-[border-color,box-shadow] duration-300 group-hover:border-magenta/40 group-hover:shadow-md"
+      >
         <div className="relative aspect-[16/9] overflow-hidden">
           <ViewTransition name={`temple-${temple.id}`} share="morph">
-            <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-[1.03]">
+            <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-[1.03] motion-reduce:!transform-none">
               <TempleImage
                 src={hero?.url ?? ""}
                 alt={`${temple.name}, ${temple.city}`}

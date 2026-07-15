@@ -20,10 +20,10 @@ export function TripIdeaCard({ idea, priority = false }: { idea: TripIdea; prior
   return (
     <Link
       href={idea.href}
-      className="group flex h-full flex-col overflow-hidden rounded-card border border-line bg-canvas shadow-sm outline-none transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1.5 hover:border-magenta/40 hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-card border border-line bg-canvas shadow-sm outline-none transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1.5 hover:border-magenta/40 hover:shadow-md motion-reduce:!transform-none"
     >
       <div className="relative aspect-[16/9] overflow-hidden">
-        <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-[1.04]">
+        <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-[1.04] motion-reduce:!transform-none">
           <TempleImage
             src={idea.image}
             alt={idea.title}

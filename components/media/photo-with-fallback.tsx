@@ -51,6 +51,12 @@ export function PhotoWithFallback({
       fill
       sizes={sizes}
       priority={priority}
+      // next/image's `priority` alone only removes lazy-loading + emits a preload
+      // link — it does NOT set the `fetchpriority` attribute browsers use to jump
+      // the network queue (a real, separate opt-in Next.js requires). Without it,
+      // the LCP hero image competed for bandwidth with fonts/scripts on an equal
+      // footing despite being flagged as the page's single most important image.
+      fetchPriority={priority ? "high" : undefined}
       placeholder="blur"
       blurDataURL={shimmer(24, 16)}
       unoptimized={unoptimized}

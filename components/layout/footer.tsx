@@ -42,7 +42,7 @@ export function Footer() {
 
           <div>
             <h2 className="eyebrow mb-4">Connect</h2>
-            <ul className="space-y-2.5 text-sm text-ink-subtle">
+            <ul className="space-y-2.5 text-sm text-ink-muted">
               {SOCIALS.map((name) => (
                 <li key={name}>{name}</li>
               ))}
@@ -62,7 +62,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-2 border-t border-line pt-6 font-mono text-[0.68rem] uppercase tracking-label text-ink-subtle sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-14 flex flex-col gap-2 border-t border-line pt-6 font-mono text-[0.68rem] uppercase tracking-label text-ink-muted sm:flex-row sm:items-center sm:justify-between">
           <span>© {2026} CTemples · Made in India</span>
           <span>v0.1 prototype · placeholder content</span>
         </div>

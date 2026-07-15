@@ -89,7 +89,7 @@ export function HeroSlide({
         <TransitionLink
           href={`/temples/${slide.id}`}
           className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-plum transition-colors hover:bg-white"
-          aria-label={`Tour ${slide.name}`}
+          aria-label={`Tour this temple: ${slide.name}`}
         >
           Tour this temple
           <ArrowRight className="h-4 w-4" aria-hidden />

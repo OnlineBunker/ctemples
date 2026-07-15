@@ -129,6 +129,9 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
 
           {result.items.length > 0 ? (
             <>
+              {/* Visually-hidden — each ResultCard's name is an h3, and this page has no
+                  other h2, which without this would skip a level (h1 -> h3). */}
+              <h2 className="sr-only">Search results</h2>
               <ResultGrid items={result.items} />
               <Pagination current={parsed} page={result.page} totalPages={result.totalPages} />
             </>

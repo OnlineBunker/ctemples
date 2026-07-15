@@ -58,7 +58,7 @@ export function StateTile({
       aria-expanded={isOpen}
       aria-controls={isOpen ? contentId : undefined}
       onClick={() => buttonRef.current && onToggle(buttonRef.current)}
-      className="flex h-full w-full flex-col items-start gap-3 rounded-card border border-line bg-canvas p-4 text-left shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-magenta/40 hover:shadow-md aria-expanded:border-magenta"
+      className="flex h-full w-full flex-col items-start gap-3 rounded-card border border-line bg-canvas p-4 text-left shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-magenta/40 hover:shadow-md aria-expanded:border-magenta motion-reduce:!transform-none"
     >
       <span
         className="inline-flex h-10 w-10 items-center justify-center rounded-full"

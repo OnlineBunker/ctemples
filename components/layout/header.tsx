@@ -65,7 +65,7 @@ function DropdownItem({ item }: { item: MenuItem }) {
         {item.current ? <Check className="h-4 w-4 text-magenta" aria-hidden /> : null}
       </span>
       {item.note ? (
-        <span className="font-mono text-[0.6rem] uppercase tracking-label text-ink-subtle">{item.note}</span>
+        <span className="font-mono text-[0.6rem] uppercase tracking-label text-ink-muted">{item.note}</span>
       ) : null}
     </>
   );
@@ -76,7 +76,7 @@ function DropdownItem({ item }: { item: MenuItem }) {
         type="button"
         aria-disabled="true"
         aria-current={item.current ? "true" : undefined}
-        className={cn(menuItemBase, "cursor-default text-ink-subtle")}
+        className={cn(menuItemBase, "cursor-default text-ink-muted")}
       >
         {content}
       </button>
@@ -237,7 +237,7 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
         </Link>
 
         <div className="mt-6 border-t border-line pt-4">
-          <p className="px-3 pb-1 font-mono text-[0.62rem] uppercase tracking-label text-ink-subtle">
+          <p className="px-3 pb-1 font-mono text-[0.62rem] uppercase tracking-label text-ink-muted">
             Language
           </p>
           <ul>
@@ -251,7 +251,7 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
                     "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
                     lang.current
                       ? "text-ink hover:bg-turmeric-soft"
-                      : "cursor-default text-ink-subtle",
+                      : "cursor-default text-ink-muted",
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -261,7 +261,7 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
                     ) : null}
                   </span>
                   {lang.current ? null : (
-                    <span className="font-mono text-[0.6rem] uppercase tracking-label text-ink-subtle">
+                    <span className="font-mono text-[0.6rem] uppercase tracking-label text-ink-muted">
                       Coming soon
                     </span>
                   )}

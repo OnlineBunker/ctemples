@@ -48,13 +48,17 @@ export function LanguageBanner() {
   if (!visible) return null;
 
   return (
-    <div className="border-b border-saffron/25 bg-saffron-soft/60 text-ink">
+    <div
+      role="region"
+      aria-label="Site announcement"
+      className="border-b border-saffron/25 bg-saffron-soft/60 text-ink"
+    >
       <div className="shell flex items-center justify-between gap-4 py-2">
         <p className="text-sm leading-snug text-ink/80">
           Available in 8 Indian languages — coming soon.{" "}
           <Link
             href="/contact"
-            className="font-medium text-magenta underline-offset-2 hover:underline"
+            className="font-medium text-magenta-deep underline-offset-2 hover:underline"
           >
             Notify me →
           </Link>

@@ -44,18 +44,18 @@ export function MethodologyContent() {
         </p>
       </div>
 
-      <p className="rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-subtle">
+      <p className="rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-muted">
         Note · CTemples is currently a frontend prototype. Temple content shown here is
         placeholder, written to the same standard the real library will follow.
       </p>
 
-      <p className="rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-subtle">
+      <p className="rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-muted">
         Image licensing · Photography shown across the site is sourced from Wikimedia Commons
         under its various free licenses. Per-image credit lines are on the way; until then, this
         note stands as the site-wide attribution.
       </p>
 
-      <p className="rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-subtle">
+      <p className="rounded-xl border border-line bg-canvas-soft p-5 font-mono text-[0.66rem] uppercase leading-relaxed tracking-label text-ink-muted">
         Map data ©{" "}
         <a
           href="https://github.com/datameet/maps"

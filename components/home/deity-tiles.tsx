@@ -24,10 +24,10 @@ export function DeityTiles({ counts }: { counts: Record<DeityKey, number> }) {
             <RevealItem key={key} className="h-full">
               <Link
                 href={`/explore?deity=${key}`}
-                className="group flex h-full min-h-[9rem] flex-col items-start justify-between rounded-card border border-line bg-canvas p-5 shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-magenta/40 hover:shadow-md"
+                className="group flex h-full min-h-[9rem] flex-col items-start justify-between rounded-card border border-line bg-canvas p-5 shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-magenta/40 hover:shadow-md motion-reduce:!transform-none"
               >
                 <span
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-105"
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-105 motion-reduce:!transform-none"
                   style={{ color: meta.accent, backgroundColor: `${meta.accent}14` }}
                 >
                   <DeityIcon icon={meta.icon} className="h-7 w-7" animated />

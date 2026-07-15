@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Info, CheckCircle2 } from "lucide-react";
 
 const FIELD =
-  "w-full rounded-xl border border-line-strong bg-canvas px-4 py-3 text-ink placeholder:text-ink-subtle focus:border-magenta focus-visible:outline-none";
+  "w-full rounded-xl border border-line-strong bg-canvas px-4 py-3 text-ink placeholder:text-ink-muted focus:border-magenta focus-visible:outline-none";
 
 const LABEL = "mb-2 block font-mono text-[0.66rem] uppercase tracking-label text-ink-muted";
 
@@ -69,7 +69,7 @@ export function SuggestForm() {
         </div>
         <div className="sm:col-span-1">
           <label htmlFor="email" className={LABEL}>
-            Your email <span className="normal-case text-ink-subtle">(optional)</span>
+            Your email <span className="normal-case text-ink-muted">(optional)</span>
           </label>
           <input
             id="email"
@@ -99,7 +99,7 @@ export function SuggestForm() {
         <button type="submit" className={submitButton}>
           Suggest this temple
         </button>
-        <span className="font-mono text-[0.62rem] uppercase tracking-label text-ink-subtle">
+        <span className="font-mono text-[0.62rem] uppercase tracking-label text-ink-muted">
           Prototype · not connected
         </span>
       </div>
