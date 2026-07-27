@@ -84,21 +84,16 @@ export function DeityIcon({
   icon: DeityIconKey;
   className?: string;
   strokeWidth?: number;
-  /** Stroke-draw reveal on hover/focus (D22#1, docs/08 §5#1) — 280ms, ease-threshold,
-   *  full stroke with color-only feedback under reduced motion. Opt-in: only the
-   *  homepage's DeityTile uses it; smaller icon usages (e.g. the Explore deity filter's
-   *  list rows) stay a plain static icon. Requires a `group` ancestor to drive
-   *  `group-hover`/`group-focus-visible`. */
+  /** One-shot stroke-draw on first paint (docs/15 — supersedes the D22#1 hover-draw so the
+   *  icon reads at rest per the "beautiful when nothing is moving" bar). Ends fully drawn;
+   *  reduced motion completes it instantly. Opt-in: deity tiles + deity pages use it;
+   *  smaller static usages (e.g. an Explore filter row) leave it off. */
   animated?: boolean;
 }) {
   return (
     <svg
       viewBox="0 0 48 48"
-      className={cn(
-        className,
-        animated &&
-          "[stroke-dasharray:100] [stroke-dashoffset:100] transition-[stroke-dashoffset] duration-[280ms] ease-threshold group-hover:[stroke-dashoffset:0] group-focus-visible:[stroke-dashoffset:0] motion-reduce:[stroke-dashoffset:0] motion-reduce:transition-none",
-      )}
+      className={cn(className, animated && "animate-deity-draw")}
       fill="none"
       stroke="currentColor"
       strokeWidth={strokeWidth}

@@ -15,6 +15,7 @@ import type { StateStripItem } from "@/components/home/state-tile";
 import { PopularSearches } from "@/components/home/popular-searches";
 import { DeityTiles } from "@/components/home/deity-tiles";
 import { MethodologyTeaser } from "@/components/home/methodology-teaser";
+import { ThresholdDivider } from "@/components/brand/threshold-divider";
 import { STATE_SILHOUETTES, CALLOUT_STATE_SLUGS } from "@/lib/india-geo";
 
 // Resolve each tile's silhouette on the SERVER and pass the path string down, rather than
@@ -71,11 +72,13 @@ export default async function HomePage() {
   return (
     <>
       <Hero slides={slides} />
+      <ThresholdDivider from="canvas" to="recess" />
       <EditorialParagraph />
       <TripIdeas />
       <StateStrip states={stateItems} />
       <PopularSearches />
       <DeityTiles counts={deityCounts} />
+      <ThresholdDivider from="recess" to="sanctum" />
       <MethodologyTeaser />
     </>
   );

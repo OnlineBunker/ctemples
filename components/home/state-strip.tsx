@@ -6,6 +6,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { Section } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
 import { StateTile, type StateStripItem } from "./state-tile";
 import { StatePopover } from "./state-popover";
@@ -43,7 +44,7 @@ export function StateStrip({ states }: { states: StateStripItem[] }) {
   }
 
   return (
-    <section className="shell py-14 md:py-20">
+    <Section surface="recess">
       <Reveal>
         <SectionHeading eyebrow="Browse by state" title="Every state, its temples" />
       </Reveal>
@@ -63,14 +64,14 @@ export function StateStrip({ states }: { states: StateStripItem[] }) {
             />
           ))}
           <Link
-            href="/explore?view=map"
+            href="/states"
             className="flex h-full min-h-[7rem] flex-col items-start justify-between rounded-card border border-dashed border-line-strong bg-transparent p-4 text-left transition-colors hover:border-magenta hover:bg-magenta-soft"
           >
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-magenta-soft text-magenta">
               <ArrowRight className="h-5 w-5" aria-hidden />
             </span>
-            <span className="font-display text-base font-semibold leading-tight text-plum">
-              See all states
+            <span className="font-display text-title-md font-semibold leading-tight text-plum">
+              All states &amp; regions
             </span>
           </Link>
         </div>
@@ -108,6 +109,6 @@ export function StateStrip({ states }: { states: StateStripItem[] }) {
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
-    </section>
+    </Section>
   );
 }

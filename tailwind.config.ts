@@ -29,6 +29,15 @@ const config: Config = {
         ink: { DEFAULT: "#241021", muted: "#6B5A67", subtle: "#9A8C96" },
         line: { DEFAULT: "#ECE0D6", strong: "#D8C8BA" },
 
+        // Section-band surfaces (docs/15 §2B, "the walk through a temple") — every value
+        // is a LOCKED palette color; no new hues. bg-surface-* names the chamber.
+        surface: {
+          canvas: "#FBF6F0", // porcelain — the nave (default reading ground)
+          recess: "#F4EADF", // porcelain-deep — a side chamber (reconciles proto #EFE6DA)
+          sanctum: "#3D0A40", // plum — the inner sanctum (gravity)
+          deep: "#241021", // ink — the garbhagriha (rarest: gallery band, 404)
+        },
+
         // Reference brand pigments (canonical vocabulary for new code).
         magenta,
         coral,
@@ -63,6 +72,16 @@ const config: Config = {
         "display-xl": ["clamp(2.75rem, 8vw, 7rem)", { lineHeight: "0.96", letterSpacing: "-0.02em" }],
         "display-lg": ["clamp(2.25rem, 5.5vw, 4.5rem)", { lineHeight: "1.0", letterSpacing: "-0.015em" }],
         "display-md": ["clamp(1.85rem, 3.6vw, 3rem)", { lineHeight: "1.05", letterSpacing: "-0.01em" }],
+        // Card/title Bricolage (D23 permits Bricolage in cards) — replaces ad-hoc text-xl.
+        "title-lg": ["1.375rem", { lineHeight: "1.15", letterSpacing: "-0.01em" }],
+        "title-md": ["1.125rem", { lineHeight: "1.2", letterSpacing: "-0.005em" }],
+        // Semantic body scale (Inter) — retires scattered text-[…] literals (docs/15 §2C).
+        "body-lg": ["1.125rem", { lineHeight: "1.7" }],
+        "body-sm": ["0.875rem", { lineHeight: "1.55" }],
+        "body-xs": ["0.75rem", { lineHeight: "1.5" }],
+        // Label scale (Space Mono) — small brand-colored text uses magenta-deep (.eyebrow).
+        label: ["0.7rem", { lineHeight: "1.4" }],
+        "label-sm": ["0.65rem", { lineHeight: "1.3" }],
       },
       letterSpacing: {
         label: "0.22em",
@@ -76,6 +95,14 @@ const config: Config = {
       },
       borderRadius: {
         card: "1.25rem",
+        // Small controls get their own radius (docs/15 §2D — the missing small radius).
+        input: "0.625rem",
+        chip: "0.625rem",
+        // The arch, in three earned tiers (docs/15 §2A). ENFORCEMENT: use only on
+        // imagery-you-enter and passages between sections — never on chrome/controls/text.
+        portal: "999px 999px 1.25rem 1.25rem", // portrait imagery you enter
+        arch: "2.25rem 2.25rem 1rem 1rem", // landscape imagery that morphs (card === hero)
+        "arch-sm": "1.25rem 1.25rem 0.5rem 0.5rem", // small thumbnails
       },
       boxShadow: {
         // Restrained, warm elevation on a porcelain canvas (DESIGN_SYSTEM §10).

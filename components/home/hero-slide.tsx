@@ -44,7 +44,7 @@ export function HeroSlide({
 }) {
   const isVideo = slide.kind === "video" && !!slide.videoUrl;
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-card bg-canvas-soft">
+    <div className="relative h-full w-full overflow-hidden rounded-portal bg-canvas-soft">
       <div className={kenBurns ? "animate-kenburns absolute inset-0 origin-center" : "absolute inset-0"}>
         <TempleImage
           src={isVideo ? (slide.poster ?? "") : slide.image}

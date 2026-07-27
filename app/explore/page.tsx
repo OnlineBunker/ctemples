@@ -86,7 +86,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
   return (
     <div className="shell py-16 md:py-20">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-display-lg text-plum">
+        <h1 className="font-display text-display-xl text-plum">
           {summary ? `Explore · ${summary}` : "Explore"}
         </h1>
         <ModeToggle current={parsed} />
@@ -129,7 +129,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
 
           {result.items.length > 0 ? (
             <>
-              {/* Visually-hidden — each ResultCard's name is an h3, and this page has no
+              {/* Visually-hidden — each card's name is an h3, and this page has no
                   other h2, which without this would skip a level (h1 -> h3). */}
               <h2 className="sr-only">Search results</h2>
               <ResultGrid items={result.items} />

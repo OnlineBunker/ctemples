@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { SearchBar } from "./search-bar";
 import { SortFilter } from "./sort-filter";
-import { ResultCardCompact } from "./result-card-compact";
+import { TempleCard, summaryToCard } from "@/components/ui/temple-card";
 import { Pagination } from "./pagination";
 import { MapStateSelect } from "./map-state-select";
 import { buildExploreHref, type ParsedExploreParams } from "@/lib/explore-url";
@@ -92,7 +92,7 @@ export function MapResultsColumn({
       <ul className="mt-5 divide-y divide-line">
         {result.items.map((temple) => (
           <li key={temple.id} className="py-1.5">
-            <ResultCardCompact temple={temple} />
+            <TempleCard temple={summaryToCard(temple)} variant="compact" />
           </li>
         ))}
       </ul>

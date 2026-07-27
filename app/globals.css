@@ -56,6 +56,15 @@
     @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12;
   }
 
+  /* Section-band vertical rhythm (docs/15 §2D) — one cadence, applied systemically so
+     vertical spacing stops drifting per page. */
+  .section-y {
+    @apply py-16 md:py-24;
+  }
+  .section-y-tight {
+    @apply py-12 md:py-16;
+  }
+
   /* Festival eyebrow: mono, spaced. magenta-deep, not magenta — small brand-colored
      text needs the deeper shade to clear AA contrast on porcelain (docs/03 §2.2). */
   .eyebrow {
@@ -232,6 +241,23 @@
 }
 .animate-dot-progress {
   animation: dot-progress 7s linear forwards;
+}
+
+/* Deity-icon stroke-draw (docs/15) — draws itself in on first paint, then STAYS visible
+   (icon-leads-identity must read at rest, docs/03 §1.5). If the animation never runs the
+   resting stroke-dashoffset is 0, so the icon is always drawn. Reduced motion completes it
+   instantly via the global override below. */
+@keyframes deity-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.animate-deity-draw {
+  stroke-dasharray: 100;
+  animation: deity-draw 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Showcase-carousel track (docs/04 §4): scrollbar hidden, wheel/drag/snap intact. */

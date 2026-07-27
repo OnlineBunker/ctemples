@@ -6,12 +6,11 @@ import { getHero } from "@/lib/media";
 import type { Temple } from "@/lib/types";
 
 /**
- * Section 1 — Hero (docs/06 §2). A contained 16:9 (4:3 mobile, max 60vh) card, not a
- * full-bleed banner — `rounded-card` like every other media surface (docs/03 §5's
- * elevation doctrine is HTML-surface only, so the crop, not the viewport, is the frame).
- * The landing side of the shared-element morph: `share="morph"` + the same
- * `temple-{id}` name the source card used, reading the same `getHero(media)` image so the
- * morph doesn't visibly swap sources on arrival.
+ * Section 1 — Hero (docs/06 §2). A contained 16:9 (4:3 mobile, max 60vh) doorway, not a
+ * full-bleed banner. The landing side of the shared-element morph: `share="morph"` + the
+ * same `temple-{id}` name the source card used, and — critically — the SAME `rounded-arch`
+ * lintel clip as the card (docs/15 §2A), so the morph reads as stepping through the
+ * doorway into the temple. Reads the same `getHero(media)` image so nothing swaps on arrival.
  */
 export function DetailHero({ temple }: { temple: Temple }) {
   const hero = getHero(temple.media);
@@ -20,7 +19,7 @@ export function DetailHero({ temple }: { temple: Temple }) {
 
   return (
     <section className="shell">
-      <div className="relative aspect-[4/3] max-h-[60vh] w-full overflow-hidden rounded-card print:hidden sm:aspect-[16/9]">
+      <div className="relative aspect-[4/3] max-h-[60vh] w-full overflow-hidden rounded-arch print:hidden sm:aspect-[16/9]">
         <ViewTransition name={`temple-${temple.id}`} share="morph">
           <div className="absolute inset-0">
             <TempleImage
@@ -37,6 +36,11 @@ export function DetailHero({ temple }: { temple: Temple }) {
         <div
           aria-hidden
           className="absolute inset-0 bg-gradient-to-t from-plum/90 via-plum/30 to-transparent"
+        />
+        {/* Gilt archway edge — static, on-brand (docs/15 §2A). */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-arch ring-1 ring-inset ring-turmeric/25"
         />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col-reverse items-start justify-between gap-5 p-5 sm:flex-row sm:items-end sm:p-8">

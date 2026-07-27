@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Reveal, Stagger, RevealItem } from "@/components/motion/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { Section } from "@/components/ui/section";
 import { DeityIcon } from "@/components/brand/deity-icons";
 import { DEITY_ORDER, DEITY_META, type DeityKey } from "@/lib/deities";
 import { pluralize } from "@/lib/format";
@@ -12,7 +13,7 @@ import { pluralize } from "@/lib/format";
  */
 export function DeityTiles({ counts }: { counts: Record<DeityKey, number> }) {
   return (
-    <section className="shell py-14 md:py-20">
+    <Section surface="recess">
       <Reveal>
         <SectionHeading eyebrow="By deity" title="Find your god" />
       </Reveal>
@@ -23,7 +24,7 @@ export function DeityTiles({ counts }: { counts: Record<DeityKey, number> }) {
           return (
             <RevealItem key={key} className="h-full">
               <Link
-                href={`/explore?deity=${key}`}
+                href={`/deities/${key}`}
                 className="group flex h-full min-h-[9rem] flex-col items-start justify-between rounded-card border border-line bg-canvas p-5 shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-magenta/40 hover:shadow-md motion-reduce:!transform-none"
               >
                 <span
@@ -33,7 +34,7 @@ export function DeityTiles({ counts }: { counts: Record<DeityKey, number> }) {
                   <DeityIcon icon={meta.icon} className="h-7 w-7" animated />
                 </span>
                 <span className="mt-4">
-                  <span className="block font-display text-xl font-semibold text-plum">
+                  <span className="block font-display text-title-lg font-semibold text-plum">
                     {meta.label}
                   </span>
                   <span className="mt-0.5 block font-mono text-[0.68rem] uppercase tracking-label text-ink-muted">
@@ -45,6 +46,6 @@ export function DeityTiles({ counts }: { counts: Record<DeityKey, number> }) {
           );
         })}
       </Stagger>
-    </section>
+    </Section>
   );
 }

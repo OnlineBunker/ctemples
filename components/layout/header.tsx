@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils";
  *  `?preset=`/unconditional `?view=map` params are retired (D4, docs/02 §3.6). */
 const EXPLORE_ITEMS = [
   { key: "all", label: "All temples", href: "/explore" },
-  { key: "pilgrimage", label: "Pilgrimage", href: "/explore?tag=pilgrimage" },
-  { key: "architecture", label: "Architecture", href: "/explore?tag=heritage" },
-  { key: "discover", label: "Discover", href: "/explore?sort=popularity" },
+  { key: "states", label: "Browse by state", href: "/states" },
+  { key: "deities", label: "Browse by deity", href: "/deities" },
+  { key: "popular", label: "Most visited", href: "/explore?sort=popularity" },
 ];
 
 const LANGUAGES = [
@@ -36,7 +36,12 @@ function isActive(pathname: string, href: string) {
 }
 
 const navTrigger =
-  "inline-flex items-center gap-1 rounded-full px-4 py-2 font-mono text-[0.7rem] uppercase tracking-label transition-colors";
+  "relative inline-flex items-center gap-1 rounded-full px-4 py-2 font-mono text-[0.7rem] uppercase tracking-label transition-colors";
+
+// The active-nav "lintel" — a thin magenta threshold under the current section (docs/15
+// §4). A small doorway on the chrome; the arch itself stays reserved for imagery.
+const navLintel =
+  "after:absolute after:left-4 after:right-4 after:-bottom-0.5 after:h-[2px] after:rounded-full after:bg-magenta after:content-['']";
 
 const iconButton =
   "inline-flex h-10 w-10 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-canvas-soft hover:text-magenta";
@@ -324,7 +329,7 @@ export function Header() {
                 <button
                   type="button"
                   aria-label="Explore"
-                  className={cn(navTrigger, exploreActive ? "text-magenta" : "text-ink-muted hover:text-ink")}
+                  className={cn(navTrigger, exploreActive ? cn("text-magenta", navLintel) : "text-ink-muted hover:text-ink")}
                 >
                   Explore
                   <ChevronDown className="h-4 w-4" aria-hidden />
@@ -336,7 +341,7 @@ export function Header() {
               aria-current={aboutActive ? "page" : undefined}
               className={cn(
                 navTrigger,
-                aboutActive ? "text-magenta" : "text-ink-muted hover:text-ink",
+                aboutActive ? cn("text-magenta", navLintel) : "text-ink-muted hover:text-ink",
               )}
             >
               About

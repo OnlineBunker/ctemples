@@ -127,10 +127,10 @@ export function Hero({ slides }: { slides: HeroSlideData[] }) {
           <p className="eyebrow" aria-live="off">
             {eyebrow}
           </p>
-          <h1 className="mt-5 font-display text-display-lg font-semibold text-plum">
+          <h1 className="mt-5 font-display text-display-xl font-semibold text-plum">
             Discover the sacred
           </h1>
-          <p lang="te" className="telugu mt-2 text-2xl font-semibold text-magenta sm:text-3xl">
+          <p lang="te" className="telugu mt-3 text-3xl font-semibold text-magenta sm:text-4xl">
             పవిత్ర దేవాలయాలు
           </p>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
@@ -163,15 +163,19 @@ export function Hero({ slides }: { slides: HeroSlideData[] }) {
           </div>
         </div>
 
-        {/* Photo stage (carousel) */}
-        <div className="order-1 lg:order-2">
+        {/* Photo stage (carousel) — framed as a portal arch, the doorway (docs/15 §2A). */}
+        <div className="relative order-1 lg:order-2">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-2.5 -z-0 rounded-portal border border-turmeric/25 sm:-inset-3.5"
+          />
           <div
             tabIndex={0}
             role="group"
             aria-roledescription="slide"
             aria-label={`Slide ${index + 1} of ${count}: ${slide.name}`}
             onKeyDown={onKeyDown}
-            className="relative aspect-[4/3] w-full overflow-hidden rounded-card outline-none ring-magenta/0 focus-visible:ring-2 focus-visible:ring-magenta lg:aspect-[16/12]"
+            className="relative aspect-[4/3] w-full overflow-hidden rounded-portal outline-none ring-magenta/0 focus-visible:ring-2 focus-visible:ring-magenta lg:aspect-[16/12]"
           >
             <AnimatePresence initial={false} mode="popLayout">
               <motion.div
@@ -185,6 +189,11 @@ export function Hero({ slides }: { slides: HeroSlideData[] }) {
                 <HeroSlide slide={slide} priority={index === 0} kenBurns={!reduce} />
               </motion.div>
             </AnimatePresence>
+            {/* Gilt archway edge — static, decorative, on-brand (docs/15 §2A imagery). */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 z-10 rounded-portal ring-1 ring-inset ring-turmeric/30"
+            />
           </div>
         </div>
       </div>

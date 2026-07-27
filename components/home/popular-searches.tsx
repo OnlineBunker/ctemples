@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { Section } from "@/components/ui/section";
 
 /**
  * Popular searches — six chips linking to pre-canned Explore URLs (docs/04 §6). List
@@ -17,7 +18,7 @@ export const POPULAR_SEARCH_CHIPS: { label: string; href: string }[] = [
 
 export function PopularSearches() {
   return (
-    <section className="shell py-10">
+    <Section tight>
       <Reveal>
         <Eyebrow className="mb-5">Popular searches</Eyebrow>
         <ul className="flex flex-wrap gap-3">
@@ -33,6 +34,6 @@ export function PopularSearches() {
           ))}
         </ul>
       </Reveal>
-    </section>
+    </Section>
   );
 }

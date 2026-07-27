@@ -1,5 +1,6 @@
 import { Reveal } from "@/components/motion/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { Section } from "@/components/ui/section";
 import { getTempleById } from "@/lib/temples";
 import { getHero } from "@/lib/media";
 import type { Region } from "@/lib/types";
@@ -70,7 +71,7 @@ export async function TripIdeas() {
   );
 
   return (
-    <section className="shell py-14 md:py-20">
+    <Section>
       <Reveal>
         <SectionHeading
           eyebrow="Trip ideas"
@@ -85,6 +86,6 @@ export async function TripIdeas() {
       <Reveal className="mt-10">
         <TripShowcase ideas={ideas} />
       </Reveal>
-    </section>
+    </Section>
   );
 }

@@ -1,16 +1,17 @@
 import { Reveal } from "@/components/motion/reveal";
+import { Section } from "@/components/ui/section";
 
-/** Two-sentence editorial framing, centered under the hero (UX_SPEC §1.4). */
+/** The preface — one editorial statement in a quiet recess chamber (docs/15). */
 export function EditorialParagraph() {
   return (
-    <section className="shell py-12 md:py-16">
+    <Section surface="recess" tight>
       <Reveal>
-        <p className="mx-auto max-w-[640px] text-balance text-center font-display text-2xl leading-snug text-plum sm:text-[1.75rem]">
+        <p className="mx-auto max-w-[720px] text-balance text-center font-display text-display-md leading-snug text-plum">
           India holds more than 20,000 temples — from living pilgrimage sites to
-          millennia-old stone. CTemples is a curated encyclopedia: start with a trip idea,
-          a state, or a deity.
+          millennia-old stone. CTemples is a field guide to all of them: start with a trip
+          idea, a state, or a deity.
         </p>
       </Reveal>
-    </section>
+    </Section>
   );
 }
