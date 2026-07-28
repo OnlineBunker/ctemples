@@ -1,85 +1,79 @@
-import {
-  getFeaturedTemples,
-  getAllTemples,
-  getStateCounts,
-  getTopTemplesByState,
-  getDeityCounts,
-} from "@/lib/temples";
+import { getAllTemples } from "@/lib/temples";
 import { getHero } from "@/lib/media";
-import { Hero } from "@/components/home/hero";
-import type { HeroSlideData } from "@/components/home/hero-slide";
-import { EditorialParagraph } from "@/components/home/editorial-paragraph";
-import { TripIdeas } from "@/components/home/trip-ideas";
-import { StateStrip } from "@/components/home/state-strip";
-import type { StateStripItem } from "@/components/home/state-tile";
-import { PopularSearches } from "@/components/home/popular-searches";
-import { DeityTiles } from "@/components/home/deity-tiles";
-import { MethodologyTeaser } from "@/components/home/methodology-teaser";
-import { ThresholdDivider } from "@/components/brand/threshold-divider";
-import { STATE_SILHOUETTES, CALLOUT_STATE_SLUGS } from "@/lib/india-geo";
+import { ThresholdHero, type ThresholdSlide } from "@/components/home/threshold-hero";
+import { IndexList, type IndexRow } from "@/components/home/index-list";
+import { FourDirections, type DirectionItem } from "@/components/home/four-directions";
+import { InFocus, type FocusData } from "@/components/home/in-focus";
+import { Finale } from "@/components/home/finale";
 
-// Resolve each tile's silhouette on the SERVER and pass the path string down, rather than
-// importing the (36KB) geometry into the client StateTile — that static client import
-// would drag the whole map dataset onto the home route's bundle (docs/05 §6: list/home
-// never pays for the map). Callout-marker states are too small/thin to read at 48px, so
-// they fall back to the gopuram mark (silhouette = null), same as a missing entry.
-const CALLOUT_SLUG_SET = new Set(CALLOUT_STATE_SLUGS);
-function silhouetteFor(slug: string): string | null {
-  if (CALLOUT_SLUG_SET.has(slug)) return null;
-  return STATE_SILHOUETTES[slug] ?? null;
-}
+const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
- * Homepage (UX_SPEC §5.1). Everything below is derived from data/temples.ts — no count
- * is hardcoded — so the full 20,000+ library drops in without touching this file.
- * Section order: hero → editorial → trip ideas → state strip → popular searches →
- * deity tiles → methodology teaser. The language banner is mounted in the root layout.
+ * Homepage — the prototype composition, ported faithfully (docs/15 §0a):
+ * Threshold hero → 01 The Index → 02 Four Directions → 03 In Focus → Finale.
+ * Everything derives from data/temples.ts — no count or list is hardcoded.
  */
 export default async function HomePage() {
-  // Hero slides — featured first, falling back to any temples so the carousel is never empty.
-  const featured = await getFeaturedTemples(6);
-  const source = featured.length ? featured : (await getAllTemples()).slice(0, 6);
-  const slides: HeroSlideData[] = source.map((t) => ({
+  const temples = await getAllTemples();
+  const heroUrl = (t: (typeof temples)[number]) => getHero(t.media)?.url ?? "";
+
+  // Hero slideshow — the six most-photographed temples (the prototype's own pick).
+  const slides: ThresholdSlide[] = temples
+    .slice()
+    .sort((a, b) => b.media.length - a.media.length)
+    .slice(0, 6)
+    .map((t) => ({ id: t.id, name: t.name, city: t.city, image: heroUrl(t) }));
+
+  // 01 — The Index: every temple, numbered.
+  const rows: IndexRow[] = temples.map((t, i) => ({
     id: t.id,
+    num: pad(i + 1),
     name: t.name,
-    city: t.city,
-    state: t.state,
-    region: t.region,
-    rating: t.rating,
-    kind: "image",
-    image: getHero(t.media)?.url ?? "",
+    loc: `${t.city} · ${t.state}`,
+    img: heroUrl(t),
   }));
 
-  // State strip — the richest states, each with its top temples for the popover.
-  const topStateCounts = (await getStateCounts()).slice(0, 6);
-  const stateItems: StateStripItem[] = await Promise.all(
-    topStateCounts.map(async (sc) => ({
-      state: sc.state,
-      slug: sc.slug,
-      region: sc.region,
-      count: sc.count,
-      silhouette: silhouetteFor(sc.slug),
-      top: (await getTopTemplesByState(sc.state, 4)).map((t) => ({
-        id: t.id,
-        name: t.name,
-        city: t.city,
-      })),
-    })),
-  );
+  // 02 — Four Directions: the cardinal regions, fronted by each one's most-photographed.
+  const directions: DirectionItem[] = [];
+  for (const name of ["South", "North", "East", "West"] as const) {
+    const list = temples.filter((t) => t.region === name);
+    if (!list.length) continue;
+    const flag = list.slice().sort((a, b) => b.media.length - a.media.length)[0];
+    directions.push({
+      name,
+      id: flag.id,
+      img: heroUrl(flag),
+      sub: `${list.length} ${list.length > 1 ? "TEMPLES" : "TEMPLE"} · ${flag.name}`.toUpperCase(),
+    });
+  }
 
-  const deityCounts = await getDeityCounts();
+  // 03 — In Focus: the featured editorial pick (docs/15 §0b — Konark's colossal stone
+  // chariot; was Meenakshi, changed per owner directive 2026-07-28).
+  const ft =
+    temples.find((t) => t.id === "konark-sun-temple") ??
+    temples.find((t) => t.id === "meenakshi-amman-temple") ??
+    temples[0];
+  const feat: FocusData | null = ft
+    ? {
+        id: ft.id,
+        name: ft.name,
+        img: heroUrl(ft),
+        tagline: ft.tagline,
+        why: ft.whyVisit,
+        deity: ft.quickFacts.presidingDeity,
+        built: ft.quickFacts.built || "—",
+        style: ft.quickFacts.architecturalStyle || "—",
+        caption: `${ft.name} — ${ft.city}, ${ft.state}`,
+      }
+    : null;
 
   return (
     <>
-      <Hero slides={slides} />
-      <ThresholdDivider from="canvas" to="recess" />
-      <EditorialParagraph />
-      <TripIdeas />
-      <StateStrip states={stateItems} />
-      <PopularSearches />
-      <DeityTiles counts={deityCounts} />
-      <ThresholdDivider from="recess" to="sanctum" />
-      <MethodologyTeaser />
+      <ThresholdHero slides={slides} templeCount={temples.length} />
+      <IndexList rows={rows} />
+      <FourDirections items={directions} />
+      {feat ? <InFocus feat={feat} /> : null}
+      <Finale names={temples.map((t) => t.name)} />
     </>
   );
 }

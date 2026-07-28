@@ -9,6 +9,67 @@
 > exactly. This is a visual + interaction remake — **not** a data-layer, IA, or
 > motion-law rewrite.
 
+## 0b. CINEMATIC-MOTION AMENDMENT (owner directive, 2026-07-28 — supersedes §0a's "Motion still bounded" bullet, §2J, and the motion lines of §3)
+
+The product owner reviewed the shipped Threshold homepage and directed that the prototype's
+**cinematic motion be restored on the homepage** — reversing this file's earlier decision to
+build it "to read identically at rest." This is written into `docs/08` as **Amendment B**
+(§5#6–10) and is binding. Restored, **homepage only**, each with its reduced-motion off-switch:
+
+- **Hero scroll-parallax** — the rAF rig: arch portal zooms + drops, orbit ring scales + fades,
+  sky/mountain/silhouette/mist layers translate at differing rates, the headline splits apart
+  and fades as the hero scrolls out (docs/08 §5#6).
+- **Drifting birds** — two faint SVG gulls crossing the sky (docs/08 §5#7).
+- **Per-slide sky shift** — the hero's warm glow/tint crossfades a subtle new hue on each slide
+  change (docs/08 §5#8) — an enhancement beyond the prototype, which the owner asked for
+  ("the background changing a bit when the temple is changing").
+- **Index cursor-follow preview card** — a floating arch thumbnail of the hovered temple trails
+  the pointer over "Choose a doorway" (docs/08 §5#9).
+- **Finale marquee** — the outlined name frieze scrolls as a seamless loop (docs/08 §5#10).
+- **Living-hero drift** — the arch photo breathes a slow ken-burns zoom at rest (docs/08 §5#11).
+
+**Unchanged:** the two-layer reduced-motion contract is absolute — every effect above is OFF
+under `prefers-reduced-motion` (and Save-Data / coarse pointer where noted), so the calm static
+Threshold is preserved for those users. The cinematic motion is confined to `components/home/*`;
+chrome and every other route stay as specified. The In Focus feature is no longer Meenakshi
+(its hero image, an overcast aerial cityscape, is replaced by the iconic gopuram shot already in
+its media set; the featured temple becomes Konark Sun Temple).
+
+## 0a. FIDELITY AMENDMENT (owner directive, 2026-07-27 — supersedes conflicting lines below)
+
+The product owner reviewed the first Threshold build and directed: **match the handoff
+prototype's visual design closely** (`prototypes/design_handoff_ctemples_redesign/`), not a
+tamed evolution of it. Binding consequences:
+
+- **Homepage = the prototype's composition**: dark cinematic Threshold hero (plum sky
+  gradient, light rays, mountain + gopuram silhouettes, mist, arch portal with ghost-tower
+  break-out and gold orbit ring, "Where the gods / still live." headline, cream dome exit)
+  → 01 THE INDEX (oversized type list) → 02 FOUR DIRECTIONS (expanding arch columns) →
+  03 IN FOCUS (beige editorial split) → Finale (outlined names strip + "Every temple is a
+  door."). The previous light split-hero + trip-ideas/state-strip/deity-tiles homepage is
+  replaced (those components remain in the tree for other surfaces).
+- **Chrome = the prototype's**: mono uppercase nav EXPLORE/ABOUT/METHODOLOGY/SUGGEST +
+  SEARCH pill + PARTNER pill (→ /contact); home header fixed transparent → plum blur on
+  scroll; mobile menu = full-screen plum takeover with numbered links; search overlay =
+  full-screen plum takeover ("SEARCH THE ATLAS", giant Bricolage input, POPULAR chips,
+  numbered thumb rows). Footer = prototype site-footer (+ States/Deities links, + DataMeet
+  attribution kept). The language dropdown/banner is unmounted (prototype has none).
+- **Explore = "The atlas."** with `NN / NN DOORWAYS` count, underline search, chip-styled
+  filters, 4:5 arch-top cards (centered region pill), gopuram "No doorways match." empty
+  state. The URL/filter/search contracts (docs/05, docs/10) are unchanged underneath.
+- **Temple = prototype layout**: ← THE ATLAS breadcrumb + crumb line, split hero (tags /
+  H1 / tagline / deity·★ left, 3:4 arch portrait + gold ring right = the morph target),
+  beige quick-facts panel, dark "Through the doorway" gallery band, beige "More doorways"
+  related band, ink prev/next bar. Section engine (D13) unchanged underneath.
+- **Motion** *(superseded by §0b, 2026-07-28 — the "NOT ported" clause below is reversed)*:
+  the prototype's rAF scroll-parallax, cursor-follow float, drifting birds, and animated
+  marquee ~~are NOT ported (docs/08); the composition is built to read identically at rest~~
+  **are now ported on the homepage per docs/08 Amendment B (§0b), each disabled under reduced
+  motion so the resting composition is preserved for those users**. Hero slideshow = sanctioned
+  crossfade autoplay (7s dwell, pause control, reduced-motion/Save-Data safe). The 1px scroll-cue
+  line animation is admitted as a standard affordance (killed under reduced motion). Machine
+  counts may use the prototype's "DOORWAYS" unit, but always data-derived — never hardcoded.
+
 ## 0. Soul
 
 In temple architecture the arch is not ornament — it is the *dvara*, the doorway that
@@ -73,20 +134,29 @@ amended in §2. No new runtime deps beyond the already-sanctioned Radix (D19). N
   the gallery lightbox + hero. Non-blocking for the visual remake.
 - **I · Favicon.** Reconcile `app/icon.svg` off-palette `#C62828`/`#B8860B` → the locked
   magenta gopuram mark used everywhere else.
-- **J · Motion.** **No motion-law expansion.** The cinema comes from shape + light + the one
-  morph. (Optional future: a one-shot draw on the portal gilt-inset stroke — a 4th
+- **J · Motion.** ~~**No motion-law expansion.**~~ *(Superseded by §0b / docs/08 Amendment B,
+  2026-07-28.)* The homepage now carries the prototype's cinematic motion — hero scroll-parallax,
+  drifting birds, per-slide sky shift, the Index cursor-follow preview card, and the Finale
+  marquee — each confined to `components/home/*` and each disabled under reduced motion. Off the
+  homepage the cinema still comes from shape + light + the one morph; the expansion does not
+  travel. (Optional future: a one-shot draw on the portal gilt-inset stroke — a 4th
   micro-interaction under D22; not shipped by default.)
 
 ## 3. Anti-patterns explicitly rejected
 
-The dark cinematic parallax portal and its whole kit (multi-layer rAF loop, ghost tower,
-scaling orbit ring, conic god-rays, drifting birds, scroll cue, foreground mist,
-split-and-skew headline); cursor-follow floating cards, tilt-on-hover, parallax depth,
-particles, marquees, any infinite loop; the homepage all-records "Index" list and the
-quick-view modal + random "next"; the "Four Directions" accordion (only 4 of 6 regions);
-outlined mega-numerals anywhere except the single 404 + one About stat band; "DOORWAYS"/
-any hardcoded count as a machine unit (metaphor lives in prose; counts are data-derived
-"temples"); floating white pills on cards; the arch on everything.
+*(2026-07-28, §0b: the homepage-motion items below are no longer rejected — the rAF parallax
+kit, ghost tower, scaling orbit ring, conic god-rays, drifting birds, scroll cue, foreground
+mist, split-and-skew headline, the cursor-follow floating card, and the Finale marquee are now
+sanctioned on the homepage per docs/08 Amendment B, each off under reduced motion. Everything
+else in this list stands.)*
+
+Off the homepage: the dark cinematic parallax kit, cursor-follow floating cards, marquees, and
+any infinite loop. Everywhere, still rejected: tilt-on-hover, parallax **depth stacks** and
+scroll-jacked camera moves (the sanctioned hero parallax is flat 2D transform/opacity, not a
+depth rig), particles; the quick-view modal + random "next"; the "Four Directions" accordion
+reduced to only 4 of 6 regions; outlined mega-numerals anywhere except the single 404 + one
+About stat band; "DOORWAYS"/any hardcoded count as a machine unit (metaphor lives in prose;
+counts are data-derived "temples"); floating white pills on cards; the arch on everything.
 
 ## 4. Build order & gate
 

@@ -1,89 +1,99 @@
 import Link from "next/link";
 import { GopuramMark } from "@/components/brand/gopuram-mark";
+import { Reveal } from "@/components/motion/reveal";
 
 /**
- * The footer — the deepest chamber (docs/15 §2B): a `surface-sanctum` plum band that
- * closes every page. Column headers are gold Space Mono; the required attribution
- * (DataMeet map data + Wikimedia imagery) is rendered as a proper imprint; social
- * channels are honest "coming soon" affordances, never dead plain text.
+ * Site footer — prototype site-footer fidelity (docs/15 §0a): ink band with a brand block
+ * ("Every temple is a door." + "A FIELD GUIDE TO SACRED INDIA"), gold mono column headers
+ * (SITE / CONTRIBUTE), and a hairline bottom row with the prototype stamp + imagery/map-data
+ * attribution.
+ *
+ * Polish (2026-07-28): the footer is treated as the site's final threshold — a gold ◆-on-
+ * hairline crest opens the band (echoing the Finale motif), the content rises on a scroll
+ * reveal, the brand statement is display-forward, and nav links draw a turmeric underline on
+ * hover/focus. Reduced motion neutralizes the reveal (opacity-only) via the Reveal primitive.
  */
-const NAV = {
-  Explore: [
-    { label: "All temples", href: "/explore" },
-    { label: "Browse by state", href: "/states" },
-    { label: "Browse by deity", href: "/deities" },
-    { label: "Most visited", href: "/explore?sort=popularity" },
-  ],
-  Contribute: [
-    { label: "Suggest a temple", href: "/suggest" },
-    { label: "Partner with us", href: "/contact" },
-  ],
-  Project: [
-    { label: "About", href: "/about" },
-    { label: "Methodology", href: "/methodology" },
-  ],
-};
+const SITE = [
+  { label: "Home", href: "/" },
+  { label: "Explore", href: "/explore" },
+  { label: "States", href: "/states" },
+  { label: "Deities", href: "/deities" },
+  { label: "About", href: "/about" },
+  { label: "Methodology", href: "/methodology" },
+];
 
-const SOCIALS = ["Instagram", "YouTube", "X"];
+const CONTRIBUTE = [
+  { label: "Suggest a temple", href: "/suggest" },
+  { label: "Partner with us", href: "/contact" },
+];
+
+function FooterLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="group inline-flex w-fit items-center text-sm text-porcelain/70 transition-colors hover:text-turmeric focus-visible:text-turmeric"
+    >
+      <span className="bg-gradient-to-r from-turmeric to-turmeric bg-[length:0%_1px] bg-left-bottom bg-no-repeat pb-0.5 transition-[background-size] duration-300 ease-threshold group-hover:bg-[length:100%_1px] group-focus-visible:bg-[length:100%_1px] motion-reduce:transition-none">
+        {label}
+      </span>
+    </Link>
+  );
+}
 
 export function Footer() {
   return (
-    <footer className="bg-surface-sanctum text-porcelain">
-      <div className="shell py-16 md:py-20">
-        <div className="grid gap-12 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
-          <div className="max-w-sm">
-            <Link href="/" className="inline-flex items-center gap-2.5" aria-label="CTemples home">
-              <GopuramMark className="h-7 w-7 text-magenta" />
-              <span className="font-display text-lg text-porcelain">
-                C<span className="text-coral">temples</span>
-              </span>
-            </Link>
-            <p className="mt-5 font-display text-title-md text-porcelain">Every temple is a door.</p>
-            <p className="mt-2 font-mono text-label uppercase tracking-label text-porcelain/50">
-              A field guide to sacred India
-            </p>
+    <footer className="bg-surface-deep text-porcelain">
+      {/* The final threshold — a gold ◆ resting on a hairline that fades in from the edges. */}
+      <div aria-hidden className="flex items-center gap-4" style={{ padding: "0 clamp(20px,6vw,110px)", paddingTop: "clamp(40px,6vh,64px)" }}>
+        <span className="h-px flex-1 bg-gradient-to-r from-transparent to-porcelain/20" />
+        <span className="text-turmeric" style={{ fontSize: 12 }}>◆</span>
+        <span className="h-px flex-1 bg-gradient-to-l from-transparent to-porcelain/20" />
+      </div>
+
+      <div style={{ padding: "clamp(40px,6vh,72px) clamp(20px,6vw,110px) 26px" }}>
+        <Reveal>
+          <div className="flex flex-wrap justify-between" style={{ gap: "clamp(30px,5vw,80px)" }}>
+            <div className="max-w-[360px]">
+              <Link href="/" className="flex items-center gap-2.5" aria-label="CTemples home">
+                <GopuramMark className="h-7 w-6 text-magenta" strokeWidth={2} />
+                <span className="font-display text-[19px] font-bold tracking-[-.02em]">CTemples</span>
+              </Link>
+              <p className="mt-5 text-balance font-display font-semibold leading-[1.18] tracking-[-.015em]" style={{ fontSize: "clamp(23px,2.6vw,30px)" }}>
+                Every temple is a door.
+              </p>
+              <p className="mt-3 font-mono text-[10px] leading-[1.9] tracking-[.22em] text-porcelain/40">
+                A FIELD GUIDE TO SACRED INDIA
+              </p>
+            </div>
+            <div className="flex flex-wrap" style={{ gap: "clamp(36px,6vw,90px)" }}>
+              <nav aria-label="Site">
+                <p className="mb-[15px] font-mono text-[10px] tracking-[.26em] text-turmeric">SITE</p>
+                <div className="flex flex-col gap-2.5">
+                  {SITE.map((l) => (
+                    <FooterLink key={l.href} href={l.href} label={l.label} />
+                  ))}
+                </div>
+              </nav>
+              <nav aria-label="Contribute">
+                <p className="mb-[15px] font-mono text-[10px] tracking-[.26em] text-turmeric">CONTRIBUTE</p>
+                <div className="flex flex-col gap-2.5">
+                  {CONTRIBUTE.map((l) => (
+                    <FooterLink key={l.href} href={l.href} label={l.label} />
+                  ))}
+                </div>
+              </nav>
+            </div>
           </div>
-
-          {(Object.keys(NAV) as (keyof typeof NAV)[]).map((group) => (
-            <nav key={group} aria-label={group}>
-              <h2 className="font-mono text-label uppercase tracking-label text-turmeric">{group}</h2>
-              <ul className="mt-4 space-y-2.5 text-body-sm text-porcelain/75">
-                {NAV[group].map((item) => (
-                  <li key={item.href}>
-                    <Link href={item.href} className="transition-colors hover:text-coral">
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              {group === "Project" ? (
-                <>
-                  <h2 className="mt-6 font-mono text-label uppercase tracking-label text-turmeric">Connect</h2>
-                  <ul className="mt-4 space-y-2.5 text-body-sm text-porcelain/50">
-                    {SOCIALS.map((name) => (
-                      <li key={name} className="flex items-center justify-between gap-3">
-                        <span>{name}</span>
-                        <span className="font-mono text-[0.55rem] uppercase tracking-label text-porcelain/40">
-                          Soon
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : null}
-            </nav>
-          ))}
+        </Reveal>
+        <div
+          className="flex flex-wrap justify-between gap-3 border-t border-porcelain/[.13] pt-[22px]"
+          style={{ marginTop: "clamp(36px,6vh,60px)" }}
+        >
+          <p className="font-mono text-[9.5px] tracking-[.2em] text-porcelain/40">© 2026 CTEMPLES — FRONTEND PROTOTYPE</p>
+          <p className="font-mono text-[9.5px] tracking-[.2em] text-porcelain/40">
+            IMAGERY — WIKIMEDIA COMMONS · BASE MAP — DATAMEET, CC BY 4.0
+          </p>
         </div>
-
-        <div className="mt-14 flex flex-col gap-3 border-t border-porcelain/15 pt-6 font-mono text-label-sm uppercase tracking-label text-porcelain/50 sm:flex-row sm:items-center sm:justify-between">
-          <span>© 2026 CTemples · Made in India</span>
-          <span className="sm:text-right">
-            Base map: DataMeet, CC BY 4.0 · Imagery: Wikimedia Commons
-          </span>
-        </div>
-        <p className="mt-3 font-mono text-label-sm uppercase tracking-label text-porcelain/40">
-          A field-guide prototype · placeholder content · nothing is booked or sold here
-        </p>
       </div>
     </footer>
   );

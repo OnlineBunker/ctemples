@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { startTransition, type ReactNode, type MouseEvent } from "react";
+import { startTransition, type CSSProperties, type ReactNode, type MouseEvent } from "react";
 import { addTransitionType } from "./view-transition";
 
 /**
@@ -16,19 +16,25 @@ export function TransitionLink({
   type = "nav-forward",
   children,
   className,
+  style,
   prefetch,
+  onClick,
   "aria-label": ariaLabel,
 }: {
   href: string;
   type?: "nav-forward" | "nav-back";
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
   prefetch?: boolean;
+  /** Optional side-effect (e.g. closing an overlay) — runs before the tagged navigation. */
+  onClick?: () => void;
   "aria-label"?: string;
 }) {
   const router = useRouter();
 
   function handleClick(e: MouseEvent<HTMLAnchorElement>) {
+    onClick?.();
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
     startTransition(() => {
@@ -46,6 +52,7 @@ export function TransitionLink({
       href={href}
       onClick={handleClick}
       className={className}
+      style={style}
       prefetch={prefetch}
       aria-label={ariaLabel}
     >

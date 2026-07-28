@@ -13,11 +13,16 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    /* The Threshold hero's decorative layers (orbit ring, mist, dome) intentionally
+       bleed past the viewport; the prototype clips them at its root wrapper the same
+       way (docs/15 §0a). `clip` clips without creating a new scroll container. */
+    overflow-x: clip;
   }
 
   body {
     @apply bg-porcelain text-ink font-body antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: clip;
   }
 
   ::selection {
@@ -103,6 +108,80 @@
   .telugu {
     font-family: theme("fontFamily.telugu");
   }
+
+  /* Outlined display type (docs/15 §0a) — the finale names strip + 404 ghost numeral. */
+  .otl {
+    -webkit-text-stroke: 1.5px rgba(251, 246, 240, 0.32);
+    color: transparent;
+  }
+}
+
+/* Hero scroll cue — a 1px line sweeping down (docs/15 §0a). The global reduced-motion
+   override below neutralizes it. */
+@keyframes cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+.animate-cue {
+  animation: cue 1.9s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* ─────── Homepage cinematic motion (docs/08 §5#6–10, Amendment B) ───────
+   Sanctioned homepage-only loops. Each is force-killed under reduced motion below
+   (the global 0.001ms/iteration-1 override would freeze `alternate`/`forwards` runs
+   mid-state, so we cut them outright — same pattern as the dwell animations). */
+
+/* §5#7 — two faint gulls drifting across the hero sky, L→R with a soft vertical bob.
+   Applied inline per-bird for start position/opacity; this drives the translate. */
+@keyframes bird {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(18vw, -3vh);
+  }
+  50% {
+    transform: translate(38vw, 1vh);
+  }
+  75% {
+    transform: translate(58vw, -4vh);
+  }
+  100% {
+    transform: translate(80vw, -1vh);
+  }
+}
+
+/* §5#10 — the Finale outlined-name frieze, duplicated then shifted one copy's width
+   (-50%) for a seamless loop. Duration is set inline (scales with the name count). */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee linear infinite;
+}
+
+/* A gentle, continuous "living hero" drift on the arch photo — a slow breathing zoom
+   (ease-in-out alternate, so it never hard-cuts). Distinct from the dwell-scoped
+   Ken Burns; this one runs at rest to keep the standing hero feeling alive. */
+@keyframes hero-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+.animate-hero-drift {
+  animation: hero-drift 24s ease-in-out infinite alternate;
 }
 
 /* ─────────────────────── View Transitions ───────────────────────
@@ -278,9 +357,15 @@
      scale). Kill them outright instead — the JS gate (useReducedMotion) also removes
      these classes post-hydration; this covers the SSR-to-hydration window. */
   .animate-kenburns,
-  .animate-dot-progress {
+  .animate-dot-progress,
+  .animate-bird,
+  .animate-marquee,
+  .animate-hero-drift {
     animation: none !important;
   }
+  /* Amendment B homepage motion (birds/marquee/hero-drift) is killed above; the hero
+     scroll-parallax rig and the Index cursor-card are JS-gated off via useReducedMotion,
+     so no element ever carries a scroll/pointer-driven transform under reduced motion. */
   *,
   *::before,
   *::after {
