@@ -67,6 +67,7 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
 
   const inputId = useId();
   const listId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
 
@@ -205,7 +206,16 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
 
       {/* Full-screen plum takeover — "SEARCH THE ATLAS" (prototype, docs/15 §0a). */}
       <Dialog.Portal>
-        <Dialog.Content className="fixed inset-0 z-[500] flex flex-col bg-[rgba(36,16,33,.96)] text-porcelain backdrop-blur-[14px] focus:outline-none">
+        <Dialog.Content
+          className="fixed inset-0 z-[500] flex flex-col bg-[rgba(36,16,33,.96)] text-porcelain backdrop-blur-[14px] focus:outline-none"
+          onOpenAutoFocus={(e) => {
+            // Radix would otherwise focus the first focusable child — the Close (✕) button,
+            // which precedes the input in DOM order — leaving the caret out of the search
+            // field. Send focus straight to the input so typing works the instant it opens.
+            e.preventDefault();
+            inputRef.current?.focus();
+          }}
+        >
           <Dialog.Title className="sr-only">Search temples</Dialog.Title>
           <Dialog.Description className="sr-only">
             Search by temple name, deity, city, or state. Type at least two characters.
@@ -230,6 +240,7 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
             </label>
             <div className="relative">
               <input
+                ref={inputRef}
                 id={inputId}
                 type="text"
                 autoComplete="off"
