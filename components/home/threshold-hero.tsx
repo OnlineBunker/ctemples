@@ -324,45 +324,39 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
           filter: "blur(26px)",
         }}
       />
-      {/* Drifting birds (§5#7) — two faint gulls crossing the sky, behind the arch. Inline
-          `animation` drives them; the `animate-bird` class lets the reduced-motion rule
-          (globals.css) kill them with !important. */}
-      <svg
-        aria-hidden
-        viewBox="0 0 40 16"
-        className="animate-bird pointer-events-none absolute z-[1]"
-        style={{
-          top: "20%",
-          left: "14%",
-          width: 26,
-          opacity: 0.5,
-          fill: "none",
-          stroke: "rgba(251,246,240,.65)",
-          strokeWidth: 1.6,
-          strokeLinecap: "round",
-          animation: "bird 34s linear infinite",
-        }}
-      >
-        <path d="M2 12 Q10 4 19 11 Q28 4 38 12" />
-      </svg>
-      <svg
-        aria-hidden
-        viewBox="0 0 40 16"
-        className="animate-bird pointer-events-none absolute z-[1]"
-        style={{
-          top: "14%",
-          left: "8%",
-          width: 17,
-          opacity: 0.35,
-          fill: "none",
-          stroke: "rgba(251,246,240,.6)",
-          strokeWidth: 1.6,
-          strokeLinecap: "round",
-          animation: "bird 46s linear 8s infinite",
-        }}
-      >
-        <path d="M2 12 Q10 4 19 11 Q28 4 38 12" />
-      </svg>
+      {/* Drifting birds (§5#7) — a faint flock of gulls crossing the sky behind the arch.
+          Each is a wrapper that drifts on an undulating path (bird-drift, fading in/out at
+          the edges) around an inner gull that flaps its wings (bird-flap). Both layers carry
+          `animate-bird` so the reduced-motion rule (globals.css) kills them with !important. */}
+      {[
+        { top: "17%", left: "8%", w: 25, o: 0.5, drift: 44, flap: 0.62, delay: 0 },
+        { top: "24%", left: "2%", w: 17, o: 0.4, drift: 57, flap: 0.74, delay: 5 },
+        { top: "13%", left: "16%", w: 13, o: 0.32, drift: 50, flap: 0.56, delay: 12 },
+      ].map((b, i) => (
+        <div
+          key={i}
+          aria-hidden
+          className="animate-bird pointer-events-none absolute z-[1]"
+          style={{ top: b.top, left: b.left, animation: `bird-drift ${b.drift}s linear ${b.delay}s infinite` }}
+        >
+          <svg
+            viewBox="0 0 40 16"
+            className="animate-bird block"
+            style={{
+              width: b.w,
+              opacity: b.o,
+              fill: "none",
+              stroke: "rgba(251,246,240,.62)",
+              strokeWidth: 1.6,
+              strokeLinecap: "round",
+              transformOrigin: "center",
+              animation: `bird-flap ${b.flap}s ease-in-out infinite`,
+            }}
+          >
+            <path d="M2 12 Q10 4 19 11 Q28 4 38 12" />
+          </svg>
+        </div>
+      ))}
 
       {/* Kicker */}
       <p
@@ -460,7 +454,7 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
       {/* Headline — overlaps the arch, in front of the ghost tower. Each line splits apart
           + fades on scroll (§5#6); l1/l2 refs carry those transforms. */}
       <h1
-        className="pointer-events-none absolute z-[4] font-display font-extrabold"
+        className="pointer-events-none absolute z-[4] font-display font-extrabold text-porcelain"
         style={{
           left: "clamp(18px,7vw,120px)",
           right: "clamp(64px,8vw,140px)",

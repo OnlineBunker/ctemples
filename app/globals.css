@@ -135,23 +135,42 @@
    (the global 0.001ms/iteration-1 override would freeze `alternate`/`forwards` runs
    mid-state, so we cut them outright — same pattern as the dwell animations). */
 
-/* §5#7 — two faint gulls drifting across the hero sky, L→R with a soft vertical bob.
-   Applied inline per-bird for start position/opacity; this drives the translate. */
-@keyframes bird {
+/* §5#7 — a faint flock of gulls crossing the hero sky. The wrapper drifts L→R on an
+   undulating path (bird-drift) and fades in/out at the screen edges so the loop reset
+   never pops; the inner gull flaps its wings (bird-flap). Per-bird timing/position is
+   set inline. Both layers carry `.animate-bird` so reduced motion kills the whole thing. */
+@keyframes bird-drift {
   0% {
     transform: translate(0, 0);
+    opacity: 0;
   }
-  25% {
-    transform: translate(18vw, -3vh);
+  10% {
+    opacity: 1;
   }
-  50% {
-    transform: translate(38vw, 1vh);
+  28% {
+    transform: translate(26vw, -6vh);
   }
-  75% {
-    transform: translate(58vw, -4vh);
+  52% {
+    transform: translate(50vw, 4vh);
+  }
+  76% {
+    transform: translate(72vw, -5vh);
+  }
+  90% {
+    opacity: 1;
   }
   100% {
-    transform: translate(80vw, -1vh);
+    transform: translate(96vw, 2vh);
+    opacity: 0;
+  }
+}
+@keyframes bird-flap {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.45);
   }
 }
 
