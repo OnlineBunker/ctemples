@@ -120,39 +120,51 @@ export function Gallery({
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {items.map((item, i) => (
-          <li key={item.url}>
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(i);
-                setPlaying(false);
-              }}
-              className="group relative block aspect-[4/3] w-full overflow-hidden rounded-xl border border-line"
-              aria-label={`Open ${item.kind === "video" ? "video" : "image"} ${i + 1} of ${count} — ${templeName}`}
-            >
-              <div className="absolute inset-0 transition-transform duration-700 ease-threshold group-hover:scale-105">
-                <TempleImage
-                  src={item.kind === "video" ? (item.poster ?? "") : item.url}
-                  alt={item.alt}
-                  region={region}
-                  seed={seed}
-                  variant={i + 1}
-                  sizes="(max-width: 640px) 45vw, 30vw"
-                />
-              </div>
-              {item.kind === "video" ? (
-                <span aria-hidden className="absolute inset-0 flex items-center justify-center bg-plum/20">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-plum">
-                    <Play className="h-4 w-4 translate-x-0.5" fill="currentColor" />
+      {/* "Through the doorway" (docs/15 §0a): an ink band with a horizontal snap rail of
+          3:4 plates, alternating arch / rounded radii — the prototype's gallery band,
+          rendered as a full-width panel inside the section column. */}
+      <div className="rounded-[26px] bg-surface-deep py-6">
+        <p className="px-6 pb-4 text-right font-mono text-[10px] tracking-[.2em] text-porcelain/45">
+          {String(count).padStart(2, "0")} PHOTOGRAPHS
+        </p>
+        <ul className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2">
+          {items.map((item, i) => (
+            <li key={item.url} className="w-[min(320px,72vw)] shrink-0 snap-start">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(i);
+                  setPlaying(false);
+                }}
+                className="group relative block w-full overflow-hidden transition-transform duration-500 ease-threshold hover:-translate-y-1.5 motion-reduce:!transform-none"
+                style={{
+                  aspectRatio: "3/4",
+                  borderRadius: i % 2 === 0 ? "160px 160px 18px 18px" : "18px",
+                }}
+                aria-label={`Open ${item.kind === "video" ? "video" : "image"} ${i + 1} of ${count} — ${templeName}`}
+              >
+                <div className="absolute inset-0">
+                  <TempleImage
+                    src={item.kind === "video" ? (item.poster ?? "") : item.url}
+                    alt={item.alt}
+                    region={region}
+                    seed={seed}
+                    variant={i + 1}
+                    sizes="(max-width: 640px) 72vw, 320px"
+                  />
+                </div>
+                {item.kind === "video" ? (
+                  <span aria-hidden className="absolute inset-0 flex items-center justify-center bg-plum/20">
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-plum">
+                      <Play className="h-4 w-4 translate-x-0.5" fill="currentColor" />
+                    </span>
                   </span>
-                </span>
-              ) : null}
-            </button>
-          </li>
-        ))}
-      </ul>
+                ) : null}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {mounted &&
         createPortal(

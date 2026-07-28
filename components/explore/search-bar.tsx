@@ -72,12 +72,11 @@ export function SearchBar({
     commit("", true);
   }
 
+  // The prototype's quiet UNDERLINE search (docs/15 §0a): a large Bricolage input over a
+  // hairline rule, magenta caret — not a boxed pill.
   return (
-    <div className="relative max-w-[640px]">
-      <Search
-        className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
-        aria-hidden
-      />
+    <div className="flex max-w-[620px] items-center gap-3.5 border-b-[1.5px] border-ink/[.22] px-0.5 pb-3.5 pt-2 focus-within:border-magenta">
+      <Search className="h-[19px] w-[19px] shrink-0 text-ink/45" aria-hidden />
       <label htmlFor={inputId} className="sr-only">
         Search temples, deities, places
       </label>
@@ -88,20 +87,17 @@ export function SearchBar({
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className="h-12 w-full rounded-full border border-line-strong bg-canvas pl-11 pr-11 text-base text-ink placeholder:text-ink-muted focus-visible:outline-none focus-visible:border-magenta"
+        className="min-w-0 flex-1 bg-transparent font-display font-semibold tracking-[-.01em] text-ink caret-magenta placeholder:text-ink/40 focus:outline-none"
+        style={{ fontSize: "clamp(19px,2.2vw,24px)" }}
       />
       {isPending ? (
-        <Loader2
-          className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-magenta"
-          role="status"
-          aria-label="Loading"
-        />
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-magenta" role="status" aria-label="Loading" />
       ) : value ? (
         <button
           type="button"
           onClick={clear}
           aria-label="Clear search"
-          className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted hover:text-magenta"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink/45 hover:text-magenta"
         >
           <X className="h-4 w-4" aria-hidden />
         </button>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { queryTemples, getStateCounts } from "@/lib/temples";
+import { queryTemples, getStateCounts, getTempleCount } from "@/lib/temples";
 import { parseExploreParams, type ParsedExploreParams } from "@/lib/explore-url";
 import { DEITY_META } from "@/lib/deities";
 import { pluralize } from "@/lib/format";
@@ -57,7 +57,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
   // filter-independent list the Your-State picker needs regardless of current filters
   // (docs/05 §9's "queryTemples is the page's only data import" is about the result set
   // and its own facets, which are now selected-safe inside runExploreQuery itself).
-  const [result, allStates] = await Promise.all([
+  const [result, allStates, totalTemples] = await Promise.all([
     queryTemples({
       q: parsed.q,
       exact: parsed.exact,
@@ -68,6 +68,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
       page: parsed.page,
     }),
     getStateCounts(),
+    getTempleCount(),
   ]);
 
   const stateLabel = parsed.state
@@ -83,12 +84,25 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
       ? `0 temples${stateLabel ? ` in ${stateLabel}` : ""}`
       : `${pluralize(result.total, "temple")}${stateLabel ? ` in ${stateLabel}` : ""} · showing ${from}–${to}`;
 
+  // The prototype's atlas readout: "NN / NN DOORWAYS" — both numbers data-derived.
+  const pad2 = (n: number) => String(n).padStart(2, "0");
+  const doorways = `${pad2(result.total)} / ${pad2(totalTemples)} DOORWAYS`;
+
   return (
-    <div className="shell py-16 md:py-20">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-display-xl text-plum">
-          {summary ? `Explore · ${summary}` : "Explore"}
+    <div style={{ padding: "clamp(44px,7vh,80px) clamp(20px,6vw,110px) clamp(70px,10vh,110px)" }}>
+      <div className="flex flex-wrap items-baseline justify-between gap-4">
+        <h1
+          className="font-display font-bold leading-none tracking-[-.03em] text-ink"
+          style={{ fontSize: "clamp(42px,6.6vw,92px)" }}
+        >
+          The atlas.
+          {summary ? <span className="sr-only"> — {summary}</span> : null}
         </h1>
+        <p className="font-mono text-[11px] tracking-[.24em] text-ink/50" aria-hidden>
+          {doorways}
+        </p>
+      </div>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <ModeToggle current={parsed} />
       </div>
 

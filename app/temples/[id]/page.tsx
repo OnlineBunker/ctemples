@@ -5,8 +5,9 @@ import { computeRelatedSections, visibleSections, reachModes } from "@/lib/detai
 import { buildTempleTitle, buildTempleDescription } from "@/lib/seo";
 import { getHero } from "@/lib/media";
 
-import { BackLink } from "@/components/temple/detail/back-link";
+import Link from "next/link";
 import { DetailHero } from "@/components/temple/detail/detail-hero";
+import { TempleFooterNav } from "@/components/temple/detail/temple-footer-nav";
 import { QuickFacts } from "@/components/temple/detail/quick-facts";
 import { MobileSectionNav } from "@/components/temple/detail/mobile-section-nav";
 import { SectionIndex } from "@/components/temple/detail/section-index";
@@ -56,6 +57,11 @@ export default async function TemplePage({ params }: { params: Promise<{ id: str
   const sections = visibleSections(temple, related);
   const modes = reachModes(temple);
 
+  // Prev/next wrap around the atlas order (docs/15 §0a — the prototype's closing bar).
+  const idx = allTemples.findIndex((t) => t.id === temple.id);
+  const prevTemple = allTemples[(idx - 1 + allTemples.length) % allTemples.length];
+  const nextTemple = allTemples[(idx + 1) % allTemples.length];
+
   function meta(sectionId: string) {
     return sections.find((s) => s.id === sectionId) ?? null;
   }
@@ -79,11 +85,20 @@ export default async function TemplePage({ params }: { params: Promise<{ id: str
 
   return (
     <article>
-      <div className="shell pt-8">
-        <BackLink state={temple.state} />
+      {/* Prototype breadcrumb row (docs/15 §0a): ← THE ATLAS + region · state · city. */}
+      <div className="shell flex flex-wrap items-baseline justify-between gap-3.5 pt-[clamp(20px,4vh,36px)] print:hidden">
+        <Link
+          href="/explore"
+          className="font-mono text-[10.5px] tracking-[.2em] text-ink/60 transition-colors hover:text-magenta"
+        >
+          ← THE ATLAS
+        </Link>
+        <p className="font-mono text-[10.5px] tracking-[.2em] text-ink/45">
+          {`${temple.region} INDIA · ${temple.state} · ${temple.city}`.toUpperCase()}
+        </p>
       </div>
 
-      <div className="mt-6">
+      <div className="shell">
         <DetailHero temple={temple} />
       </div>
 
@@ -224,6 +239,13 @@ export default async function TemplePage({ params }: { params: Promise<{ id: str
 
           <SectionIndex sections={sections} />
         </div>
+      </div>
+
+      <div className="mt-16 md:mt-20">
+        <TempleFooterNav
+          prev={{ id: prevTemple.id, name: prevTemple.name }}
+          next={{ id: nextTemple.id, name: nextTemple.name }}
+        />
       </div>
 
       <BackToTop />

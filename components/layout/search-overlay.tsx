@@ -10,7 +10,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { TempleImage } from "@/components/media/temple-image";
 import { TransitionLink } from "@/components/motion/transition-link";
 import { addTransitionType } from "@/components/motion/view-transition";
@@ -57,7 +57,7 @@ function navigate(router: ReturnType<typeof useRouter>, href: string) {
  * after a newer keystroke's request — the practical equivalent of AbortController
  * cancellation for a Server Action (there's no fetch Request here to abort).
  */
-export function SearchOverlay() {
+export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -173,150 +173,163 @@ export function SearchOverlay() {
   // transitional state right after crossing MIN_QUERY_LENGTH).
   const listboxRendered = showResults && (suggestions.items.length > 0 || isPending);
 
+  const pad = (n: number) => String(n).padStart(2, "0");
+
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      {/* One responsive trigger, not two DOM-separate buttons — the label/⌘K hint fade
-          in at md: via inner spans, rather than swapping between a desktop pill and a
-          mobile icon button, which would need two Dialog.Triggers living in two
-          different parts of the header's flex layout for one Dialog.Root. */}
+      {/* SEARCH pill trigger — cream-outline over the dark home hero, ink-outline on
+          light chrome (prototype site-header). */}
       <Dialog.Trigger asChild>
         <button
           type="button"
-          aria-label="Search temples"
-          className="inline-flex h-10 items-center gap-1.5 rounded-full px-2.5 font-mono text-[0.7rem] uppercase tracking-label text-ink-muted transition-colors hover:bg-canvas-soft hover:text-ink md:border md:border-line md:px-3 md:hover:border-line-strong md:hover:bg-transparent"
+          aria-label="Search the atlas"
+          className={cn(
+            "inline-flex h-[38px] items-center gap-2 rounded-full border px-[15px] font-mono text-[10.5px] tracking-[.18em] transition-colors",
+            tone === "dark"
+              ? "border-porcelain/30 text-porcelain hover:border-turmeric hover:text-turmeric"
+              : "border-ink/20 text-ink hover:border-magenta hover:text-magenta",
+          )}
         >
-          <Search className="h-5 w-5 md:h-4 md:w-4" aria-hidden />
-          <span className="hidden md:inline">Search</span>
-          <kbd className="hidden rounded-md border border-line px-1.5 py-0.5 font-mono text-[0.62rem] normal-case text-ink-muted md:inline">
+          <Search className="h-3.5 w-3.5" aria-hidden />
+          <span className="hidden md:inline">SEARCH</span>
+          <kbd
+            className={cn(
+              "hidden rounded-md border px-1.5 py-0.5 font-mono text-[0.62rem] normal-case md:inline",
+              tone === "dark" ? "border-porcelain/25 text-porcelain/60" : "border-ink/15 text-ink/50",
+            )}
+          >
             ⌘K
           </kbd>
         </button>
       </Dialog.Trigger>
 
+      {/* Full-screen plum takeover — "SEARCH THE ATLAS" (prototype, docs/15 §0a). */}
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[70] bg-plum/40 backdrop-blur-sm" />
-        <Dialog.Content
-          className="fixed inset-x-0 bottom-0 z-[70] flex h-[50vh] flex-col overflow-hidden rounded-t-card border-t border-line bg-canvas shadow-xl focus:outline-none md:inset-x-auto md:bottom-auto md:left-1/2 md:top-24 md:h-auto md:max-h-[70vh] md:w-[480px] md:-translate-x-1/2 md:rounded-card md:border"
-        >
+        <Dialog.Content className="fixed inset-0 z-[500] flex flex-col bg-[rgba(36,16,33,.96)] text-porcelain backdrop-blur-[14px] focus:outline-none">
           <Dialog.Title className="sr-only">Search temples</Dialog.Title>
           <Dialog.Description className="sr-only">
             Search by temple name, deity, city, or state. Type at least two characters.
           </Dialog.Description>
 
-          <div className="flex items-center gap-3 border-b border-line px-4">
-            <Search className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden />
-            <label htmlFor={inputId} className="sr-only">
-              Search temples, deities, places
-            </label>
-            <input
-              id={inputId}
-              type="text"
-              autoComplete="off"
-              value={query}
-              onChange={(e) => onQueryChange(e.target.value)}
-              onKeyDown={onInputKeyDown}
-              placeholder="Search temples, deities, places…"
-              role="combobox"
-              aria-expanded={listboxRendered}
-              aria-controls={listboxRendered ? listId : undefined}
-              aria-autocomplete="list"
-              aria-activedescendant={activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined}
-              className="h-14 w-full bg-transparent text-base text-ink placeholder:text-ink-muted focus:outline-none"
-            />
-            {isPending ? (
-              <Loader2 className="h-4 w-4 shrink-0 animate-spin text-magenta" role="status" aria-label="Loading" />
-            ) : null}
+          <div className="flex items-center justify-between px-5 py-[15px] sm:px-8 lg:px-12 xl:px-[clamp(20px,6vw,110px)]">
+            <span className="font-mono text-[11px] tracking-[.28em] text-porcelain/50">SEARCH THE ATLAS</span>
             <Dialog.Close asChild>
               <button
                 type="button"
                 aria-label="Close search"
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted hover:bg-canvas-soft hover:text-ink"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-porcelain/25 text-porcelain transition-colors hover:border-magenta hover:bg-magenta"
               >
-                <X className="h-4 w-4" aria-hidden />
+                ✕
               </button>
             </Dialog.Close>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-2">
+          <div className="px-5 sm:px-8 lg:px-12 xl:px-[clamp(20px,8vw,110px)]" style={{ paddingTop: "clamp(10px,4vh,36px)" }}>
+            <label htmlFor={inputId} className="sr-only">
+              Search temples, deities, places
+            </label>
+            <div className="relative">
+              <input
+                id={inputId}
+                type="text"
+                autoComplete="off"
+                value={query}
+                onChange={(e) => onQueryChange(e.target.value)}
+                onKeyDown={onInputKeyDown}
+                placeholder="Temple, deity, city, state…"
+                role="combobox"
+                aria-expanded={listboxRendered}
+                aria-controls={listboxRendered ? listId : undefined}
+                aria-autocomplete="list"
+                aria-activedescendant={activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined}
+                className="w-full border-b-2 border-porcelain/25 bg-transparent pb-4 pt-1.5 font-display font-semibold tracking-[-.02em] text-porcelain caret-turmeric placeholder:text-porcelain/40 focus:border-magenta focus:outline-none"
+                style={{ fontSize: "clamp(26px,4.5vw,52px)" }}
+              />
+              {isPending ? (
+                <Loader2
+                  className="absolute right-0 top-1/2 h-5 w-5 -translate-y-1/2 animate-spin text-turmeric"
+                  role="status"
+                  aria-label="Loading"
+                />
+              ) : null}
+            </div>
+
             {!showResults ? (
-              <div className="p-3">
-                <p className="mb-3 font-mono text-[0.62rem] uppercase tracking-label text-ink-muted">
-                  Popular searches
-                </p>
-                <ul className="flex flex-wrap gap-2">
-                  {POPULAR_SEARCH_CHIPS.map((chip) => (
-                    <li key={chip.label}>
-                      <TransitionLink
-                        href={chip.href}
-                        className="inline-flex items-center rounded-full border border-line px-3 py-1.5 text-sm text-plum transition-colors hover:border-magenta hover:bg-magenta-soft hover:text-magenta-deep"
-                      >
-                        {chip.label}
-                      </TransitionLink>
-                    </li>
-                  ))}
-                </ul>
+              <div className="mt-[22px] flex flex-wrap items-center gap-[9px]">
+                <span className="font-mono text-[10px] tracking-[.24em] text-porcelain/40">POPULAR</span>
+                {POPULAR_SEARCH_CHIPS.map((chip) => (
+                  <TransitionLink
+                    key={chip.label}
+                    href={chip.href}
+                    onClick={() => setOpen(false)}
+                    className="rounded-full border border-porcelain/25 px-[15px] py-2 text-[12.5px] text-porcelain transition-colors hover:border-turmeric hover:text-turmeric"
+                  >
+                    {chip.label}
+                  </TransitionLink>
+                ))}
               </div>
-            ) : suggestions.items.length === 0 && !isPending ? (
-              <p className="p-6 text-center text-sm text-ink-muted">
-                No temples found for &lsquo;{trimmedQuery}&rsquo;
+            ) : null}
+          </div>
+
+          <div className="mt-2 flex-1 overflow-y-auto px-5 pb-16 pt-6 sm:px-8 lg:px-12 xl:px-[clamp(20px,8vw,110px)]">
+            {showResults && suggestions.items.length === 0 && !isPending ? (
+              <p className="mt-4 font-mono text-[11px] tracking-[.2em] text-porcelain/50">
+                NO DOORWAYS MATCH — TRY &ldquo;SHIVA&rdquo;, &ldquo;MADURAI&rdquo;, &ldquo;HIMALAYAN&rdquo;
               </p>
-            ) : (
+            ) : null}
+            {showResults && suggestions.items.length > 0 ? (
               <>
                 {suggestions.matchedAliasLabel ? (
-                  <p className="px-3 pb-2 pt-1 text-xs text-magenta-deep">
-                    Matched: &lsquo;{trimmedQuery}&rsquo; → {suggestions.matchedAliasLabel}
+                  <p className="pb-2 font-mono text-[10px] tracking-[.2em] text-turmeric">
+                    MATCHED: &lsquo;{trimmedQuery.toUpperCase()}&rsquo; → {suggestions.matchedAliasLabel.toUpperCase()}
                   </p>
                 ) : null}
                 {/* Clicking any result (a real TransitionLink underneath) always closes the
                     overlay — one delegated handler instead of one per row. */}
                 <ul id={listId} role="listbox" aria-label="Search results" onClick={() => setOpen(false)}>
                   {suggestions.items.map((item, i) => (
-                    <li
-                      key={item.id}
-                      id={`${listId}-option-${i}`}
-                      role="option"
-                      aria-selected={i === activeIndex}
-                    >
+                    <li key={item.id} id={`${listId}-option-${i}`} role="option" aria-selected={i === activeIndex}>
                       <TransitionLink
                         href={`/temples/${item.id}`}
                         className={cn(
-                          "flex items-center gap-3 rounded-lg p-2",
-                          i === activeIndex ? "bg-magenta-soft" : "hover:bg-canvas-soft",
+                          "flex items-center gap-[clamp(14px,3vw,28px)] border-b border-porcelain/10 py-[15px] transition-[padding-left] duration-300 ease-threshold",
+                          i === activeIndex ? "pl-3.5 text-turmeric" : "text-porcelain hover:pl-3.5",
                         )}
                       >
-                        <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-md">
-                          <TempleImage
-                            src={item.hero?.url ?? ""}
-                            alt=""
-                            region={item.region}
-                            seed={item.id}
-                            sizes="32px"
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-plum">{item.name}</p>
-                          <p className="truncate text-xs text-ink-muted">
-                            {item.city}, {item.state}
-                          </p>
-                        </div>
+                        <span className="w-[26px] shrink-0 font-mono text-[11px] text-magenta">{pad(i + 1)}</span>
+                        <span className="relative block h-14 w-11 shrink-0 overflow-hidden rounded-[22px_22px_7px_7px]">
+                          <TempleImage src={item.hero?.url ?? ""} alt="" region={item.region} seed={item.id} sizes="44px" />
+                        </span>
+                        <span
+                          className="min-w-0 flex-1 truncate font-display font-semibold tracking-[-.01em]"
+                          style={{ fontSize: "clamp(18px,2.6vw,26px)" }}
+                        >
+                          {item.name}
+                        </span>
+                        <span className="hidden shrink-0 font-mono text-[10.5px] uppercase tracking-[.14em] text-porcelain/50 sm:block">
+                          {item.city} · {item.state}
+                        </span>
+                        <span className="text-turmeric" aria-hidden>
+                          →
+                        </span>
                       </TransitionLink>
                     </li>
                   ))}
                 </ul>
               </>
-            )}
-          </div>
+            ) : null}
 
-          {showResults ? (
-            <div className="border-t border-line" onClick={() => setOpen(false)}>
-              <TransitionLink
-                href={`/explore?q=${encodeURIComponent(trimmedQuery)}`}
-                className="block p-3 text-center text-sm font-medium text-magenta-deep hover:bg-magenta-soft"
-              >
-                See all results for &lsquo;{trimmedQuery}&rsquo; →
-              </TransitionLink>
-            </div>
-          ) : null}
+            {showResults ? (
+              <div className="pt-5" onClick={() => setOpen(false)}>
+                <TransitionLink
+                  href={`/explore?q=${encodeURIComponent(trimmedQuery)}`}
+                  className="font-mono text-[11px] tracking-[.2em] text-porcelain/60 transition-colors hover:text-turmeric"
+                >
+                  SEE ALL RESULTS FOR &lsquo;{trimmedQuery.toUpperCase()}&rsquo; →
+                </TransitionLink>
+              </div>
+            ) : null}
+          </div>
 
           <div aria-live="polite" className="sr-only">
             {showResults && !isPending

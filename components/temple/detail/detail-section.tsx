@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { Reveal } from "@/components/motion/reveal";
-import { Eyebrow } from "@/components/ui/eyebrow";
 import { cn } from "@/lib/utils";
 
 /**
@@ -24,17 +23,23 @@ export function DetailSection({
   children: ReactNode;
   className?: string;
 }) {
+  // Prototype kicker style (docs/15 §0a): "NN — EYEBROW" in bold, letter-spaced mono
+  // magenta, then a big Bricolage title.
   return (
     <section id={id} className={cn("scroll-mt-36", className)}>
       <Reveal>
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-xs text-ink-muted">{String(index).padStart(2, "0")}</span>
-          <Eyebrow>{eyebrow}</Eyebrow>
-        </div>
-        <h2 className="mt-4 font-display text-display-md text-plum">{title}</h2>
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[.26em] text-magenta">
+          {String(index).padStart(2, "0")} — {eyebrow}
+        </p>
+        <h2
+          className="mt-3 text-balance font-display font-bold tracking-[-.02em] text-ink"
+          style={{ fontSize: "clamp(25px,3.2vw,42px)", lineHeight: 1.08 }}
+        >
+          {title}
+        </h2>
       </Reveal>
       <Reveal delay={0.05}>
-        <div className="mt-7">{children}</div>
+        <div className="mt-6">{children}</div>
       </Reveal>
     </section>
   );

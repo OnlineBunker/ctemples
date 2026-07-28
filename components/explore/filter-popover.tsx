@@ -29,15 +29,15 @@ export function FilterPopover({
         <button
           type="button"
           className={cn(
-            "inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors",
+            // Prototype atlas chip (docs/15 §0a): mono, letter-spaced, pill; active = ink fill.
+            "inline-flex h-11 items-center gap-2 rounded-full border px-[15px] font-mono text-[10.5px] uppercase tracking-[.14em] transition-colors",
             active
-              ? "border-magenta bg-magenta-soft text-magenta-deep"
-              : "border-line-strong bg-canvas text-plum hover:border-magenta hover:text-magenta",
+              ? "border-ink bg-ink text-porcelain"
+              : "border-ink/[.18] bg-white/70 text-ink hover:border-ink",
           )}
         >
-          {active ? <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-magenta-deep" /> : null}
           <span className="whitespace-nowrap">{label}</span>
-          <ChevronDown className="h-4 w-4 shrink-0" aria-hidden />
+          <ChevronDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
         </button>
       }
     >

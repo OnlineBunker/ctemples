@@ -4,7 +4,6 @@ import { fontDisplay, fontBody, fontMono, fontTelugu } from "./fonts";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { LanguageBanner } from "@/components/home/language-banner";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ctemples.example"),
@@ -45,7 +44,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
-        <LanguageBanner />
         <Header />
         <main id="main" className="flex-1">
           {children}

@@ -1,16 +1,16 @@
 import { ViewTransition } from "@/components/motion/view-transition";
 import { TempleImage } from "@/components/media/temple-image";
-import { Rating } from "@/components/ui/rating";
 import { ActionRow } from "./action-row";
 import { getHero } from "@/lib/media";
+import { formatRating } from "@/lib/format";
 import type { Temple } from "@/lib/types";
 
 /**
- * Section 1 — Hero (docs/06 §2). A contained 16:9 (4:3 mobile, max 60vh) doorway, not a
- * full-bleed banner. The landing side of the shared-element morph: `share="morph"` + the
- * same `temple-{id}` name the source card used, and — critically — the SAME `rounded-arch`
- * lintel clip as the card (docs/15 §2A), so the morph reads as stepping through the
- * doorway into the temple. Reads the same `getHero(media)` image so nothing swaps on arrival.
+ * Section 1 — Hero, prototype fidelity (docs/15 §0a): a split header — tags, the big
+ * Bricolage name, tagline, and DEITY · ★RATING in mono magenta on the left; a 3:4 arch
+ * portrait (999px crown) with a gold orbit ring on the right. The portrait is the landing
+ * side of the shared-element morph (`temple-{id}`), reading the same `getHero(media)`
+ * image the card used so nothing swaps on arrival.
  */
 export function DetailHero({ temple }: { temple: Temple }) {
   const hero = getHero(temple.media);
@@ -18,54 +18,71 @@ export function DetailHero({ temple }: { temple: Temple }) {
   const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
   return (
-    <section className="shell">
-      <div className="relative aspect-[4/3] max-h-[60vh] w-full overflow-hidden rounded-arch print:hidden sm:aspect-[16/9]">
-        <ViewTransition name={`temple-${temple.id}`} share="morph">
-          <div className="absolute inset-0">
-            <TempleImage
-              src={hero?.url ?? ""}
-              alt={hero?.alt ?? `${temple.name}, ${temple.city}`}
-              region={temple.region}
-              seed={temple.id}
-              priority
-              sizes="100vw"
-            />
-          </div>
-        </ViewTransition>
+    <header
+      className="grid items-center"
+      style={{
+        gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,400px),1fr))",
+        gap: "clamp(30px,5vw,80px)",
+        padding: "clamp(28px,5vh,60px) 0 clamp(40px,7vh,70px)",
+      }}
+    >
+      <div className="flex flex-col gap-[18px] print:hidden">
+        <div className="flex flex-wrap gap-1.5">
+          {temple.tags.slice(0, 4).map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full border border-ink/[.18] px-[11px] py-1 font-mono text-[9.5px] uppercase tracking-[.1em] text-ink/70"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        <h1
+          className="text-balance font-display font-extrabold text-ink"
+          style={{ fontSize: "clamp(38px,5.8vw,84px)", letterSpacing: "-.03em", lineHeight: 1 }}
+        >
+          {temple.name}
+        </h1>
+        <p className="max-w-[44ch] font-semibold text-plum" style={{ fontSize: "clamp(16px,1.6vw,20px)" }}>
+          {temple.tagline}
+        </p>
+        <p className="font-mono text-[11px] tracking-[.18em] text-magenta">
+          {`${temple.quickFacts.presidingDeity || temple.deity}  ·  ★ ${formatRating(temple.rating)}`.toUpperCase()}
+        </p>
+        <ActionRow getDirectionsHref={directionsHref} />
+      </div>
 
+      <div className="relative w-full max-w-[430px] justify-self-center print:hidden">
+        {/* Gold orbit ring */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-plum/90 via-plum/30 to-transparent"
+          className="absolute rounded-full border border-turmeric/50"
+          style={{ top: "-5%", left: "-10%", width: "70%", aspectRatio: "1/1" }}
         />
-        {/* Gilt archway edge — static, on-brand (docs/15 §2A). */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-arch ring-1 ring-inset ring-turmeric/25"
-        />
-
-        <div className="absolute inset-x-0 bottom-0 flex flex-col-reverse items-start justify-between gap-5 p-5 sm:flex-row sm:items-end sm:p-8">
-          <div className="min-w-0">
-            <p className="font-mono text-[0.68rem] uppercase tracking-label text-white/70">
-              {temple.state} · {temple.region} India
-            </p>
-            <h1 className="mt-2 max-w-2xl font-display text-display-lg leading-[1.05] text-white">
-              {temple.name}
-            </h1>
-            <p className="mt-3 max-w-xl text-lg leading-relaxed text-white/80">{temple.tagline}</p>
-            {typeof temple.rating === "number" ? (
-              <div className="mt-3">
-                <Rating value={temple.rating} tone="overlay" />
-              </div>
-            ) : null}
-          </div>
-
-          <ActionRow getDirectionsHref={directionsHref} className="shrink-0" />
+        <div
+          className="relative w-full overflow-hidden bg-surface-recess"
+          style={{
+            aspectRatio: "3/4",
+            borderRadius: "999px 999px 26px 26px",
+            boxShadow: "0 34px 90px rgba(36,16,33,.26)",
+          }}
+        >
+          <ViewTransition name={`temple-${temple.id}`} share="morph">
+            <div className="absolute inset-0">
+              <TempleImage
+                src={hero?.url ?? ""}
+                alt={hero?.alt ?? `${temple.name}, ${temple.city}`}
+                region={temple.region}
+                seed={temple.id}
+                priority
+                sizes="(max-width: 860px) 100vw, 430px"
+              />
+            </div>
+          </ViewTransition>
         </div>
       </div>
 
-      {/* Print-only text fallback (docs/06 §9: the hero photo and action row are hidden
-          when printed). Never rendered alongside the photo hero's own H1 — one is always
-          `display: none` depending on media, so the page keeps exactly one H1 either way. */}
+      {/* Print-only text fallback (docs/06 §9). */}
       <div className="hidden print:block">
         <h1 className="font-display text-3xl text-plum">{temple.name}</h1>
         <p className="mt-2 text-ink-muted">{temple.tagline}</p>
@@ -73,6 +90,6 @@ export function DetailHero({ temple }: { temple: Temple }) {
           {temple.city}, {temple.state}
         </p>
       </div>
-    </section>
+    </header>
   );
 }

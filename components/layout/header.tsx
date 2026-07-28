@@ -2,143 +2,48 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import * as Popover from "@radix-ui/react-popover";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Menu, X, ChevronDown, Globe, Check } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { GopuramMark } from "@/components/brand/gopuram-mark";
 import { SearchOverlay } from "@/components/layout/search-overlay";
-import { PopoverShell } from "@/components/ui/popover-shell";
 import { cn } from "@/lib/utils";
 
-/** Explore ▾ presets — real, resolvable list-mode filter URLs (docs/02 §2). The old
- *  `?preset=`/unconditional `?view=map` params are retired (D4, docs/02 §3.6). */
-const EXPLORE_ITEMS = [
-  { key: "all", label: "All temples", href: "/explore" },
-  { key: "states", label: "Browse by state", href: "/states" },
-  { key: "deities", label: "Browse by deity", href: "/deities" },
-  { key: "popular", label: "Most visited", href: "/explore?sort=popularity" },
+/**
+ * Site header — prototype fidelity (docs/15 §0a):
+ * - Desktop nav: EXPLORE / ABOUT / METHODOLOGY / SUGGEST in Space Mono small caps;
+ *   the active route is magenta with a 1.5px bottom border. A dark PARTNER pill at right.
+ * - On the homepage the header floats fixed and transparent over the dark Threshold
+ *   hero (cream text), gaining a blurred plum background after ~40px of scroll.
+ *   Everywhere else: sticky, blurred cream, hairline bottom border.
+ * - Mobile: hamburger opens a full-screen plum takeover with big numbered links
+ *   (focus-trapped, Esc closes and restores focus).
+ */
+const NAV = [
+  { label: "EXPLORE", href: "/explore" },
+  { label: "ABOUT", href: "/about" },
+  { label: "METHODOLOGY", href: "/methodology" },
+  { label: "SUGGEST", href: "/suggest" },
 ];
 
-const LANGUAGES = [
-  { code: "EN", label: "English", current: true },
-  { code: "HI", label: "हिन्दी" },
-  { code: "TA", label: "தமிழ்" },
-  { code: "TE", label: "తెలుగు" },
-  { code: "KN", label: "ಕನ್ನಡ" },
-  { code: "ML", label: "മലയാളം" },
-  { code: "BN", label: "বাংলা" },
-  { code: "MR", label: "मराठी" },
+const MENU = [
+  { label: "Home", href: "/" },
+  { label: "Explore", href: "/explore" },
+  { label: "About", href: "/about" },
+  { label: "Methodology", href: "/methodology" },
+  { label: "Suggest a temple", href: "/suggest" },
+  { label: "Partner with us", href: "/contact" },
 ];
+
+const pad = (n: number) => String(n).padStart(2, "0");
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-const navTrigger =
-  "relative inline-flex items-center gap-1 rounded-full px-4 py-2 font-mono text-[0.7rem] uppercase tracking-label transition-colors";
-
-// The active-nav "lintel" — a thin magenta threshold under the current section (docs/15
-// §4). A small doorway on the chrome; the arch itself stays reserved for imagery.
-const navLintel =
-  "after:absolute after:left-4 after:right-4 after:-bottom-0.5 after:h-[2px] after:rounded-full after:bg-magenta after:content-['']";
-
-const iconButton =
-  "inline-flex h-10 w-10 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-canvas-soft hover:text-magenta";
-
-type MenuItem = {
-  key: string;
-  label: ReactNode;
-  href?: string;
-  disabled?: boolean;
-  current?: boolean;
-  note?: string;
-};
-
-const menuItemBase = "flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm";
-const menuItemInteractive = "text-ink transition-colors hover:bg-magenta-soft focus:bg-magenta-soft focus:outline-none";
-
-/** A single dropdown item — a real Link for a real destination, a disabled note-only row
- *  for the not-yet-available languages. Every interactive row is wrapped in `Popover.Close`
- *  so selecting it dismisses the panel (docs/03 §6.4's behavior contract), without the
- *  hand-rolled pathname-effect the old implementation needed for the same result. */
-function DropdownItem({ item }: { item: MenuItem }) {
-  const content = (
-    <>
-      <span className="flex items-center gap-2">
-        {item.label}
-        {item.current ? <Check className="h-4 w-4 text-magenta" aria-hidden /> : null}
-      </span>
-      {item.note ? (
-        <span className="font-mono text-[0.6rem] uppercase tracking-label text-ink-muted">{item.note}</span>
-      ) : null}
-    </>
-  );
-
-  if (item.disabled) {
-    return (
-      <button
-        type="button"
-        aria-disabled="true"
-        aria-current={item.current ? "true" : undefined}
-        className={cn(menuItemBase, "cursor-default text-ink-muted")}
-      >
-        {content}
-      </button>
-    );
-  }
-
-  if (item.href) {
-    return (
-      <Popover.Close asChild>
-        <Link
-          href={item.href}
-          aria-current={item.current ? "page" : undefined}
-          className={cn(menuItemBase, menuItemInteractive)}
-        >
-          {content}
-        </Link>
-      </Popover.Close>
-    );
-  }
-
-  return (
-    <Popover.Close asChild>
-      <button type="button" aria-current={item.current ? "true" : undefined} className={cn(menuItemBase, menuItemInteractive)}>
-        {content}
-      </button>
-    </Popover.Close>
-  );
-}
-
-/** Header nav dropdown (Explore presets, Language) on the shared Radix Popover shell
- *  (docs/03 §6.4, D19) — focus-in-on-open, Tab-trap, Esc-close-and-restore, and
- *  outside-pointer-dismiss all come from Radix, not hand-rolled. */
-function Dropdown({
-  items,
-  align = "start",
-  panelLabel,
-  trigger,
-}: {
-  items: MenuItem[];
-  align?: "start" | "end";
-  panelLabel: string;
-  trigger: ReactNode;
-}) {
-  return (
-    <PopoverShell trigger={trigger} panelLabel={panelLabel} align={align} className="w-auto min-w-[13rem] p-1.5">
-      {items.map((item) => (
-        <DropdownItem key={item.key} item={item} />
-      ))}
-    </PopoverShell>
-  );
-}
-
-/** Full-screen mobile navigation sheet. Traps focus, closes on Esc, and
- *  restores focus to the trigger on close. */
-function MobileSheet({ onClose }: { onClose: () => void }) {
+/** Full-screen plum mobile menu takeover. Traps focus, closes on Esc. */
+function MobileMenu({ pathname, onClose }: { pathname: string; onClose: () => void }) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const [exploreOpen, setExploreOpen] = useState(false);
   const reduce = useReducedMotion();
 
   useEffect(() => {
@@ -153,9 +58,7 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
       }
       if (e.key === "Tab") {
         const focusables = Array.from(
-          el.querySelectorAll<HTMLElement>(
-            'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
-          ),
+          el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
         );
         if (!focusables.length) return;
         const first = focusables[0];
@@ -173,122 +76,63 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const sheetLink =
-    "block rounded-lg px-3 py-3 text-base text-ink transition-colors hover:bg-turmeric-soft";
-
   return (
     <motion.div
       ref={panelRef}
       role="dialog"
       aria-modal="true"
       aria-label="Menu"
-      className="fixed inset-0 z-[60] flex flex-col bg-canvas md:hidden"
-      initial={{ opacity: 0, y: reduce ? 0 : -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: reduce ? 0 : -8 }}
-      transition={{ duration: reduce ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed inset-0 z-[400] flex flex-col bg-surface-deep text-porcelain md:hidden"
+      initial={{ opacity: reduce ? 1 : 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: reduce ? 1 : 0 }}
+      transition={{ duration: reduce ? 0 : 0.25 }}
     >
-      <div className="shell flex h-16 items-center justify-between border-b border-saffron/25">
-        <Link href="/" onClick={onClose} className="flex items-center gap-2.5" aria-label="CTemples home">
-          <GopuramMark className="h-7 w-7 text-magenta" />
-          <span className="font-display text-lg text-ink">
-            C<span className="text-magenta">temples</span>
-          </span>
-        </Link>
+      <div className="flex items-center justify-between px-5 py-[15px]">
+        <span className="font-display text-[19px] font-bold">CTemples</span>
         <button
           type="button"
           data-autofocus
           onClick={onClose}
           aria-label="Close menu"
-          className={iconButton}
+          className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-full border border-porcelain/25 text-porcelain"
         >
-          <X className="h-5 w-5" aria-hidden />
+          <X className="h-4 w-4" aria-hidden />
         </button>
       </div>
-
-      <nav aria-label="Primary" className="shell flex-1 overflow-y-auto py-6">
-        <div>
-          <button
-            type="button"
-            aria-expanded={exploreOpen}
-            aria-controls="m-explore"
-            onClick={() => setExploreOpen((v) => !v)}
-            className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-base text-ink transition-colors hover:bg-turmeric-soft"
+      <nav aria-label="Primary" className="flex flex-1 flex-col justify-center gap-1 px-6">
+        {MENU.map((item, i) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onClose}
+            aria-current={isActive(pathname, item.href) ? "page" : undefined}
+            className={cn(
+              "flex items-baseline gap-4 border-b border-porcelain/10 py-2.5 transition-colors hover:text-turmeric",
+              isActive(pathname, item.href) ? "text-turmeric" : "text-porcelain",
+            )}
           >
-            Explore
-            <ChevronDown
-              className={cn("h-5 w-5 transition-transform", exploreOpen && "rotate-180")}
-              aria-hidden
-            />
-          </button>
-          {exploreOpen ? (
-            <ul id="m-explore" className="ml-3 border-l border-line pl-3">
-              {EXPLORE_ITEMS.map((item) => (
-                <li key={item.key}>
-                  <Link href={item.href} onClick={onClose} className={sheetLink}>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-
-        <Link href="/about" onClick={onClose} className={sheetLink}>
-          About
-        </Link>
-        <Link href="/explore" onClick={onClose} className={sheetLink}>
-          Search temples
-        </Link>
-
-        <div className="mt-6 border-t border-line pt-4">
-          <p className="px-3 pb-1 font-mono text-[0.62rem] uppercase tracking-label text-ink-muted">
-            Language
-          </p>
-          <ul>
-            {LANGUAGES.map((lang) => (
-              <li key={lang.code}>
-                <button
-                  type="button"
-                  aria-disabled={lang.current ? undefined : true}
-                  aria-current={lang.current ? "true" : undefined}
-                  className={cn(
-                    "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
-                    lang.current
-                      ? "text-ink hover:bg-turmeric-soft"
-                      : "cursor-default text-ink-muted",
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    {lang.label}
-                    {lang.current ? (
-                      <Check className="h-4 w-4 text-magenta" aria-hidden />
-                    ) : null}
-                  </span>
-                  {lang.current ? null : (
-                    <span className="font-mono text-[0.6rem] uppercase tracking-label text-ink-muted">
-                      Coming soon
-                    </span>
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+            <span className="font-mono text-[11px] text-magenta">{pad(i + 1)}</span>
+            <span className="font-display text-[clamp(28px,7vw,44px)] font-bold tracking-[-.02em]">{item.label}</span>
+          </Link>
+        ))}
       </nav>
+      <p className="px-6 py-[22px] font-mono text-[10px] tracking-[.24em] text-porcelain/40">
+        A FIELD GUIDE TO SACRED INDIA
+      </p>
     </motion.div>
   );
 }
 
 export function Header() {
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
 
-  // Close the mobile sheet on route change.
   useEffect(() => setMenuOpen(false), [pathname]);
 
-  // Lock scroll while the mobile sheet is open.
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
@@ -296,101 +140,117 @@ export function Header() {
     };
   }, [menuOpen]);
 
-  const exploreActive = isActive(pathname, "/explore");
-  const aboutActive = isActive(pathname, "/about");
+  // Homepage: transparent over the hero → blurred plum after 40px.
+  useEffect(() => {
+    if (!isHome) return;
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
 
-  const languageItems: MenuItem[] = LANGUAGES.map((lang) => ({
-    key: lang.code,
-    label: lang.label,
-    current: lang.current,
-    disabled: !lang.current,
-    note: lang.current ? undefined : "Coming soon",
-  }));
+  const dark = isHome; // cream text over the dark hero
+  const navLink = (href: string, label: string) => {
+    const active = isActive(pathname, href);
+    return (
+      <Link
+        key={href}
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "border-b-[1.5px] py-1.5 font-mono text-[11px] tracking-[.2em] transition-colors",
+          dark
+            ? "border-transparent text-porcelain/60 hover:text-turmeric"
+            : active
+              ? "border-magenta text-magenta"
+              : "border-transparent text-ink/70 hover:text-magenta",
+        )}
+      >
+        {label}
+      </Link>
+    );
+  };
 
   return (
-    <header
-      className="sticky top-0 z-50 border-b border-saffron/25 bg-canvas/90 backdrop-blur-md"
-      style={{ viewTransitionName: "site-header" } as CSSProperties}
-    >
-      <div className="shell flex h-16 items-center justify-between gap-4">
-        <div className="flex items-center gap-5">
-          <Link href="/" className="group flex items-center gap-2.5" aria-label="CTemples home">
-            <GopuramMark className="h-7 w-7 text-magenta transition-transform duration-500 ease-threshold group-hover:-translate-y-0.5" />
-            <span className="font-display text-lg tracking-tight text-ink">
-              C<span className="text-magenta">temples</span>
-            </span>
+    <>
+      <header
+        className={cn(
+          "left-0 right-0 top-0",
+          isHome
+            ? cn("fixed z-[120] transition-[background-color,box-shadow] duration-300", scrolled && "backdrop-blur-md")
+            : "sticky z-50 border-b border-ink/10 bg-porcelain/90 backdrop-blur-md",
+        )}
+        style={
+          {
+            viewTransitionName: "site-header",
+            ...(isHome
+              ? {
+                  background: scrolled ? "rgba(36,16,33,.9)" : "transparent",
+                  boxShadow: scrolled ? "0 1px 0 rgba(251,246,240,.12)" : "none",
+                }
+              : {}),
+          } as CSSProperties
+        }
+      >
+        <div className="flex items-center justify-between gap-4 px-5 py-[15px] sm:px-8 lg:px-12 xl:px-[clamp(20px,6vw,110px)]">
+          <Link
+            href="/"
+            aria-label="CTemples home"
+            className={cn("flex items-center gap-2.5", dark ? "text-porcelain" : "text-ink")}
+          >
+            <GopuramMark className="h-7 w-6 text-magenta" strokeWidth={2} />
+            <span className="font-display text-[19px] font-bold tracking-[-.02em]">CTemples</span>
           </Link>
 
-          <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
-            <Dropdown
-              panelLabel="Explore presets"
-              items={EXPLORE_ITEMS}
-              trigger={
-                <button
-                  type="button"
-                  aria-label="Explore"
-                  className={cn(navTrigger, exploreActive ? cn("text-magenta", navLintel) : "text-ink-muted hover:text-ink")}
-                >
-                  Explore
-                  <ChevronDown className="h-4 w-4" aria-hidden />
-                </button>
-              }
-            />
+          <nav aria-label="Primary" className="hidden items-center gap-[clamp(14px,2.4vw,30px)] md:flex">
+            {isHome ? (
+              <a
+                href="#index"
+                className="border-b-[1.5px] border-transparent py-1.5 font-mono text-[11px] tracking-[.2em] text-porcelain/60 transition-colors hover:text-turmeric"
+              >
+                THE INDEX ↓
+              </a>
+            ) : null}
+            {NAV.filter((n) => !isHome || n.href === "/explore" || n.href === "/about").map((n) =>
+              navLink(n.href, n.label),
+            )}
+          </nav>
+
+          <div className="flex items-center gap-2.5">
+            <SearchOverlay tone={dark ? "dark" : "light"} />
             <Link
-              href="/about"
-              aria-current={aboutActive ? "page" : undefined}
+              href="/contact"
               className={cn(
-                navTrigger,
-                aboutActive ? cn("text-magenta", navLintel) : "text-ink-muted hover:text-ink",
+                "hidden h-[38px] items-center rounded-full px-[17px] font-mono text-[10.5px] tracking-[.18em] transition-colors md:inline-flex",
+                dark
+                  ? "border border-porcelain/30 text-porcelain hover:border-turmeric hover:text-turmeric"
+                  : "bg-ink text-porcelain hover:bg-magenta",
               )}
             >
-              About
+              PARTNER
             </Link>
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <SearchOverlay />
-
-          <div className="hidden md:block">
-            <Dropdown
-              panelLabel="Choose language"
-              items={languageItems}
-              align="end"
-              trigger={
-                <button
-                  type="button"
-                  aria-label="Language: English"
-                  className="inline-flex h-10 items-center gap-1.5 rounded-full border border-line px-3 font-mono text-[0.7rem] uppercase tracking-label text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
-                >
-                  <Globe className="h-4 w-4" aria-hidden />
-                  EN
-                  <ChevronDown className="h-4 w-4" aria-hidden />
-                </button>
-              }
-            />
-          </div>
-
-          <div className="flex items-center gap-1 md:hidden">
             <button
               ref={hamburgerRef}
               type="button"
-              className={cn(iconButton, "border border-line")}
               aria-expanded={menuOpen}
-              aria-controls="mobile-menu"
               aria-label="Open menu"
               onClick={() => setMenuOpen(true)}
+              className={cn(
+                "inline-flex h-[38px] w-[38px] items-center justify-center rounded-full border md:hidden",
+                dark ? "border-porcelain/30 text-porcelain" : "border-ink/20 text-ink",
+              )}
             >
-              <Menu className="h-5 w-5" aria-hidden />
+              <Menu className="h-4 w-4" aria-hidden />
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
       <AnimatePresence>
         {menuOpen ? (
-          <MobileSheet
+          <MobileMenu
             key="mobile-menu"
+            pathname={pathname}
             onClose={() => {
               setMenuOpen(false);
               hamburgerRef.current?.focus();
@@ -398,6 +258,6 @@ export function Header() {
           />
         ) : null}
       </AnimatePresence>
-    </header>
+    </>
   );
 }

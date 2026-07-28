@@ -28,28 +28,21 @@ export function QuickFacts({ temple }: { temple: Temple }) {
     cells.push({ label: "Open today", value: `${temple.timings.opening}–${temple.timings.closing}` });
   if (temple.entryFee?.indian?.trim()) cells.push({ label: "Entry", value: temple.entryFee.indian });
 
+  // The prototype's beige quick-facts panel (docs/15 §0a): a single rounded
+  // porcelain-deep band, mono keys over medium values.
   return (
-    <div className="sticky top-16 z-20 bg-canvas py-3 print:static print:top-auto">
-      <div className="relative">
-        <div className="-mx-4 overflow-x-auto px-4 pb-1 md:mx-0 md:overflow-visible md:px-0 md:pb-0">
-          <dl className="flex gap-px overflow-hidden rounded-card border border-line bg-line md:grid md:grid-cols-4">
-            {cells.map((cell) => (
-              <div key={cell.label} className="min-w-[9rem] shrink-0 bg-canvas p-4 md:min-w-0 md:shrink md:p-5">
-                <dt className="font-mono text-[0.62rem] uppercase tracking-label text-ink-muted">
-                  {cell.label}
-                </dt>
-                <dd className="mt-1.5 truncate font-display text-base leading-snug text-plum">
-                  {cell.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-canvas to-transparent md:hidden"
-        />
-      </div>
+    <div className="sticky top-16 z-20 bg-porcelain py-3 print:static print:top-auto">
+      <dl
+        className="grid rounded-[22px] bg-surface-recess"
+        style={{ gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 20, padding: "clamp(20px,3vw,30px)" }}
+      >
+        {cells.map((cell) => (
+          <div key={cell.label} className="min-w-0">
+            <dt className="font-mono text-[9.5px] uppercase tracking-[.2em] text-ink/50">{cell.label}</dt>
+            <dd className="mt-[5px] truncate text-[13.5px] font-medium leading-[1.45] text-ink">{cell.value}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }
