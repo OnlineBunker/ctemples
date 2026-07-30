@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { padCount } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { VisibleSection } from "@/lib/detail-sections";
 
@@ -75,7 +76,7 @@ export function SectionIndex({ sections }: { sections: VisibleSection[] }) {
                     isActive ? "text-magenta-deep" : "text-ink-muted hover:text-plum",
                   )}
                 >
-                  {String(s.index).padStart(2, "0")} — {s.label}
+                  {padCount(s.index)} — {s.label}
                 </a>
               </li>
             );

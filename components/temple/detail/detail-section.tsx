@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { padCount } from "@/lib/format";
 import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +30,7 @@ export function DetailSection({
     <section id={id} className={cn("scroll-mt-36", className)}>
       <Reveal>
         <p className="font-mono text-[10px] font-bold uppercase tracking-[.26em] text-magenta">
-          {String(index).padStart(2, "0")} — {eyebrow}
+          {padCount(index)} — {eyebrow}
         </p>
         <h2
           className="mt-3 text-balance font-display font-bold tracking-[-.02em] text-ink"

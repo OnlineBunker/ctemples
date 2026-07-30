@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { padCount } from "@/lib/format";
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Pause, Play } from "lucide-react";
@@ -37,8 +38,6 @@ export interface ThresholdSlide {
 
 const DWELL_MS = 7000;
 const FADE_MS = 1500;
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Subtle, on-brand warm glows that crossfade with each slide (docs/08 §5#8). Kept low-alpha
  *  and screen-blended so the plum identity holds — a shift in light, not a repaint. */
@@ -588,7 +587,7 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
           {`${slide.name} — ${slide.city}`.toUpperCase()}
         </span>
         <span className="flex items-center gap-2 font-mono text-[10px] tracking-[.14em] text-porcelain/60">
-          {pad(index + 1)} / {pad(count)}
+          {padCount(index + 1)} / {padCount(count)}
           {autoplayEligible ? (
             <button
               type="button"

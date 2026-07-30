@@ -88,7 +88,12 @@ export default async function DeityPage({ params }: { params: Promise<{ key: str
         <div className="mt-8 grid items-center gap-10 lg:grid-cols-[minmax(0,38%)_minmax(0,62%)]">
           <div className="flex justify-center">
             <span
-              className="inline-flex h-40 w-40 items-center justify-center rounded-portal"
+              // A medallion, not an arch. `rounded-portal` is reserved by docs/15 §2A for
+              // "imagery you can enter" and passages between sections — never for chrome or a
+              // glyph container. A line-drawn deity icon is neither, so using the arch here
+              // broke the app's own enforcement rule and started the arch templating onto
+              // non-imagery. A circle also frames a centred monoline icon better.
+              className="inline-flex h-40 w-40 items-center justify-center rounded-full"
               style={{ color: meta.accent, backgroundColor: `${meta.accent}22` }}
             >
               <DeityIcon icon={meta.icon} className="h-24 w-24" animated />

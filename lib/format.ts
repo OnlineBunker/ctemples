@@ -48,6 +48,17 @@ export function formatRelativeDistance(km: number): string {
   return `${Math.round(km).toLocaleString("en-IN")} km away`;
 }
 
+/**
+ * Zero-padded two-digit numeral: 1 -> "01". The field-guide index voice (docs/15 §2C's
+ * "NN —" kicker) uses this on the homepage index, the hero counter, the mobile menu, search
+ * results, section ordinals, the gallery count and the wishlist readout — and it had been
+ * re-implemented inline or as a local `pad` in ten places, five of them separate definitions of
+ * the identical arrow function. Numbers above 99 pass through unpadded rather than truncating.
+ */
+export function padCount(n: number): string {
+  return String(Math.max(0, Math.trunc(n))).padStart(2, "0");
+}
+
 /** One-decimal rating: 4.8. */
 export function formatRating(rating: number): string {
   return rating.toFixed(1);

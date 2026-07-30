@@ -78,7 +78,6 @@ const config: Config = {
         // Semantic body scale (Inter) — retires scattered text-[…] literals (docs/15 §2C).
         "body-lg": ["1.125rem", { lineHeight: "1.7" }],
         "body-sm": ["0.875rem", { lineHeight: "1.55" }],
-        "body-xs": ["0.75rem", { lineHeight: "1.5" }],
         // Label scale (Space Mono) — small brand-colored text uses magenta-deep (.eyebrow).
         label: ["0.7rem", { lineHeight: "1.4" }],
         "label-sm": ["0.65rem", { lineHeight: "1.3" }],
@@ -95,9 +94,11 @@ const config: Config = {
       },
       borderRadius: {
         card: "1.25rem",
-        // Small controls get their own radius (docs/15 §2D — the missing small radius).
-        input: "0.625rem",
-        chip: "0.625rem",
+        // `input`/`chip` (0.625rem) removed: added for a "missing small radius" that the
+        // prototype-fidelity pass never needed — every control ended up on `rounded-full`, so
+        // both tokens sat unused. A design system with dead tokens invites inconsistency,
+        // because the next person has to guess which of two answers is current. Same for the
+        // removed `body-xs` type token.
         // The arch, in three earned tiers (docs/15 §2A). ENFORCEMENT: use only on
         // imagery-you-enter and passages between sections — never on chrome/controls/text.
         portal: "999px 999px 1.25rem 1.25rem", // portrait imagery you enter

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { queryTemples, getStateCounts, getTempleCount } from "@/lib/temples";
 import { parseExploreParams, type ParsedExploreParams } from "@/lib/explore-url";
 import { DEITY_META } from "@/lib/deities";
-import { pluralize } from "@/lib/format";
+import { pluralize, padCount } from "@/lib/format";
 import { SearchBar } from "@/components/explore/search-bar";
 import { StateFilter } from "@/components/explore/state-filter";
 import { DeityFilter } from "@/components/explore/deity-filter";
@@ -90,8 +90,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
       : `${pluralize(result.total, "temple")}${stateLabel ? ` in ${stateLabel}` : ""} · showing ${from}–${to}`;
 
   // The prototype's atlas readout: "NN / NN DOORWAYS" — both numbers data-derived.
-  const pad2 = (n: number) => String(n).padStart(2, "0");
-  const doorways = `${pad2(result.total)} / ${pad2(totalTemples)} DOORWAYS`;
+  const doorways = `${padCount(result.total)} / ${padCount(totalTemples)} DOORWAYS`;
 
   return (
     <div style={{ padding: "clamp(44px,7vh,80px) clamp(20px,6vw,110px) clamp(70px,10vh,110px)" }}>

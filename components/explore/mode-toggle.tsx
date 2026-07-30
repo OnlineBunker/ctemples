@@ -9,15 +9,18 @@ import { buildViewHref, type ParsedExploreParams } from "@/lib/explore-url";
  * silently pre-filter the list. Only the visitor's own location carries over.
  */
 export function ModeToggle({ current }: { current: ParsedExploreParams }) {
+  // Sized so the OUTER control is exactly 44px, matching the filter pills and active-filter
+  // chips beside it: 2px border + 2×1px padding + 40px segment. It previously measured 46px
+  // against their 44px — a 2px misalignment across one toolbar row — with 36px segments.
   const segClass = (active: boolean) =>
-    `flex h-9 items-center rounded-full px-4 font-mono text-[10.5px] uppercase tracking-[.14em] transition-colors ${
+    `flex h-10 items-center rounded-full px-4 font-mono text-[10.5px] uppercase tracking-[.14em] transition-colors ${
       active ? "bg-ink text-porcelain" : "text-ink/60 hover:text-magenta"
     }`;
   return (
     <div
       role="group"
       aria-label="View mode"
-      className="inline-flex items-center gap-1 rounded-full border border-ink/[.18] bg-white/70 p-1"
+      className="inline-flex items-center gap-1 rounded-full border border-ink/[.18] bg-white/70 p-px"
     >
       <Link
         href={buildViewHref(current, "list")}

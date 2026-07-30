@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { padCount } from "@/lib/format";
 import { getAllTemples } from "@/lib/temples";
 import { getHero } from "@/lib/media";
 import { ThresholdHero, type ThresholdSlide } from "@/components/home/threshold-hero";
@@ -12,8 +13,6 @@ import { Finale } from "@/components/home/finale";
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
  * Homepage — the prototype composition, ported faithfully (docs/15 §0a):
@@ -34,7 +33,7 @@ export default async function HomePage() {
   // 01 — The Index: every temple, numbered.
   const rows: IndexRow[] = temples.map((t, i) => ({
     id: t.id,
-    num: pad(i + 1),
+    num: padCount(i + 1),
     name: t.name,
     loc: `${t.city} · ${t.state}`,
     img: heroUrl(t),

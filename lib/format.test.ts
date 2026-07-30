@@ -8,6 +8,7 @@ import {
   formatRating,
   formatCoordinates,
   pluralize,
+  padCount,
 } from "./format";
 import type { CostEstimate } from "./types";
 
@@ -84,5 +85,22 @@ describe("pluralize", () => {
     expect(pluralize(1, "festival")).toBe("1 festival");
     expect(pluralize(3, "festival")).toBe("3 festivals");
     expect(pluralize(2, "deity", "deities")).toBe("2 deities");
+  });
+});
+
+describe("padCount", () => {
+  it("pads single digits to two", () => {
+    expect(padCount(0)).toBe("00");
+    expect(padCount(1)).toBe("01");
+    expect(padCount(9)).toBe("09");
+  });
+  it("leaves two digits alone and does not truncate three", () => {
+    expect(padCount(15)).toBe("15");
+    expect(padCount(100)).toBe("100");
+    expect(padCount(2000)).toBe("2000");
+  });
+  it("clamps negatives and truncates fractions rather than emitting '-1' or '1.5'", () => {
+    expect(padCount(-3)).toBe("00");
+    expect(padCount(4.7)).toBe("04");
   });
 });

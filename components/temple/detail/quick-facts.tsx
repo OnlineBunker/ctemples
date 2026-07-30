@@ -33,7 +33,8 @@ export function QuickFacts({ temple }: { temple: Temple }) {
   return (
     <div className="sticky top-16 z-20 bg-porcelain py-3 print:static print:top-auto">
       <dl
-        className="grid rounded-[22px] bg-surface-recess"
+        // `rounded-card` (the token) rather than a one-off 22px — see gallery.tsx.
+        className="grid rounded-card bg-surface-recess"
         style={{ gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 20, padding: "clamp(20px,3vw,30px)" }}
       >
         {cells.map((cell) => (

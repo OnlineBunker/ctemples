@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { padCount } from "@/lib/format";
 import type { VisibleSection } from "@/lib/detail-sections";
 
 /**
@@ -17,7 +18,7 @@ export function MobileSectionNav({ sections }: { sections: VisibleSection[] }) {
         {sections.map((s) => (
           <li key={s.id}>
             <a href={`#${s.id}`} className="block py-2 text-sm text-ink-muted hover:text-magenta">
-              {String(s.index).padStart(2, "0")} — {s.label}
+              {padCount(s.index)} — {s.label}
             </a>
           </li>
         ))}

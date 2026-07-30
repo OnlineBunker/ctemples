@@ -9,6 +9,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { useRouter } from "next/navigation";
+import { padCount } from "@/lib/format";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Search, Loader2 } from "lucide-react";
 import { TempleImage } from "@/components/media/temple-image";
@@ -166,12 +167,6 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
 
   const trimmedQuery = query.trim();
   const showResults = trimmedQuery.length >= MIN_QUERY_LENGTH;
-  // The exact condition under which the `<ul id={listId} role="listbox">` below actually
-  // mounts (items present, or still pending so it's about to be) — aria-controls/
-  // aria-expanded MUST derive from this same boolean, or they can reference a listbox id
-  // that doesn't exist in the DOM (popular-chips/no-results branches) or report
-  // aria-expanded=false while an empty listbox is genuinely mounted (the pending-empty
-  // transitional state right after crossing MIN_QUERY_LENGTH).
   // Must match the `<ul role="listbox">` render guard below EXACTLY. It previously also
   // returned true while `isPending`, but the list only mounts once there are items — so during
   // the pending window every search passes through (the first keystrokes after the 2-char
@@ -179,8 +174,6 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
   // resolving to nothing, and screen readers announced a popup that could not be reached. The
   // spinner already conveys the in-flight state, so no empty listbox is needed.
   const listboxRendered = showResults && suggestions.items.length > 0;
-
-  const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -343,7 +336,7 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
                           i === activeIndex ? "pl-3.5 text-turmeric" : "text-porcelain hover:pl-3.5",
                         )}
                       >
-                        <span className="w-[26px] shrink-0 font-mono text-[11px] text-magenta">{pad(i + 1)}</span>
+                        <span className="w-[26px] shrink-0 font-mono text-[11px] text-magenta">{padCount(i + 1)}</span>
                         <span className="relative block h-14 w-11 shrink-0 overflow-hidden rounded-[22px_22px_7px_7px]">
                           <TempleImage src={item.hero?.url ?? ""} alt="" region={item.region} seed={item.id} sizes="44px" />
                         </span>

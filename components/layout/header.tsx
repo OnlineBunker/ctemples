@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { padCount } from "@/lib/format";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -35,8 +36,6 @@ const MENU = [
   { label: "Suggest a temple", href: "/suggest" },
   { label: "Your wishlist", href: "/wishlist" },
 ];
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -113,7 +112,7 @@ function MobileMenu({ pathname, onClose }: { pathname: string; onClose: () => vo
               isActive(pathname, item.href) ? "text-turmeric" : "text-porcelain",
             )}
           >
-            <span className="font-mono text-[11px] text-magenta">{pad(i + 1)}</span>
+            <span className="font-mono text-[11px] text-magenta">{padCount(i + 1)}</span>
             <span className="font-display text-[clamp(28px,7vw,44px)] font-bold tracking-[-.02em]">{item.label}</span>
           </Link>
         ))}
