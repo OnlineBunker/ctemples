@@ -359,12 +359,23 @@ viewport height, one clean column only at ≥1000px), because `writing-mode: ver
 string longer than the available height. It is now `whitespace-nowrap` and gated on viewport
 *height*, so it renders as one column when there is room and not at all when there isn't.
 
-**Still open.** CTA styling is hand-rolled in several places while `ButtonLink` exists and is used
-once — worth consolidating, but it carries real visual risk across the 404/error/about/suggest
-surfaces and deserves its own pass. The hero photo is still decoded twice (the arch frame and the
-ghost tower render the same source at two sizes) — correct as authored, since the ghost tower needs
-its own masked copy, but a single shared decode would be cheaper. The **naming** half of the
-code-quality lens has still never been run.
+**CTAs consolidated onto the shared primitive.** `/about` and the suggest form hand-rolled
+mono-uppercase pills while every other CTA in the redesign uses `ButtonLink`'s body-font pill —
+two CTA languages in one product. Both now use `Button`/`ButtonLink`, which also carries the
+AA-verified magenta→coral-deep gradient (the hand-rolled flat `bg-magenta` with white label text
+sat right on the 4.5:1 line). Verified: `/about` and `/states/[slug]` CTAs now measure identically
+(52px, Inter), the submit is 44px, and the form still reaches its honest thank-you state.
+
+**Naming lens (finally run).** File naming is uniformly kebab-case with no exceptions. Four
+comments were actively misleading and are fixed: two pointed at the deleted `state-strip` popover,
+one sent readers to the retired `components/home/hero-slide.tsx` for the dormant video branch (it
+lives in `temple/detail/gallery.tsx`), and two claimed the shared Button primitive "is rebuilt in
+Phase 2" — Phase 2 shipped long ago and the primitive already existed, which is precisely why those
+two call sites had drifted into hand-rolling their own.
+
+**Still open.** The hero photo is decoded twice — the arch frame and the ghost tower render the same
+source at two sizes. That is correct as authored (the ghost tower needs its own masked copy), but a
+single shared decode would be cheaper and is the last known perf item.
 
 ## 0. Soul
 

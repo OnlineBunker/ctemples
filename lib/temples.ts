@@ -78,7 +78,7 @@ export const getStateCounts = cache(async (): Promise<StateCount[]> => {
   return countByState(temples);
 });
 
-/** Top temples in a state (state-strip popover). */
+/** Top temples in a state (the state pages' list). */
 export async function getTopTemplesByState(state: string, limit?: number): Promise<Temple[]> {
   return topByState(temples, state, limit);
 }

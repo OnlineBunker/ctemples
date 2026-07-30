@@ -2,15 +2,13 @@
 
 import { useState } from "react";
 import { Info, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const FIELD =
   "w-full rounded-xl border border-line-strong bg-canvas px-4 py-3 text-ink placeholder:text-ink-muted focus:border-magenta focus-visible:outline-none";
 
 const LABEL = "mb-2 block font-mono text-[0.66rem] uppercase tracking-label text-ink-muted";
 
-// Transitional inline submit; the shared Button primitive is rebuilt in Phase 2.
-const submitButton =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-magenta px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-canvas transition-colors hover:bg-magenta-deep";
 
 export function SuggestForm({ defaultLocation = "" }: { defaultLocation?: string }) {
   const [templeName, setTempleName] = useState("");
@@ -102,9 +100,11 @@ export function SuggestForm({ defaultLocation = "" }: { defaultLocation?: string
       </div>
 
       <div className="mt-7 flex flex-wrap items-center gap-4">
-        <button type="submit" className={submitButton}>
+        {/* Shared primitive — was a hand-rolled mono pill whose comment claimed the primitive
+            "is rebuilt in Phase 2"; Phase 2 shipped long ago and Button has existed since. */}
+        <Button type="submit" variant="primary" size="md">
           Suggest this temple
-        </button>
+        </Button>
         <span className="font-mono text-[0.62rem] uppercase tracking-label text-ink-muted">
           Prototype · not connected
         </span>

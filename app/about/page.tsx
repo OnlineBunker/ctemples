@@ -7,6 +7,7 @@ import { Stat } from "@/components/ui/stat";
 import { MethodologyContent } from "@/components/methodology/methodology-content";
 import { getTempleCount } from "@/lib/temples";
 import { STATE_REGION, REGION_ORDER } from "@/lib/regions";
+import { ButtonLink } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "About",
@@ -14,11 +15,6 @@ export const metadata: Metadata = {
     "CTemples is a comprehensive encyclopedia of India's temples — history, architecture, and practical travel, all in one place.",
 };
 
-// Transitional inline CTAs; the shared Button primitive is rebuilt in Phase 2.
-const ctaPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-magenta px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-canvas transition-colors hover:bg-magenta-deep";
-const ctaSecondary =
-  "inline-flex items-center justify-center gap-2 rounded-full border border-line-strong bg-canvas px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-ink transition-colors hover:bg-canvas-soft";
 
 const APPROACH = [
   {
@@ -107,12 +103,19 @@ export default async function AboutPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-4">
-          <Link href="/explore" className={ctaPrimary}>
+          {/* The shared primitive, not hand-rolled classes. These were mono-uppercase pills
+              while every other CTA in the redesign (e.g. /states/[slug]) uses ButtonLink's
+              body-font pill — two CTA languages in one product. ButtonLink also carries the
+              AA-verified magenta→coral-deep gradient; the old hand-rolled flat `bg-magenta`
+              with white label text sat right on the 4.5:1 line. The comment this replaces
+              claimed the primitive "is rebuilt in Phase 2" — Phase 2 shipped long ago and the
+              primitive has existed since. */}
+          <ButtonLink href="/explore" variant="primary" size="lg">
             Explore temples
-          </Link>
-          <Link href="/suggest" className={ctaSecondary}>
+          </ButtonLink>
+          <ButtonLink href="/suggest" variant="secondary" size="lg">
             Suggest a temple
-          </Link>
+          </ButtonLink>
         </div>
       </section>
 

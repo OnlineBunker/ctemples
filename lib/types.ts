@@ -20,9 +20,11 @@ export interface NearbyAttraction {
 }
 
 /**
- * A single gallery/hero media item. `kind: "video"` is schema-ready for future
- * production video (none ships in the prototype yet — see components/home/hero-slide.tsx
- * for the dormant video-slide branch). `poster` is the still shown before a video plays.
+ * A single gallery/hero media item. `kind: "video"` is schema-ready for future production video;
+ * none ships in the prototype yet. The live dormant branch is in
+ * `components/temple/detail/gallery.tsx` (poster + tap-to-play, muted per docs/08 §6) — the
+ * homepage slide component this used to point at was retired with the old split hero.
+ * `poster` is the still shown before a video plays.
  */
 export interface MediaItem {
   kind: "image" | "video";

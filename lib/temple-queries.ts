@@ -111,7 +111,7 @@ export function countByTag(list: Temple[]): TagCount[] {
     .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
 }
 
-/** Top temples in a state, highest rating first (for the state-strip popover). */
+/** Top temples in a state, highest rating first (the state pages' "Temples in {state}" list). */
 export function topByState(list: Temple[], state: string, limit = 4): Temple[] {
   return list
     .filter((t) => t.state === state)
