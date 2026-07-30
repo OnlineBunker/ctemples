@@ -39,8 +39,9 @@ export function MethodologyContent() {
           If a fact looks out of date, or a temple you know deserves a place here,{" "}
           <Link href="/suggest" className="font-semibold text-magenta hover:text-magenta-deep">
             suggest a correction or a temple
-          </Link>{" "}
-          — we read every submission.
+          </Link>
+          . Submissions aren&apos;t wired to a backend yet, so nothing is sent while this is a
+          prototype — the form tells you so before you type.
         </p>
       </div>
 

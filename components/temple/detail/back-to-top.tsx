@@ -12,13 +12,27 @@ export function BackToTop() {
   const [visible, setVisible] = useState(false);
   const reduce = useReducedMotion();
 
+  // rAF-gated like every other scroll listener in the codebase. Unthrottled, this ran a React
+  // state comparison on every scroll event — cheap individually, but it fires far more often
+  // than once per frame on a touch device, and this is the long temple page.
   useEffect(() => {
-    function onScroll() {
+    let raf = 0;
+    let queued = false;
+    const measure = () => {
+      queued = false;
       setVisible(window.scrollY > window.innerHeight * 2);
-    }
-    onScroll();
+    };
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      raf = requestAnimationFrame(measure);
+    };
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   if (!visible) return null;

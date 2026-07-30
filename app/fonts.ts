@@ -28,11 +28,14 @@ export const fontMono = Space_Mono({
   variable: "--font-mono",
 });
 
-// Telugu accent — Noto Sans Telugu for the bilingual hero flourish. Loaded but used
-// sparingly; the prototype's content is English-only (see DESIGN.md / UX_SPEC §Appendix).
+// Telugu accent — Noto Sans Telugu for the bilingual hero flourish (hero only; the rest of
+// the prototype's content is English). Trimmed to exactly what renders: ONE weight (600) and
+// the Telugu subset alone. It previously shipped three weights plus the latin subset, i.e. two
+// unused faces and a duplicate latin alphabet, on every route — the latin glyphs are never
+// needed because the fallback chain (`--font-body`) handles non-Telugu text.
 export const fontTelugu = Noto_Sans_Telugu({
-  subsets: ["telugu", "latin"],
-  weight: ["400", "600", "700"],
+  subsets: ["telugu"],
+  weight: ["600"],
   display: "swap",
   variable: "--font-telugu",
 });

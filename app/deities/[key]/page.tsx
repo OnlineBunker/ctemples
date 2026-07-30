@@ -59,6 +59,7 @@ export async function generateMetadata({
   return {
     title: `${meta.label} temples`,
     description: `Temples of ${meta.label} across India — ${DEITY_CONTENT[key as DeityKey].blurb}`.slice(0, 155),
+    alternates: { canonical: `/deities/${key}` },
   };
 }
 

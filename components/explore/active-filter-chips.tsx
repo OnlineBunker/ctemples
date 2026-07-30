@@ -54,11 +54,15 @@ export function ActiveFilterChips({
   if (chips.length === 0) return null;
 
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-2">
+    // `role="group"` + label: without it these chips are announced as loose navigation links,
+    // so "link, Tamil Nadu" reads as "go to Tamil Nadu" when it actually REMOVES that filter —
+    // the ✕ that conveys "remove" to sighted users is aria-hidden (WCAG 2.4.4).
+    <div role="group" aria-label="Active filters" className="mt-4 flex flex-wrap items-center gap-2">
       {chips.map((chip) => (
         <Link
           key={chip.key}
           href={chip.href}
+          aria-label={`Remove filter: ${chip.label}`}
           className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/[.18] bg-white/70 px-[15px] font-mono text-[10.5px] uppercase tracking-[.14em] text-ink transition-colors hover:border-magenta hover:text-magenta"
         >
           {chip.label}

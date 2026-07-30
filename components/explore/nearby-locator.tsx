@@ -40,6 +40,18 @@ interface CachedFix {
   at: number;
 }
 
+/**
+ * Coordinates are coarsened to 3dp (~110 m) BEFORE anything is stored or sent. The device
+ * reports GPS-grade precision, which for a home address is far more than "which temples are
+ * near me" needs — persisting that for 7 days would leave a precise location trail in
+ * localStorage for any other script or a shared device to read. 3dp is exactly the precision
+ * the URL already uses, so ranking is unaffected.
+ */
+const coarsen = (fix: LatLng): LatLng => ({
+  lat: Math.round(fix.lat * 1000) / 1000,
+  lng: Math.round(fix.lng * 1000) / 1000,
+});
+
 function readCache(): LatLng | null {
   try {
     const raw = window.localStorage.getItem(COORDS_KEY);
@@ -47,7 +59,12 @@ function readCache(): LatLng | null {
     const parsed = JSON.parse(raw) as Partial<CachedFix>;
     if (typeof parsed?.lat !== "number" || typeof parsed?.lng !== "number") return null;
     if (typeof parsed.at !== "number" || Date.now() - parsed.at > MAX_AGE_MS) return null;
-    return { lat: parsed.lat, lng: parsed.lng };
+    // localStorage is user-writable, so treat it as untrusted input: a tampered or corrupt
+    // entry (NaN/Infinity/out-of-range) would otherwise be applied to the URL, where
+    // `parseNear` rejects it — silently disabling distance sort with no way to recover.
+    if (!Number.isFinite(parsed.lat) || !Number.isFinite(parsed.lng)) return null;
+    if (Math.abs(parsed.lat) > 90 || Math.abs(parsed.lng) > 180) return null;
+    return coarsen({ lat: parsed.lat, lng: parsed.lng });
   } catch {
     return null;
   }
@@ -55,7 +72,7 @@ function readCache(): LatLng | null {
 
 function writeCache(fix: LatLng) {
   try {
-    window.localStorage.setItem(COORDS_KEY, JSON.stringify({ ...fix, at: Date.now() }));
+    window.localStorage.setItem(COORDS_KEY, JSON.stringify({ ...coarsen(fix), at: Date.now() }));
   } catch {
     // Not persisted — this visit still works.
   }
@@ -113,7 +130,9 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
       setPhase("asking");
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const fix = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          // Coarsen at the source so full-precision GPS never reaches storage, the URL, or the
+          // server — only the ~110 m figure the ranking actually needs.
+          const fix = coarsen({ lat: pos.coords.latitude, lng: pos.coords.longitude });
           writeCache(fix);
           setPhase("active");
           apply(fix, mode);

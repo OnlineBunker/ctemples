@@ -172,7 +172,13 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
   // that doesn't exist in the DOM (popular-chips/no-results branches) or report
   // aria-expanded=false while an empty listbox is genuinely mounted (the pending-empty
   // transitional state right after crossing MIN_QUERY_LENGTH).
-  const listboxRendered = showResults && (suggestions.items.length > 0 || isPending);
+  // Must match the `<ul role="listbox">` render guard below EXACTLY. It previously also
+  // returned true while `isPending`, but the list only mounts once there are items — so during
+  // the pending window every search passes through (the first keystrokes after the 2-char
+  // minimum) the combobox advertised `aria-expanded="true"` and an `aria-controls` IDREF
+  // resolving to nothing, and screen readers announced a popup that could not be reached. The
+  // spinner already conveys the in-flight state, so no empty listbox is needed.
+  const listboxRendered = showResults && suggestions.items.length > 0;
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -283,10 +289,29 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
           </div>
 
           <div className="mt-2 flex-1 overflow-y-auto px-5 pb-16 pt-6 sm:px-8 lg:px-12 xl:px-[clamp(20px,8vw,110px)]">
+            {/* A dead end used to live here: on zero results the suggestion chips were already
+                gone (they only show for an empty query) and the "see all results" footer was
+                hidden too, so the one moment a visitor most needs a way forward offered nothing
+                but a sentence. The chips come back as real, clickable recovery routes. */}
             {showResults && suggestions.items.length === 0 && !isPending ? (
-              <p className="mt-4 font-mono text-[11px] tracking-[.2em] text-porcelain/50">
-                NO DOORWAYS MATCH — TRY &ldquo;SHIVA&rdquo;, &ldquo;MADURAI&rdquo;, &ldquo;HIMALAYAN&rdquo;
-              </p>
+              <div role="status">
+                <p className="mt-4 font-mono text-[11px] tracking-[.2em] text-porcelain/50">
+                  NO DOORWAYS MATCH &lsquo;{trimmedQuery.toUpperCase()}&rsquo;
+                </p>
+                <p className="mt-6 font-mono text-[10px] tracking-[.24em] text-porcelain/40">TRY ONE OF THESE</p>
+                <div className="mt-3 flex flex-wrap gap-[9px]">
+                  {POPULAR_SEARCH_CHIPS.map((chip) => (
+                    <TransitionLink
+                      key={chip.label}
+                      href={chip.href}
+                      onClick={() => setOpen(false)}
+                      className="rounded-full border border-porcelain/25 px-[15px] py-2 text-[12.5px] text-porcelain transition-colors hover:border-turmeric hover:text-turmeric"
+                    >
+                      {chip.label}
+                    </TransitionLink>
+                  ))}
+                </div>
+              </div>
             ) : null}
             {showResults && suggestions.items.length > 0 ? (
               <>

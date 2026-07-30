@@ -51,10 +51,12 @@ export function TempleMap({ temple }: { temple: Temple }) {
   const haloRadius = viewBoxWidth * 0.024;
 
   return (
-    <div className="grid gap-6 md:grid-cols-[1.4fr_1fr]">
+    <div className="grid gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
       <figure
         aria-label={`Map of ${temple.state} showing ${temple.name}`}
-        className="relative m-0 aspect-[4/3] overflow-hidden rounded-card border border-line bg-canvas-soft"
+        // `max-h` caps the plot so a wide column can't turn a locator map into a
+        // full-screen graphic; the SVG's viewBox keeps it centred and undistorted inside.
+        className="relative m-0 aspect-[4/3] max-h-[380px] overflow-hidden rounded-card border border-line bg-canvas-soft"
       >
         <svg viewBox={viewBox} className="h-full w-full" aria-hidden>
           {stateGeo ? (

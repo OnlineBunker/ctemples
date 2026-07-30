@@ -44,6 +44,10 @@ export async function generateMetadata({
     title: summary ? `Explore · ${summary}` : "Explore",
     description:
       "Search and filter India's temples by state, deity, and tag — then step through into each one's full story.",
+    // Every facet combination (`?state=…&deity=…&tag=…&page=…&near=…`) is the same collection
+    // viewed differently, so all of them canonicalise to the bare route. Without this, faceted
+    // navigation generates effectively unlimited duplicate URLs for crawlers to burn budget on.
+    alternates: { canonical: "/explore" },
   };
 }
 

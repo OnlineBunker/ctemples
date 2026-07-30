@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "Your wishlist",
   description:
     "The temples you've saved — your own shortlist of doorways to visit, kept on this device.",
+  alternates: { canonical: "/wishlist" },
+  // Renders purely from the visitor's own localStorage — there is no shared content here for a
+  // crawler to index, whatever the site-wide setting is.
+  robots: { index: false, follow: true },
 };
 
 /**

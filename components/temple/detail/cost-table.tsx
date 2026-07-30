@@ -7,7 +7,16 @@ import { formatDistance } from "@/lib/format";
 export function CostTable({ estimates }: { estimates: CostEstimate[] }) {
   return (
     <div>
-      <div className="hidden overflow-x-auto rounded-card border border-line print:block md:block">
+      {/* Focusable scroll region: the 6-column table overflows inside the detail page's content
+          column, and the table has no focusable descendants — so without `tabIndex` a
+          keyboard-only user cannot scroll right and the Mid-range/Luxury bands are simply
+          unreachable (WCAG 2.1.1). The global :focus-visible rule supplies the focus ring. */}
+      <div
+        role="region"
+        aria-label="Cost estimates by departure city"
+        tabIndex={0}
+        className="hidden overflow-x-auto rounded-card border border-line print:block md:block"
+      >
         <table className="w-full text-left text-sm">
           <thead className="bg-canvas-soft">
             <tr className="font-mono text-[0.6rem] uppercase tracking-label text-ink-muted">

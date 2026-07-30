@@ -18,7 +18,7 @@ import type { TempleSummary } from "@/lib/temples";
  * ids are ever fetched.
  */
 export function WishlistGrid() {
-  const { ids, key, ready, clear, count } = useWishlist();
+  const { ids, key, ready, clear, count, toggle } = useWishlist();
   const [cache, setCache] = useState<Record<string, TempleSummary>>({});
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -39,6 +39,14 @@ export function WishlistGrid() {
           for (const item of items) next[item.id] = item;
           return next;
         });
+        // Prune phantoms. A saved id whose record no longer exists (a retired slug) is
+        // correctly omitted by the server, so it could never enter the cache, never render a
+        // card, and never be un-saved — while still inflating the header badge and the
+        // "NN SAVED" readout forever. Anything we asked for and didn't get back is gone.
+        const returned = new Set(items.map((i) => i.id));
+        for (const id of missing) {
+          if (!returned.has(id)) toggle(id);
+        }
       })
       .catch(() => {
         if (!cancelled) setFailed(true);

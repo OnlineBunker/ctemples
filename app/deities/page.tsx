@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Deities",
   description:
     "Browse India's temples by the deity they honour — Shiva, Vishnu, Devi, Ganesha, Murugan, and Hanuman.",
+  alternates: { canonical: "/deities" },
 };
 
 /** /deities — the pantheon index (docs/15 §2G). Six locked deities (D11), icon-led. */

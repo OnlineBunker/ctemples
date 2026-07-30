@@ -1,51 +1,63 @@
 "use client";
 
-import { useState } from "react";
-import { Heart, Share2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Share2, Check } from "lucide-react";
+import { WishlistButton } from "@/components/ui/wishlist-button";
 import { cn } from "@/lib/utils";
 
 /**
- * The hero's action row (docs/06 §2): Save (heart, UI-only local toggle — no backend in
- * this prototype), Share (copies the page URL, announces via a `role="status"` toast, not
- * a native share sheet — keeps behavior identical and testable across browsers), and the
- * caller-supplied primary "Get directions →" button (file 07 §7's Google Maps URL).
+ * The hero's action row (docs/06 §2): Save, Share, and the primary "Get directions".
+ *
+ * Two corrections (owner report 2026-07-30):
+ *  • **Share now confirms itself.** It used to copy silently apart from an `sr-only` message
+ *    and a small toast tucked inside this row, which was easy to miss entirely. The
+ *    confirmation is now a portalled, viewport-fixed pill — it cannot be clipped by an
+ *    ancestor and appears in the same place every time.
+ *  • **Save is real.** The heart was local `useState`, so it forgot the temple immediately
+ *    and never reached the wishlist. It now uses the shared wishlist store, so saving here
+ *    shows up on `/wishlist` and on the temple's own Explore card.
+ *
+ * Styling targets the light hero (the split layout sits on porcelain, not over a photo).
  */
-export function ActionRow({ getDirectionsHref, className }: { getDirectionsHref: string; className?: string }) {
-  const [saved, setSaved] = useState(false);
+const TOAST_MS = 2400;
+
+export function ActionRow({
+  templeId,
+  templeName,
+  getDirectionsHref,
+  className,
+}: {
+  templeId: string;
+  templeName: string;
+  getDirectionsHref: string;
+  className?: string;
+}) {
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   async function share() {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setCopied(false), TOAST_MS);
     } catch {
-      // Clipboard API unavailable (permissions, insecure context) — silently a no-op;
-      // there's nothing else to fall back to without a real share target in this prototype.
+      // Clipboard unavailable (insecure context / denied) — nothing to fall back to without
+      // a real share target, so stay silent rather than claim a copy that didn't happen.
     }
   }
 
   return (
-    <div className={cn("relative flex items-center gap-2.5", className)}>
-      <button
-        type="button"
-        onClick={() => setSaved((s) => !s)}
-        aria-pressed={saved}
-        aria-label={saved ? "Remove from saved" : "Save this temple"}
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-plum/30 text-white backdrop-blur-sm transition-colors hover:bg-plum/50"
-      >
-        <Heart className={cn("h-4.5 w-4.5", saved && "fill-magenta text-magenta")} aria-hidden />
-      </button>
-
-      <button
-        type="button"
-        onClick={share}
-        aria-label="Copy link to this temple"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-plum/30 text-white backdrop-blur-sm transition-colors hover:bg-plum/50"
-      >
-        <Share2 className="h-4 w-4" aria-hidden />
-      </button>
-
+    <div className={cn("flex flex-wrap items-center gap-2.5", className)}>
       <a
         href={getDirectionsHref}
         target="_blank"
@@ -55,17 +67,43 @@ export function ActionRow({ getDirectionsHref, className }: { getDirectionsHref:
         Get directions →
       </a>
 
-      <span role="status" className="sr-only" aria-live="polite">
-        {copied ? "Link copied" : ""}
-      </span>
-      {copied ? (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -top-11 right-0 rounded-full bg-plum px-3 py-1.5 font-mono text-[0.65rem] uppercase tracking-label text-white shadow-md"
-        >
-          Link copied
-        </span>
-      ) : null}
+      <WishlistButton
+        id={templeId}
+        name={templeName}
+        variant="icon"
+        className="h-11 w-11 border-ink/20"
+      />
+
+      <button
+        type="button"
+        onClick={share}
+        aria-label="Copy link to this temple"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/20 text-ink/60 transition-colors hover:border-magenta hover:text-magenta"
+      >
+        <Share2 className="h-4 w-4" aria-hidden />
+      </button>
+
+      {/* Portalled so no ancestor's transform/overflow can clip or offset it. */}
+      {mounted
+        ? createPortal(
+            <div
+              role="status"
+              aria-live="polite"
+              className="pointer-events-none fixed inset-x-0 bottom-8 z-[90] flex justify-center px-4 print:hidden"
+            >
+              <span
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-full bg-plum px-5 py-3 font-mono text-[11px] uppercase tracking-[.16em] text-porcelain shadow-xl transition-all duration-300 ease-threshold",
+                  copied ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0",
+                )}
+              >
+                <Check className="h-3.5 w-3.5 text-turmeric" aria-hidden />
+                {copied ? "Link copied to clipboard" : ""}
+              </span>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

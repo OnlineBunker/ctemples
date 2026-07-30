@@ -5,6 +5,8 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Divider } from "@/components/brand/divider";
 import { Stat } from "@/components/ui/stat";
 import { MethodologyContent } from "@/components/methodology/methodology-content";
+import { getTempleCount } from "@/lib/temples";
+import { STATE_REGION, REGION_ORDER } from "@/lib/regions";
 
 export const metadata: Metadata = {
   title: "About",
@@ -33,7 +35,12 @@ const APPROACH = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  // Derived from the same sources /states and the seam use, so the two pages can never disagree.
+  const templeCount = await getTempleCount();
+  const stateCount = Object.keys(STATE_REGION).length;
+  const regionCount = REGION_ORDER.length;
+
   return (
     <div className="shell py-20 md:py-28">
       <header className="max-w-3xl">
@@ -75,15 +82,20 @@ export default function AboutPage() {
         <Reveal>
           <Eyebrow tone="warm">The library</Eyebrow>
           <p className="mt-5 max-w-3xl font-display text-2xl leading-snug text-ink md:text-3xl">
-            2,000+ temples across 28 states are on the way. This build is the frame that content
+            2,000+ temples across every state are on the way. This build is the frame that content
             drops into — designed first, so the temples arrive somewhere worthy of them.
           </p>
         </Reveal>
+        {/* Counts are DERIVED, not typed. This band previously read "28 states" while /states
+            listed 36 from the same registry — two pages contradicting each other on a checkable
+            fact, and a hardcoded dataset count of exactly the kind CLAUDE.md prohibits. Only
+            "2,000+" stays literal: it is the sanctioned forward-looking figure, and it is
+            labelled "planned" so it can't be mistaken for what's live. */}
         <Stagger className="mt-12 grid grid-cols-2 gap-8 md:grid-cols-4">
           <RevealItem><Stat value="2,000+" label="temples planned" /></RevealItem>
-          <RevealItem><Stat value="28" label="states & territories" /></RevealItem>
-          <RevealItem><Stat value="6" label="cultural regions" /></RevealItem>
-          <RevealItem><Stat value="1" label="place to find them" /></RevealItem>
+          <RevealItem><Stat value={String(templeCount)} label="documented so far" /></RevealItem>
+          <RevealItem><Stat value={String(stateCount)} label="states & territories" /></RevealItem>
+          <RevealItem><Stat value={String(regionCount)} label="cultural regions" /></RevealItem>
         </Stagger>
       </section>
 

@@ -144,10 +144,27 @@ export function Header() {
   // Homepage: transparent over the hero → blurred plum after 40px.
   useEffect(() => {
     if (!isHome) return;
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
+    // rAF-gated, and only commits state when the boolean actually flips — this listener is
+    // mounted on the homepage where the parallax rig is already doing per-frame work, so an
+    // unthrottled setState on every scroll event was the one avoidable re-render in that path.
+    let raf = 0;
+    let queued = false;
+    const measure = () => {
+      queued = false;
+      const next = window.scrollY > 40;
+      setScrolled((prev) => (prev === next ? prev : next));
+    };
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      raf = requestAnimationFrame(measure);
+    };
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, [isHome]);
 
   const dark = isHome; // cream text over the dark hero

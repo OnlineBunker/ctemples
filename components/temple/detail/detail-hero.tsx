@@ -1,8 +1,9 @@
-import { ViewTransition } from "@/components/motion/view-transition";
-import { TempleImage } from "@/components/media/temple-image";
+import Link from "next/link";
 import { ActionRow } from "./action-row";
-import { getHero } from "@/lib/media";
+import { HeroPhotoStack, type StackPhoto } from "./hero-photo-stack";
 import { formatRating } from "@/lib/format";
+import { slugify } from "@/lib/utils";
+import { DEITY_ORDER, DEITY_META, matchesDeity } from "@/lib/deities";
 import type { Temple } from "@/lib/types";
 
 /**
@@ -13,9 +14,18 @@ import type { Temple } from "@/lib/types";
  * image the card used so nothing swaps on arrival.
  */
 export function DetailHero({ temple }: { temple: Temple }) {
-  const hero = getHero(temple.media);
   const { lat, lng } = temple.coordinates;
   const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  // Up to three stills for the stack — media[0] is always the hero (lib/media.ts), so this
+  // is "the main photo plus its next two". Fewer than three degrades to what exists.
+  const photos: StackPhoto[] = temple.media
+    .filter((m) => m.kind === "image" || m.poster)
+    .slice(0, 3)
+    .map((m) => ({ url: m.kind === "video" ? (m.poster ?? "") : m.url, alt: m.alt }));
+
+  // The first canonical deity this temple matches, or null if it matches none — used to decide
+  // whether the deity reads as a link or as plain text.
+  const deityKey = DEITY_ORDER.find((key) => matchesDeity(temple, key)) ?? null;
 
   return (
     <header
@@ -46,45 +56,56 @@ export function DetailHero({ temple }: { temple: Temple }) {
         <p className="max-w-[44ch] font-semibold text-plum" style={{ fontSize: "clamp(16px,1.6vw,20px)" }}>
           {temple.tagline}
         </p>
-        <p className="font-mono text-[11px] tracking-[.18em] text-magenta">
-          {`${temple.quickFacts.presidingDeity || temple.deity}  ·  ★ ${formatRating(temple.rating)}`.toUpperCase()}
+        {/* The deity and the state are now real links, not inert text. This was the entry's
+            biggest dead end: the two strongest lateral routes out of a temple — "more of this
+            deity" and "more in this state" — existed as pages but were unreachable from here,
+            leaving Back as the only exit. It also feeds the internal link graph the spec wants
+            (docs/01 D26). The deity link only renders when the record actually matches one of
+            the six canonical deities, so it can never point at a page with nothing on it. */}
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[.18em] text-magenta">
+          {deityKey ? (
+            <Link
+              href={`/deities/${deityKey}`}
+              className="uppercase underline-offset-4 transition-colors hover:text-magenta-deep hover:underline"
+            >
+              {DEITY_META[deityKey].label} temples
+            </Link>
+          ) : (
+            <span className="uppercase">{temple.quickFacts.presidingDeity || temple.deity}</span>
+          )}
+          <span aria-hidden className="text-ink/25">·</span>
+          <Link
+            href={`/states/${slugify(temple.state)}`}
+            className="uppercase underline-offset-4 transition-colors hover:text-magenta-deep hover:underline"
+          >
+            {temple.state}
+          </Link>
+          <span aria-hidden className="text-ink/25">·</span>
+          <span className="uppercase text-ink/60">★ {formatRating(temple.rating)}</span>
         </p>
-        <ActionRow getDirectionsHref={directionsHref} />
-      </div>
-
-      <div className="relative w-full max-w-[430px] justify-self-center print:hidden">
-        {/* Gold orbit ring */}
-        <div
-          aria-hidden
-          className="absolute rounded-full border border-turmeric/50"
-          style={{ top: "-5%", left: "-10%", width: "70%", aspectRatio: "1/1" }}
+        <ActionRow
+          templeId={temple.id}
+          templeName={temple.name}
+          getDirectionsHref={directionsHref}
         />
-        <div
-          className="relative w-full overflow-hidden bg-surface-recess"
-          style={{
-            aspectRatio: "3/4",
-            borderRadius: "999px 999px 26px 26px",
-            boxShadow: "0 34px 90px rgba(36,16,33,.26)",
-          }}
-        >
-          <ViewTransition name={`temple-${temple.id}`} share="morph">
-            <div className="absolute inset-0">
-              <TempleImage
-                src={hero?.url ?? ""}
-                alt={hero?.alt ?? `${temple.name}, ${temple.city}`}
-                region={temple.region}
-                seed={temple.id}
-                priority
-                sizes="(max-width: 860px) 100vw, 430px"
-              />
-            </div>
-          </ViewTransition>
-        </div>
       </div>
 
-      {/* Print-only text fallback (docs/06 §9). */}
+      <div className="w-full justify-self-center print:hidden">
+        <HeroPhotoStack
+          photos={photos}
+          templeId={temple.id}
+          region={temple.region}
+          name={temple.name}
+          city={temple.city}
+        />
+      </div>
+
+      {/* Print-only text fallback (docs/06 §9). A <p>, not a second <h1>: the screen hero above
+          already owns the page's single h1, and shipping two in the markup gives crawlers and
+          outline tools a conflicting document structure even though `display:none` hides this
+          one from assistive tech on screen. Print styling carries the hierarchy visually. */}
       <div className="hidden print:block">
-        <h1 className="font-display text-3xl text-plum">{temple.name}</h1>
+        <p className="font-display text-3xl text-plum">{temple.name}</p>
         <p className="mt-2 text-ink-muted">{temple.tagline}</p>
         <p className="mt-1 text-sm text-ink-muted">
           {temple.city}, {temple.state}

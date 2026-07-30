@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "States & regions",
   description:
     "Browse India's temples by state within each of the six cultural regions — a gazetteer of sacred geography.",
+  alternates: { canonical: "/states" },
 };
 
 /**

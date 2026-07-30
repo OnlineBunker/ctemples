@@ -29,6 +29,7 @@ export async function generateMetadata({
   return {
     title: `Temples in ${name}`,
     description: `Temples of ${name}, ${REGION_META[STATE_REGION[name]].label} India — history, architecture, festivals, and how to visit.`,
+    alternates: { canonical: `/states/${slug}` },
   };
 }
 

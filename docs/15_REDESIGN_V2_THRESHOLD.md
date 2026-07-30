@@ -161,6 +161,113 @@ no backend behind it in this prototype, so it was the right thing to trade away.
   on "Opening your doorways…" forever instead of showing the empty state. `hydrate()` now
   always emits.
 
+## 0e. TEMPLE-PAGE FIXES (owner report, 2026-07-30)
+
+**One root cause explained five of the seven reports.** The section column was declared
+`lg:grid-cols-[1fr_220px]`. A bare `1fr` is `minmax(auto,1fr)`, so the track's *minimum* is its
+content's min-content width — the gallery rail and cost table forced the column to **2720px at a
+1280px viewport**. Everything downstream followed: the locator map stretched to 1275px tall, the
+`within-100km` (2569px) and `same-deity` cards were magnified past the viewport, `how-to-reach`
+and `nearby` cards ran off-screen, and the gallery rail never scrolled because its clientWidth
+(2720) already equalled its scrollWidth. The excess was unreachable because `html`/`body` clip
+horizontal overflow (§0a's hero bleed fix), so it read as "horizontal scroll is locked".
+
+Fixed with `lg:grid-cols-[minmax(0,1fr)_220px]`. Measured after: sections 2720 → **900px**, map
+1275 → **475px** tall, within-100km → 1076px, same-deity → 538px, gallery rail genuinely
+scrollable (scrollWidth 2720 > clientWidth 900). The locator map additionally takes a
+`max-h-[380px]` cap so a wide column can never turn it into a full-screen graphic again, and its
+inner grid uses `minmax(0,…)` tracks for the same reason.
+
+Also in this pass:
+- **Hero is a stack of three photographs** (`hero-photo-stack.tsx`). At rest the two supporting
+  stills sit behind the main one, rotated and offset so ~half of each peeks out, veiled so the
+  main plate stays dominant; on hover/focus-within they fan outward and the veil lifts. A
+  scroll-linked drift (rAF, passive, transform-only) gives the group life. **The front plate is
+  the morph target and is never transformed** — only the two behind move, and every transform is
+  2D, so the card→hero View Transition stays valid (docs/03 §5). The fan is sized to stay inside
+  the column (front plate 78% wide + 6% inline padding), verified no overflow at 1280/1024/375
+  even while fanned. Back plates are `aria-hidden`; the front carries the alt.
+- **Reading progress bar** (`reading-progress.tsx`) — a 3px magenta/coral rule at the top of the
+  viewport. Deliberately *not* reduced-motion-gated (it is information, not decoration) and
+  deliberately un-transitioned, so it tracks scroll exactly. Verified 0% → 44.7% → 100%.
+- **Share now confirms itself.** It previously copied with only an `sr-only` message and a small
+  toast nested in the action row, which was easy to miss. The confirmation is a portalled,
+  viewport-fixed plum pill ("Link copied to clipboard") that no ancestor can clip.
+- **The hero's Save heart is real.** It was local `useState` — it forgot the temple instantly and
+  never reached `/wishlist`. Now on the shared wishlist store. The action row was also still
+  styled for a dark photo overlay; restyled for the light split hero.
+- **Quick-facts values no longer truncate.** `truncate` clipped the actual facts ("Completed
+  around 1…" hid the century); they now wrap with `break-words`.
+
+## 0f. PRODUCTION-READINESS AUDIT (2026-07-30)
+
+A nine-lens audit (product, design, motion, UX, a11y, perf, security, architecture) run against
+the real codebase. What was **fixed and verified** in this pass:
+
+**Security (nothing existed before).** `next.config.mjs` now sets a CSP plus HSTS, `nosniff`,
+`X-Frame-Options: DENY`, `Referrer-Policy`, and a `Permissions-Policy` that keeps geolocation
+(the app uses it) and denies everything else; `poweredByHeader` is off. The CSP's
+`script-src 'unsafe-inline'` is a documented, bounded trade (Next's inline RSC bootstrap; the app
+has *no* HTML-injection surface — no `dangerouslySetInnerHTML`/`innerHTML`/`eval`, verified) with
+the nonce-via-middleware upgrade path recorded. Verified 0 violations across 30 route/viewport
+combinations. The image allowlist dropped two never-referenced hosts (each one is an origin the
+optimizer can be induced to fetch). Geolocation is now **coarsened to 3dp (~110 m) at the source**
+before it reaches storage, the URL, or the server, and `localStorage` is treated as untrusted
+input on read.
+
+**Resilience (nothing existed before).** `app/error.tsx` (keeps chrome, offers `reset()`, shows
+`digest` not `error.message`), `app/global-error.tsx` (self-contained inline styling, since the
+layout that failed is what normally supplies `<html>`/fonts/Tailwind), and `app/explore/loading.tsx`
+for the one route rendered on demand — deliberately not a shimmer skeleton (docs/08).
+
+**SEO.** `metadataBase` was the placeholder `ctemples.example`, making every canonical and OG URL
+point at a domain nobody owns; it is now env-driven via `lib/site.ts`, alongside an `INDEXABLE`
+flag that keeps the spec's prototype-wide `noindex` as the default and makes go-live one
+environment variable. Added `sitemap.ts` (derived from the data, empty while noindex) and
+`robots.ts`. **A canonical bug was introduced and caught during this pass:** a layout-level
+`alternates.canonical` is inherited by every child route, so every page briefly declared itself a
+duplicate of `/`. Canonicals are now per route, with all `/explore` facet permutations collapsing
+to the bare route (faceted navigation otherwise mints unlimited duplicate URLs).
+
+**Identity + payload.** The `lang="te"` Noto Sans Telugu accent — part of the locked identity —
+existed **only in the retired split hero**, so replacing that composition silently dropped the
+bilingual accent from the live site while the font still shipped on every route. Restored to the
+Threshold hero under the kicker, and the face trimmed to the one weight and one subset that
+render: **font payload 495 KB → 382 KB.**
+
+**Dead code.** 17 files were unreachable from every Next entry point (computed as a transitive
+closure, not guessed) — the retired homepage composition and the primitives only it fed. Removed.
+
+**Accessibility.** The search combobox advertised `aria-expanded="true"` with an `aria-controls`
+IDREF resolving to nothing during the pending window every search passes through (the guard and
+the render condition disagreed — now one boolean). Active-filter chips announced as navigation
+while actually *removing* a filter (WCAG 2.4.4) — now labelled and grouped. The cost table's
+scroll region was keyboard-unreachable, hiding the Mid-range/Luxury bands (WCAG 2.1.1). The hero
+photo stack's fan-out was pointer-only — nothing in it was focusable, so keyboard/touch users
+could never reach photos 2–3 while the caption told them to "Hover"; it is now a real
+`aria-expanded` toggle with mode-neutral copy. Temple pages shipped two `<h1>`s.
+
+**Content integrity.** `/about` hardcoded "28 states" while `/states` derived 36 from the same
+registry — two pages contradicting each other on a checkable fact, and exactly the hardcoded
+dataset count CLAUDE.md prohibits; all counts are now derived. The methodology page claimed "we
+read every submission" while the form sends nothing (D12).
+
+**UX.** Temple entries were a lateral dead end (deity, state and rating were inert text) — the
+deity and state are now links, feeding the D26 internal-link graph. Zero-result search hid its
+only recovery path exactly when needed; it now offers the popular-search routes. A saved id whose
+record disappears no longer inflates the wishlist count forever.
+
+**Known remaining** (real, ranked, not yet done): text-only controls under the 24×24 px target in
+the Explore bottom sheet and wishlist confirm row; search results place interactive `<a>`s inside
+`role="option"`, conflicting with the `aria-activedescendant` model; the wishlist clear-confirm
+moves no focus; hero H1 contrast over unconstrained photography; design-consistency drift (three
+panel radii on the temple page, two control languages on Explore, unused `.section-y`/`body-xs`/
+`rounded-input` tokens, off-palette dark hues in the hero); and perf items (Reveal animating
+`filter: blur()` over large subtrees, seven blend layers in the hero, the hero photo decoded twice,
+`IndexList` hoisting hover state to the section root). Two audit lenses (motion, code-quality) and
+~12 verification passes were lost to a spend limit — the dead-code analysis was redone by hand,
+but the motion lens has **not** been covered.
+
 ## 0. Soul
 
 In temple architecture the arch is not ornament — it is the *dvara*, the doorway that

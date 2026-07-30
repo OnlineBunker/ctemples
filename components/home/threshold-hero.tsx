@@ -120,7 +120,7 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
   const mistRef = useRef<HTMLDivElement>(null);
   const fmistRef = useRef<HTMLDivElement>(null);
   const raysRef = useRef<HTMLDivElement>(null);
-  const kickerRef = useRef<HTMLParagraphElement>(null);
+  const kickerRef = useRef<HTMLDivElement>(null);
   const vertRef = useRef<HTMLParagraphElement>(null);
   const cueRef = useRef<HTMLDivElement>(null);
   const capRef = useRef<HTMLDivElement>(null);
@@ -359,13 +359,25 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
       ))}
 
       {/* Kicker */}
-      <p
+      <div
         ref={kickerRef}
-        className="absolute z-[6] font-mono text-[11px] tracking-[.3em] text-porcelain/55"
+        className="absolute z-[6]"
         style={{ top: "clamp(84px,12vh,130px)", left: "clamp(20px,7vw,120px)" }}
       >
-        A FIELD GUIDE TO SACRED INDIA
-      </p>
+        <p className="font-mono text-[11px] tracking-[.3em] text-porcelain/55">
+          A FIELD GUIDE TO SACRED INDIA
+        </p>
+        {/* The bilingual accent — part of the locked identity (Noto Sans Telugu, hero only).
+            It lived solely in the retired split hero, so replacing that composition silently
+            dropped it from the live site while the font kept shipping on every route. */}
+        <p
+          lang="te"
+          className="telugu mt-2.5 text-turmeric/85"
+          style={{ fontSize: "clamp(17px,2vw,24px)", fontWeight: 600, letterSpacing: "0" }}
+        >
+          పవిత్ర దేవాలయాలు
+        </p>
+      </div>
       {/* Vertical side line (data-derived count — never hardcoded) */}
       <p
         ref={vertRef}

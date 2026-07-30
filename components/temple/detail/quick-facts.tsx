@@ -39,7 +39,10 @@ export function QuickFacts({ temple }: { temple: Temple }) {
         {cells.map((cell) => (
           <div key={cell.label} className="min-w-0">
             <dt className="font-mono text-[9.5px] uppercase tracking-[.2em] text-ink/50">{cell.label}</dt>
-            <dd className="mt-[5px] truncate text-[13.5px] font-medium leading-[1.45] text-ink">{cell.value}</dd>
+            {/* Not truncated: these values ARE the fact (a clipped "Completed around 1…"
+                hides the century), so they wrap instead. `break-words` keeps a long
+                unbroken token from widening the auto-fit track. */}
+            <dd className="mt-[5px] break-words text-[13.5px] font-medium leading-[1.45] text-ink">{cell.value}</dd>
           </div>
         ))}
       </dl>

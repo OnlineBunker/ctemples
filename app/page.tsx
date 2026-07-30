@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getAllTemples } from "@/lib/temples";
 import { getHero } from "@/lib/media";
 import { ThresholdHero, type ThresholdSlide } from "@/components/home/threshold-hero";
@@ -5,6 +6,12 @@ import { IndexList, type IndexRow } from "@/components/home/index-list";
 import { FourDirections, type DirectionItem } from "@/components/home/four-directions";
 import { InFocus, type FocusData } from "@/components/home/in-focus";
 import { Finale } from "@/components/home/finale";
+
+// Declared per route rather than in the root layout — a layout-level canonical is inherited by
+// every child page, which would make each one claim to be a duplicate of "/".
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const pad = (n: number) => String(n).padStart(2, "0");
 

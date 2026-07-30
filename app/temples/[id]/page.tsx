@@ -7,6 +7,7 @@ import { getHero } from "@/lib/media";
 
 import Link from "next/link";
 import { DetailHero } from "@/components/temple/detail/detail-hero";
+import { ReadingProgress } from "@/components/temple/detail/reading-progress";
 import { TempleFooterNav } from "@/components/temple/detail/temple-footer-nav";
 import { QuickFacts } from "@/components/temple/detail/quick-facts";
 import { MobileSectionNav } from "@/components/temple/detail/mobile-section-nav";
@@ -43,7 +44,10 @@ export async function generateMetadata({
     // per-route title is already the complete, ≤60-char `<title>` value.
     title: { absolute: buildTempleTitle(temple.name, temple.city) },
     description: buildTempleDescription(temple),
-    openGraph: hero ? { images: [{ url: hero.url }] } : undefined,
+    alternates: { canonical: `/temples/${temple.id}` },
+    openGraph: hero
+      ? { type: "article", url: `/temples/${temple.id}`, images: [{ url: hero.url, alt: hero.alt }] }
+      : { type: "article", url: `/temples/${temple.id}` },
   };
 }
 
@@ -85,6 +89,7 @@ export default async function TemplePage({ params }: { params: Promise<{ id: str
 
   return (
     <article>
+      <ReadingProgress />
       {/* Prototype breadcrumb row (docs/15 §0a): ← THE ATLAS + region · state · city. */}
       <div className="shell flex flex-wrap items-baseline justify-between gap-3.5 pt-[clamp(20px,4vh,36px)] print:hidden">
         <Link
@@ -139,7 +144,12 @@ export default async function TemplePage({ params }: { params: Promise<{ id: str
             two-column grid with the section index (D20) as the right rail — the nav's own
             `sticky` element stretches (the grid default) to match this column's full
             height, so it sticks all the way through section 18, not just its own row. */}
-        <div className="mt-16 space-y-16 md:mt-20 md:space-y-20 lg:grid lg:grid-cols-[1fr_220px] lg:items-start lg:gap-16 lg:space-y-0">
+        {/* `minmax(0,1fr)`, NOT `1fr`. A bare `1fr` track is `minmax(auto,1fr)`, so its
+            minimum is the content's min-content width — one wide child (the gallery rail,
+            the cost table) blew the whole column out to 2720px at a 1280px viewport, which
+            in turn stretched the map to 1275px tall and magnified every related card. The
+            excess was then unreachable because the page clips horizontal overflow. */}
+        <div className="mt-16 space-y-16 md:mt-20 md:space-y-20 lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start lg:gap-16 lg:space-y-0">
           <div className="space-y-16 md:space-y-20">
             <DetailSection id="overview" index={overview.index} eyebrow="Overview" title={overview.label}>
               <Prose text={temple.overview} />
