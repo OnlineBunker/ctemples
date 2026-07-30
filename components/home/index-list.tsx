@@ -121,8 +121,8 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
 
       <Reveal>
         <div className="mb-4 flex items-baseline justify-between gap-4">
-          <p className="font-mono text-[11px] font-bold tracking-[.28em] text-magenta">01 — THE INDEX</p>
-          <p className="hidden font-mono text-[10.5px] tracking-[.2em] text-ink/45 sm:block">
+          <p className="font-mono text-[11px] font-bold tracking-[.28em] text-magenta-deep">01 — THE INDEX</p>
+          <p className="hidden font-mono text-[10.5px] tracking-[.2em] text-ink-muted sm:block">
             HOVER TO BEHOLD · CLICK TO ENTER
           </p>
         </div>
@@ -158,7 +158,7 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
                 className="group flex items-center text-ink transition-[padding-left] duration-500 ease-threshold hover:pl-5 focus-visible:pl-5 motion-reduce:!pl-0"
                 style={{ gap: "clamp(14px,3vw,34px)", paddingBlock: "clamp(17px,2.8vh,28px)" }}
               >
-                <span className="shrink-0 font-mono text-xs text-magenta" style={{ width: "clamp(30px,4vw,58px)" }}>
+                <span className="shrink-0 font-mono text-xs text-magenta-deep" style={{ width: "clamp(30px,4vw,58px)" }}>
                   {t.num}
                 </span>
                 <span
@@ -184,7 +184,7 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
                     />
                   </span>
                 ) : null}
-                <span className="hidden shrink-0 font-mono text-[11px] uppercase tracking-[.14em] text-ink/50 sm:block">
+                <span className="hidden shrink-0 font-mono text-[11px] uppercase tracking-[.14em] text-ink-muted sm:block">
                   {t.loc}
                 </span>
               </TransitionLink>

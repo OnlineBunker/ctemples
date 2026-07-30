@@ -373,9 +373,71 @@ lives in `temple/detail/gallery.tsx`), and two claimed the shared Button primiti
 Phase 2" — Phase 2 shipped long ago and the primitive already existed, which is precisely why those
 two call sites had drifted into hand-rolling their own.
 
-**Still open.** The hero photo is decoded twice — the arch frame and the ghost tower render the same
-source at two sizes. That is correct as authored (the ghost tower needs its own masked copy), but a
-single shared decode would be cheaper and is the last known perf item.
+**The hero's two layers now request their own resolutions.** The arch frame and the ghost tower render
+the same source through one `FadeLayers`, which shared a single `sizes` of `"(max-width:760px) 70vw,
+40vw"`. That resolved to a 512px-wide source for a 461×684 cover-cropped box — a 2.14× upscale, i.e.
+the "sharpness" regression, not a decode problem. `sizes` is now a required per-layer prop: the ghost
+tower asks for 320/480px (it is masked at 55% opacity, so its upscale is invisible and paying for
+detail there is waste), the arch asks for 640/1280px, capped at 1280 because that is the widest
+Wikimedia serves. Measured warm steady state: **desktop LCP 104 ms, CLS 0.0002, 370 KB images, arch
+upscale 2.14 → 1.21**; **mobile at 4× CPU / 1.6 Mbps LCP 1,540 ms, CLS 0.0007, 50 KB.** An earlier
+attempt at 900px on mobile pushed LCP to 2,760 ms — over the 2.5 s bar — which is why the mobile step
+is 640px and not larger. This closes the item logged above as a double decode; the double decode is
+real but costs nothing measurable, and the ghost tower genuinely needs its own masked copy.
+
+### Fifth pass — the accessibility claim, verified with tooling instead of asserted
+
+Every prior pass reasoned about contrast by eye. Running **axe-core (WCAG 2.0/2.1/2.2 A + AA) over 13
+routes × 2 viewports = 26 page runs** replaced that with a measurement, and it found **213 violation
+nodes, all one rule: `color-contrast`, impact "serious".** This also promoted an earlier finding
+("alpha-tinted ink/porcelain text fails 1.4.3") out of the *unverified* bucket — its verify agent had
+died on a spend limit, so it had been neither confirmed nor disproven. It was real.
+
+**Root cause: alpha tints for the caption tier.** Every mono micro-label in this product is 9.5–11px,
+so it sits under 1.4.3's 4.5:1 threshold with no headroom at all — and an alpha-tinted foreground
+reads as pleasantly "quiet" in the editor while computing far below the bar. Measured: `text-ink/40`
+= **2.54:1**, `/45` = **2.91**, `/50` = **3.37**, `/55` = **3.96**, and `text-porcelain/40` on a dark
+band = **3.6**. All failures, none of them visible as failures in source.
+
+**Fix is at the token layer, not the call site,** so the next label written cannot reinherit the bug.
+`porcelain.muted` (`#BBB1B2`) joins the existing `ink.muted` (`#6B5A67`) as a sanctioned "quiet
+foreground" pair, with the measured ratios written into `tailwind.config.ts` as a contract:
+`ink.muted` = 5.95:1 on porcelain / 5.38 on porcelain-deep; `porcelain.muted` = 8.58 on ink / 7.63 on
+plum. 33 call sites across 18 files moved onto them. Solid also beats alpha on correctness: an alpha
+tint silently re-derives its contrast from whatever it lands on (a photo, a mid-tone band), so it
+cannot be verified once and trusted. `ink.subtle` (2.98:1) is now marked DECORATIVE ONLY.
+
+**Small brand-accent text is surface-dependent — the two surfaces needed opposite fixes.** `magenta`
+at 11px measures **4.29:1** on porcelain (a near-miss failure), so light-surface labels moved to
+`magenta-deep` (**6.15**), which is the rule the codebase already documented but had not applied. On
+dark, measurement contradicted the obvious move: `magenta` on ink is **3.89** — already failing — and
+`magenta-deep` would have made it **2.71**, i.e. the "fix" would have been a regression. The two dark
+ordinal numerals (mobile drawer, search overlay) use `coral` (**5.25** on ink) instead, which keeps
+magenta's hue family while leaving `turmeric` reserved for the active/hover state so that affordance
+stays unambiguous. axe never flagged these two — they live inside a closed drawer and overlay, so no
+automated pass can reach them. They were found by measuring the palette against both surfaces.
+
+**Two remaining nodes, both instructive.** A 16px `/methodology` body link at 4.29 → `magenta-deep`,
+plus `hover:underline` so the hover state still signals (it no longer changes colour). And the finale
+marquee's outlined display type: the `-webkit-text-stroke` alpha *is* the foreground WCAG measures,
+because the fill is transparent — at 0.32 it flattened to `#695a63` on ink = **2.77:1**, under even
+the 3:1 large-text bar. Now 0.42 = **3.86**. The strip is `aria-hidden` decorative texture, but
+`aria-hidden` removes text from the accessibility tree without removing it from the screen; a
+low-vision sighted reader still has to look at it, so the bar still applies.
+
+**Verified outcome: 213 → 0.** Re-running the same 26-page audit reports **zero violations**.
+Screenshot pass confirms the visual hierarchy survived — labels read as quiet but legible, still
+plainly subordinate to their values. Non-text `text-magenta` was deliberately left alone: icons and
+glyphs answer to 1.4.11's 3:1 (4.29 passes), and logotypes are explicitly exempt from both.
+
+**Still open (honest list, not a to-do that quietly became "done").** Hover-state contrast was NOT
+swept: ~29 files carry `hover:text-magenta`, many mixing light and dark regions in one file, and axe
+cannot test hover. Blanket-swapping them on a static heuristic is exactly the kind of unverified
+sweep that caused self-inflicted regressions earlier in this branch, so it is deferred to a pass that
+can measure each surface. Beyond a11y: no per-image `MediaAttribution` (a real CC-BY-SA licensing gap
+under D14), zero component/integration/E2E tests (all 305 are `lib/**` units), no telemetry or error
+reporting, forms submit nowhere, in-memory search will not scale past the prototype, and the dataset
+is still 15 placeholder records against a 20,000 goal.
 
 ## 0. Soul
 

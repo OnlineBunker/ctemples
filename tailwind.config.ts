@@ -24,7 +24,21 @@ const config: Config = {
     extend: {
       colors: {
         // Core neutrals — porcelain page, white elevated surfaces, plum-tinted ink.
-        porcelain: { DEFAULT: "#FBF6F0", deep: "#F4EADF" },
+        //
+        // CONTRAST CONTRACT (WCAG 2.1 AA, measured — do not substitute an alpha tint).
+        // Text below 18.66px bold / 24px regular needs 4.5:1, and every mono micro-label
+        // in this product is 9.5–11px, so the caption tier has no headroom at all. An
+        // alpha-tinted foreground reads as "subtle" in the editor but computes far below
+        // the bar: `text-ink/40` is 2.54:1, `/45` is 2.91, `/50` is 3.37, `/55` is 3.96 —
+        // all failures. `text-porcelain/40` on a dark band is 3.6 — also a failure.
+        // These two solid `muted` values are the sanctioned "quiet foreground" pair:
+        //   ink.muted       #6B5A67 → 5.95:1 on porcelain, 5.38:1 on porcelain-deep
+        //   porcelain.muted #BBB1B2 → 8.58:1 on ink,       7.63:1 on plum
+        // Solid also beats alpha for correctness: an alpha tint silently re-derives its
+        // own contrast from whatever it happens to land on (a photo, a mid-tone band),
+        // so it cannot be verified once and trusted. Reach for these, not `/40`–`/55`.
+        // ink.subtle (2.98:1) is DECORATIVE ONLY — rules, glyphs, disabled marks; never text.
+        porcelain: { DEFAULT: "#FBF6F0", deep: "#F4EADF", muted: "#BBB1B2" },
         canvas: { DEFAULT: "#FFFFFF", soft: "#F4EADF", elevated: "#FFFFFF" },
         ink: { DEFAULT: "#241021", muted: "#6B5A67", subtle: "#9A8C96" },
         line: { DEFAULT: "#ECE0D6", strong: "#D8C8BA" },

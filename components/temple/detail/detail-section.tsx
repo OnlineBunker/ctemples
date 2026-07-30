@@ -29,7 +29,7 @@ export function DetailSection({
   return (
     <section id={id} className={cn("scroll-mt-36", className)}>
       <Reveal>
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[.26em] text-magenta">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[.26em] text-magenta-deep">
           {padCount(index)} — {eyebrow}
         </p>
         <h2

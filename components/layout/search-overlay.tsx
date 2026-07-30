@@ -195,7 +195,7 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
           <kbd
             className={cn(
               "hidden rounded-md border px-1.5 py-0.5 font-mono text-[0.62rem] normal-case md:inline",
-              tone === "dark" ? "border-porcelain/25 text-porcelain/60" : "border-ink/15 text-ink/50",
+              tone === "dark" ? "border-porcelain/25 text-porcelain/60" : "border-ink/15 text-ink-muted",
             )}
           >
             ⌘K
@@ -252,7 +252,7 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
                 aria-controls={listboxRendered ? listId : undefined}
                 aria-autocomplete="list"
                 aria-activedescendant={activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined}
-                className="w-full border-b-2 border-porcelain/25 bg-transparent pb-4 pt-1.5 font-display font-semibold tracking-[-.02em] text-porcelain caret-turmeric placeholder:text-porcelain/40 focus:border-magenta focus:outline-none"
+                className="w-full border-b-2 border-porcelain/25 bg-transparent pb-4 pt-1.5 font-display font-semibold tracking-[-.02em] text-porcelain caret-turmeric placeholder:text-porcelain-muted focus:border-magenta focus:outline-none"
                 style={{ fontSize: "clamp(26px,4.5vw,52px)" }}
               />
               {isPending ? (
@@ -266,7 +266,7 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
 
             {!showResults ? (
               <div className="mt-[22px] flex flex-wrap items-center gap-[9px]">
-                <span className="font-mono text-[10px] tracking-[.24em] text-porcelain/40">POPULAR</span>
+                <span className="font-mono text-[10px] tracking-[.24em] text-porcelain-muted">POPULAR</span>
                 {POPULAR_SEARCH_CHIPS.map((chip) => (
                   <TransitionLink
                     key={chip.label}
@@ -291,7 +291,7 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
                 <p className="mt-4 font-mono text-[11px] tracking-[.2em] text-porcelain/50">
                   NO DOORWAYS MATCH &lsquo;{trimmedQuery.toUpperCase()}&rsquo;
                 </p>
-                <p className="mt-6 font-mono text-[10px] tracking-[.24em] text-porcelain/40">TRY ONE OF THESE</p>
+                <p className="mt-6 font-mono text-[10px] tracking-[.24em] text-porcelain-muted">TRY ONE OF THESE</p>
                 <div className="mt-3 flex flex-wrap gap-[9px]">
                   {POPULAR_SEARCH_CHIPS.map((chip) => (
                     <TransitionLink
@@ -336,7 +336,7 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
                           i === activeIndex ? "pl-3.5 text-turmeric" : "text-porcelain hover:pl-3.5",
                         )}
                       >
-                        <span className="w-[26px] shrink-0 font-mono text-[11px] text-magenta">{padCount(i + 1)}</span>
+                        <span className="w-[26px] shrink-0 font-mono text-[11px] text-coral">{padCount(i + 1)}</span>
                         <span className="relative block h-14 w-11 shrink-0 overflow-hidden rounded-[22px_22px_7px_7px]">
                           <TempleImage src={item.hero?.url ?? ""} alt="" region={item.region} seed={item.id} sizes="44px" />
                         </span>

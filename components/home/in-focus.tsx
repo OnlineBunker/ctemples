@@ -34,7 +34,7 @@ export function InFocus({ feat }: { feat: FocusData }) {
       >
         <div className="flex flex-col" style={{ gap: "clamp(18px,3vh,28px)" }}>
           <Reveal>
-            <p className="font-mono text-[11px] font-bold tracking-[.28em] text-magenta">03 — IN FOCUS</p>
+            <p className="font-mono text-[11px] font-bold tracking-[.28em] text-magenta-deep">03 — IN FOCUS</p>
           </Reveal>
           <Reveal>
             <h2
@@ -58,7 +58,7 @@ export function InFocus({ feat }: { feat: FocusData }) {
                 ["STYLE", feat.style],
               ].map(([k, v]) => (
                 <div key={k}>
-                  <p className="font-mono text-[9.5px] tracking-[.2em] text-ink/50">{k}</p>
+                  <p className="font-mono text-[9.5px] tracking-[.2em] text-ink-muted">{k}</p>
                   <p className="mt-[5px] text-[13.5px] font-medium">{v}</p>
                 </div>
               ))}
@@ -94,7 +94,7 @@ export function InFocus({ feat }: { feat: FocusData }) {
               <div className="absolute inset-0 bg-plum/20" />
             )}
           </div>
-          <p className="mt-3.5 text-center font-mono text-[10.5px] uppercase tracking-[.2em] text-ink/50">
+          <p className="mt-3.5 text-center font-mono text-[10.5px] uppercase tracking-[.2em] text-ink-muted">
             {feat.caption}
           </p>
         </Reveal>

@@ -62,7 +62,7 @@ export function DetailHero({ temple }: { temple: Temple }) {
             leaving Back as the only exit. It also feeds the internal link graph the spec wants
             (docs/01 D26). The deity link only renders when the record actually matches one of
             the six canonical deities, so it can never point at a page with nothing on it. */}
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[.18em] text-magenta">
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[.18em] text-magenta-deep">
           {deityKey ? (
             <Link
               href={`/deities/${deityKey}`}

@@ -109,9 +109,15 @@
     font-family: theme("fontFamily.telugu");
   }
 
-  /* Outlined display type (docs/15 §0a) — the finale names strip + 404 ghost numeral. */
+  /* Outlined display type (docs/15 §0a) — the finale names strip + 404 ghost numeral.
+     Stroke alpha is a CONTRAST FLOOR, not a taste knob: the stroke is the only rendered
+     ink, so it is the foreground WCAG 1.4.3 measures. At the previous 0.32 it flattened
+     to #695a63 on ink = 2.77:1, under the 3:1 large-text bar (axe measured 2.76). 0.42
+     lands at 3.86:1. These names are aria-hidden decorative texture, but aria-hidden
+     removes text from the a11y tree without removing it from the screen — a low-vision
+     sighted reader still has to look at it, so the bar still applies. */
   .otl {
-    -webkit-text-stroke: 1.5px rgba(251, 246, 240, 0.32);
+    -webkit-text-stroke: 1.5px rgba(251, 246, 240, 0.42);
     color: transparent;
   }
 }

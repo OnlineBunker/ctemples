@@ -61,7 +61,7 @@ export function Footer() {
               <p className="mt-5 text-balance font-display font-semibold leading-[1.18] tracking-[-.015em]" style={{ fontSize: "clamp(23px,2.6vw,30px)" }}>
                 Every temple is a door.
               </p>
-              <p className="mt-3 font-mono text-[10px] leading-[1.9] tracking-[.22em] text-porcelain/40">
+              <p className="mt-3 font-mono text-[10px] leading-[1.9] tracking-[.22em] text-porcelain-muted">
                 A FIELD GUIDE TO SACRED INDIA
               </p>
             </div>
@@ -89,8 +89,8 @@ export function Footer() {
           className="flex flex-wrap justify-between gap-3 border-t border-porcelain/[.13] pt-[22px]"
           style={{ marginTop: "clamp(36px,6vh,60px)" }}
         >
-          <p className="font-mono text-[9.5px] tracking-[.2em] text-porcelain/40">© 2026 CTEMPLES — FRONTEND PROTOTYPE</p>
-          <p className="font-mono text-[9.5px] tracking-[.2em] text-porcelain/40">
+          <p className="font-mono text-[9.5px] tracking-[.2em] text-porcelain-muted">© 2026 CTEMPLES — FRONTEND PROTOTYPE</p>
+          <p className="font-mono text-[9.5px] tracking-[.2em] text-porcelain-muted">
             IMAGERY — WIKIMEDIA COMMONS · BASE MAP — DATAMEET, CC BY 4.0
           </p>
         </div>

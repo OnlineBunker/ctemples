@@ -112,12 +112,12 @@ function MobileMenu({ pathname, onClose }: { pathname: string; onClose: () => vo
               isActive(pathname, item.href) ? "text-turmeric" : "text-porcelain",
             )}
           >
-            <span className="font-mono text-[11px] text-magenta">{padCount(i + 1)}</span>
+            <span className="font-mono text-[11px] text-coral">{padCount(i + 1)}</span>
             <span className="font-display text-[clamp(28px,7vw,44px)] font-bold tracking-[-.02em]">{item.label}</span>
           </Link>
         ))}
       </nav>
-      <p className="px-6 py-[22px] font-mono text-[10px] tracking-[.24em] text-porcelain/40">
+      <p className="px-6 py-[22px] font-mono text-[10px] tracking-[.24em] text-porcelain-muted">
         A FIELD GUIDE TO SACRED INDIA
       </p>
     </motion.div>
@@ -179,7 +179,7 @@ export function Header() {
           dark
             ? "border-transparent text-porcelain/60 hover:text-turmeric"
             : active
-              ? "border-magenta text-magenta"
+              ? "border-magenta text-magenta-deep"
               : "border-transparent text-ink/70 hover:text-magenta",
         )}
       >

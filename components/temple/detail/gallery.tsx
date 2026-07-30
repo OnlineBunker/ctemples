@@ -127,7 +127,7 @@ export function Gallery({
       {/* `rounded-card`, not a magic 26px: every other panel on this page uses the token, and
           three different panel radii in one entry read as drift rather than intent. */}
       <div className="rounded-card bg-surface-deep py-6">
-        <p className="px-6 pb-4 text-right font-mono text-[10px] tracking-[.2em] text-porcelain/45">
+        <p className="px-6 pb-4 text-right font-mono text-[10px] tracking-[.2em] text-porcelain-muted">
           {padCount(count)} PHOTOGRAPHS
         </p>
         <ul className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2">

@@ -20,7 +20,7 @@ export default function ExploreLoading() {
         >
           The atlas.
         </h1>
-        <p className="font-mono text-[11px] tracking-[.24em] text-ink/40" aria-hidden>
+        <p className="font-mono text-[11px] tracking-[.24em] text-ink-muted" aria-hidden>
           LOADING
         </p>
       </div>
@@ -31,7 +31,7 @@ export default function ExploreLoading() {
         className="mt-24 flex flex-col items-center gap-4 pb-16 text-center"
       >
         <GopuramMark className="h-12 w-11 text-magenta/40" strokeWidth={1.2} />
-        <p className="font-mono text-[10.5px] uppercase tracking-[.2em] text-ink/45">
+        <p className="font-mono text-[10.5px] uppercase tracking-[.2em] text-ink-muted">
           Gathering the atlas…
         </p>
       </div>

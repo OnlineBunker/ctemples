@@ -106,6 +106,7 @@ function FadeLayers({
   className,
   offset = false,
   drift = false,
+  sizes,
 }: {
   slides: ThresholdSlide[];
   index: number;
@@ -117,6 +118,16 @@ function FadeLayers({
   offset?: boolean;
   /** Apply the slow living-hero drift (killed under reduced motion via the global rule). */
   drift?: boolean;
+  /**
+   * Per-layer `sizes`, because the two layers need very different resolutions.
+   *
+   * Measured problem: a single shared `sizes` of "70vw/40vw" resolved to a 512px-wide source for
+   * an arch box measuring 461×684. `object-fit: cover` fits a LANDSCAPE source into a PORTRAIT
+   * box by matching height, so the required source width is (box height × source aspect) ≈ 1094px
+   * — the 512px file was being upscaled ~2.1× and read soft. Byte-saving had quietly cost image
+   * quality on a photography-led hero.
+   */
+  sizes: string;
 }) {
   const pos = offset
     ? { top: "-35.14%", height: "135.14%", left: 0, right: 0 }
@@ -150,10 +161,7 @@ function FadeLayers({
                 // sets fetchpriority=high, so it no longer queues behind fonts and scripts.
                 priority={i === 0}
                 loading={i === 0 ? "eager" : "lazy"}
-                // Optimized (see photo-with-fallback.tsx): the arch renders at
-                // clamp(290px,36vw,560px), so this asks for ~that width in AVIF instead of the
-                // fixed 1280px JPEG Wikimedia serves.
-                sizes="(max-width: 760px) 70vw, 40vw"
+                sizes={sizes}
                 draggable={false}
                 className="object-cover"
                 style={{ objectPosition: "center" }}
@@ -473,7 +481,7 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
           nothing when there isn't — it is decorative, so absence beats a broken version. */}
       <p
         ref={vertRef}
-        className="absolute z-[6] hidden whitespace-nowrap font-mono text-[10px] tracking-[.32em] text-porcelain/40 md:[@media(min-height:940px)]:block"
+        className="absolute z-[6] hidden whitespace-nowrap font-mono text-[10px] tracking-[.32em] text-porcelain-muted md:[@media(min-height:940px)]:block"
         style={{
           right: "clamp(16px,4vw,60px)",
           top: "50%",
@@ -531,7 +539,16 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
               "radial-gradient(ellipse 60% 56% at 50% 34%,#000 32%,rgba(0,0,0,.65) 54%,transparent 74%)",
           }}
         >
-          <FadeLayers slides={slides} index={index} prev={prev} />
+          {/* GHOST TOWER: 55% opacity behind a soft elliptical mask, so fine detail is
+              invisible by construction. It deliberately requests a much smaller source than the
+              arch — that is what removes the "same large bitmap decoded twice" cost, rather than
+              two full-resolution copies of one image. */}
+          <FadeLayers
+            slides={slides}
+            index={index}
+            prev={prev}
+            sizes="(max-width: 760px) 320px, 480px"
+          />
         </div>
         {/* The sharp arch frame */}
         <div
@@ -547,7 +564,21 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
             boxShadow: "0 40px 120px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,195,0,.55)",
           }}
         >
-          <FadeLayers slides={slides} index={index} prev={prev} offset drift />
+          {/* ARCH: the sharp, focal copy and the page's LCP element. Sized for the cover-crop
+              (see `sizes` above), capped at 1280px — the widest Wikimedia serves.
+              Mobile asks for 640px, not the ~1026px a perfect cover-crop would want. That is a
+              measured trade, not an oversight: 900px pushed mobile LCP from 1.49 s to 2.76 s,
+              past Google's 2.5 s bar, to sharpen a 290px-wide arch on a bandwidth-constrained
+              device. 640px leaves ~1.6× upscale, which is far less noticeable at that physical
+              size than a 1.3 s delay before anything is visible at all. */}
+          <FadeLayers
+            slides={slides}
+            index={index}
+            prev={prev}
+            offset
+            drift
+            sizes="(max-width: 760px) 640px, 1280px"
+          />
           <div
             className="absolute bottom-0 left-0 right-0 z-[3]"
             style={{ height: "26%", background: "linear-gradient(180deg,transparent,rgba(36,16,33,.7))" }}

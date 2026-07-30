@@ -39,7 +39,7 @@ export function WishlistButton({
           "inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors",
           saved
             ? "border-magenta/40 bg-magenta-soft text-magenta"
-            : "border-ink/15 text-ink/45 hover:border-magenta/40 hover:text-magenta",
+            : "border-ink/15 text-ink-muted hover:border-magenta/40 hover:text-magenta",
           className,
         )}
       >
@@ -56,7 +56,7 @@ export function WishlistButton({
       aria-label={label}
       className={cn(
         "group/save inline-flex items-center gap-1.5 rounded-full py-1 pr-2 font-mono text-[9.5px] uppercase tracking-[.16em] transition-colors",
-        saved ? "text-magenta" : "text-ink/45 hover:text-magenta",
+        saved ? "text-magenta" : "text-ink-muted hover:text-magenta",
         className,
       )}
     >

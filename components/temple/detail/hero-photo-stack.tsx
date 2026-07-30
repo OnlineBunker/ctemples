@@ -177,7 +177,7 @@ export function HeroPhotoStack({
             type="button"
             onClick={() => setFanned((f) => !f)}
             aria-expanded={fanned}
-            className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[9.5px] uppercase tracking-[.2em] text-ink/45 transition-colors hover:text-magenta focus-visible:text-magenta"
+            className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[9.5px] uppercase tracking-[.2em] text-ink-muted transition-colors hover:text-magenta focus-visible:text-magenta"
           >
             {fanned ? "Stack photographs" : `Show all ${photos.length} photographs`}
           </button>

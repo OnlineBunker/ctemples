@@ -76,7 +76,7 @@ export function SearchBar({
   // hairline rule, magenta caret — not a boxed pill.
   return (
     <div className="flex max-w-[620px] items-center gap-3.5 border-b-[1.5px] border-ink/[.22] px-0.5 pb-3.5 pt-2 focus-within:border-magenta">
-      <Search className="h-[19px] w-[19px] shrink-0 text-ink/45" aria-hidden />
+      <Search className="h-[19px] w-[19px] shrink-0 text-ink-muted" aria-hidden />
       <label htmlFor={inputId} className="sr-only">
         Search temples, deities, places
       </label>
@@ -87,7 +87,7 @@ export function SearchBar({
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className="min-w-0 flex-1 bg-transparent font-display font-semibold tracking-[-.01em] text-ink caret-magenta placeholder:text-ink/40 focus:outline-none"
+        className="min-w-0 flex-1 bg-transparent font-display font-semibold tracking-[-.01em] text-ink caret-magenta placeholder:text-ink-muted focus:outline-none"
         style={{ fontSize: "clamp(19px,2.2vw,24px)" }}
       />
       {isPending ? (
@@ -97,7 +97,7 @@ export function SearchBar({
           type="button"
           onClick={clear}
           aria-label="Clear search"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink/45 hover:text-magenta"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted hover:text-magenta"
         >
           <X className="h-4 w-4" aria-hidden />
         </button>

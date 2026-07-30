@@ -65,7 +65,7 @@ export default async function AboutPage() {
           {APPROACH.map((item, i) => (
             <RevealItem key={item.title}>
               <div className="border-t border-line pt-6">
-                <span className="font-mono text-xs text-magenta">0{i + 1}</span>
+                <span className="font-mono text-xs text-magenta-deep">0{i + 1}</span>
                 <h3 className="mt-3 font-display text-2xl text-ink">{item.title}</h3>
                 <p className="mt-3 leading-relaxed text-ink-muted">{item.body}</p>
               </div>

@@ -79,7 +79,7 @@ export function WishlistGrid() {
   // Before hydration we can't know what's saved — stay quiet rather than flash an empty state.
   if (!ready) {
     return (
-      <p role="status" className="mt-14 font-mono text-[10.5px] uppercase tracking-[.2em] text-ink/40">
+      <p role="status" className="mt-14 font-mono text-[10.5px] uppercase tracking-[.2em] text-ink-muted">
         Opening your doorways…
       </p>
     );
@@ -127,7 +127,7 @@ export function WishlistGrid() {
       </div>
 
       {loading ? (
-        <p role="status" className="mt-8 font-mono text-[10.5px] uppercase tracking-[.2em] text-ink/40">
+        <p role="status" className="mt-8 font-mono text-[10.5px] uppercase tracking-[.2em] text-ink-muted">
           Opening your doorways…
         </p>
       ) : null}
@@ -155,14 +155,14 @@ export function WishlistGrid() {
                 clear();
                 setConfirmClear(false);
               }}
-              className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-magenta underline-offset-4 hover:underline"
+              className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-magenta-deep underline-offset-4 hover:underline"
             >
               Yes, clear
             </button>
             <button
               type="button"
               onClick={() => setConfirmClear(false)}
-              className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-ink/45 underline-offset-4 hover:underline"
+              className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-ink-muted underline-offset-4 hover:underline"
             >
               Keep them
             </button>
@@ -172,7 +172,7 @@ export function WishlistGrid() {
             ref={clearRef}
             type="button"
             onClick={() => setConfirmClear(true)}
-            className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-ink/45 underline-offset-4 transition-colors hover:text-magenta hover:underline"
+            className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-ink-muted underline-offset-4 transition-colors hover:text-magenta hover:underline"
           >
             Clear wishlist
           </button>

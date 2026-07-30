@@ -8,7 +8,7 @@ export function WishlistCount() {
   const { count, ready } = useWishlist();
   if (!ready) return null;
   return (
-    <p className="font-mono text-[11px] tracking-[.24em] text-ink/50" aria-hidden>
+    <p className="font-mono text-[11px] tracking-[.24em] text-ink-muted" aria-hidden>
       {padCount(count)} SAVED
     </p>
   );

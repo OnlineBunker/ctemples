@@ -98,7 +98,7 @@ export default async function TemplePage({ params }: { params: Promise<{ id: str
         >
           ← THE ATLAS
         </Link>
-        <p className="font-mono text-[10.5px] tracking-[.2em] text-ink/45">
+        <p className="font-mono text-[10.5px] tracking-[.2em] text-ink-muted">
           {`${temple.region} INDIA · ${temple.state} · ${temple.city}`.toUpperCase()}
         </p>
       </div>

@@ -203,7 +203,7 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
   if (active) {
     const cachedNear = current.near ? formatNearParam(current.near) : "";
     return (
-      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[.16em] text-ink/55">
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[.16em] text-ink-muted">
         <span className="inline-flex items-center gap-1.5 text-magenta-deep">
           <LocateFixed className="h-3.5 w-3.5" aria-hidden />
           Nearest you
@@ -229,7 +229,7 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
 
   if (phase === "asking") {
     return (
-      <p className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.16em] text-ink/55">
+      <p className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.16em] text-ink-muted">
         <Loader2 className="h-3.5 w-3.5 animate-spin text-magenta" aria-hidden />
         Finding temples near you…
       </p>

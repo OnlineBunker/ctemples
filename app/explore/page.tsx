@@ -102,7 +102,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
           The atlas.
           {summary ? <span className="sr-only"> — {summary}</span> : null}
         </h1>
-        <p className="font-mono text-[11px] tracking-[.24em] text-ink/50" aria-hidden>
+        <p className="font-mono text-[11px] tracking-[.24em] text-ink-muted" aria-hidden>
           {doorways}
         </p>
       </div>

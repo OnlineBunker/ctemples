@@ -37,7 +37,7 @@ export function MethodologyContent() {
         <h2 className="font-display text-xl text-ink">Something wrong, or missing?</h2>
         <p className="mt-3 leading-relaxed text-ink-muted">
           If a fact looks out of date, or a temple you know deserves a place here,{" "}
-          <Link href="/suggest" className="font-semibold text-magenta hover:text-magenta-deep">
+          <Link href="/suggest" className="font-semibold text-magenta-deep hover:text-magenta-deep hover:underline">
             suggest a correction or a temple
           </Link>
           . Submissions aren&apos;t wired to a backend yet, so nothing is sent while this is a

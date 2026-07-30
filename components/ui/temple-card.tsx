@@ -169,7 +169,7 @@ export function TempleCard({
               {temple.name}
             </h3>
             <div className="mt-[5px] flex items-baseline justify-between gap-2.5">
-              <p className="truncate font-mono text-[10px] uppercase tracking-[.14em] text-ink/50">
+              <p className="truncate font-mono text-[10px] uppercase tracking-[.14em] text-ink-muted">
                 {temple.city} · {temple.state}
               </p>
               {typeof temple.rating === "number" ? (
