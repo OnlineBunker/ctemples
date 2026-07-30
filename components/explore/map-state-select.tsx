@@ -32,7 +32,8 @@ export function MapStateSelect({
         value={current.state ?? ""}
         onChange={(e) => {
           const slug = e.target.value || undefined;
-          router.push(buildExploreHref(current, { state: slug, page: 1 }));
+          // Preserve scroll — see explore-map-view.tsx's handleSelectState.
+          router.push(buildExploreHref(current, { state: slug, page: 1 }), { scroll: false });
         }}
         className="min-w-0 flex-1 rounded-full border border-line-strong bg-canvas px-3 py-2 text-sm text-ink focus-visible:border-magenta focus-visible:outline-none"
       >

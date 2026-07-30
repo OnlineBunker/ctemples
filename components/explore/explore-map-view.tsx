@@ -44,7 +44,11 @@ export function ExploreMapView({
 
   function handleSelectState(slug: string) {
     const next = current.state === slug ? undefined : slug;
-    router.push(buildExploreHref(current, { state: next, page: 1 }));
+    // `scroll: false` — the App Router scrolls to the top of the document on every
+    // navigation by default, which threw you back to the page header the instant you
+    // picked a state on the map. Selecting a state changes the results beside the map;
+    // it is not a new page, so the scroll position must be preserved.
+    router.push(buildExploreHref(current, { state: next, page: 1 }), { scroll: false });
   }
 
   const peekLabel = current.state

@@ -26,7 +26,10 @@ import type { LatLng } from "@/lib/distance";
  *    control, no second way to pick a location.
  */
 const COORDS_KEY = "ctemples:geo";
-const DECLINED_KEY = "ctemples:geo-declined";
+/** The browser/device can't give us a position (denied or unsupported) → render nothing. */
+const DENIED_KEY = "ctemples:geo-denied";
+/** The visitor switched distance ordering OFF → stop auto-applying, but keep offering it. */
+const OFF_KEY = "ctemples:geo-off";
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 type Phase = "idle" | "asking" | "active" | "unavailable";
@@ -58,17 +61,18 @@ function writeCache(fix: LatLng) {
   }
 }
 
-function hasDeclined(): boolean {
+function readFlag(key: string): boolean {
   try {
-    return window.localStorage.getItem(DECLINED_KEY) === "1";
+    return window.localStorage.getItem(key) === "1";
   } catch {
     return false;
   }
 }
 
-function setDeclined() {
+function writeFlag(key: string, on: boolean) {
   try {
-    window.localStorage.setItem(DECLINED_KEY, "1");
+    if (on) window.localStorage.setItem(key, "1");
+    else window.localStorage.removeItem(key);
   } catch {
     // no-op
   }
@@ -92,8 +96,16 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
     [current, router],
   );
 
-  const request = useCallback(
+  /** Turning it ON is always an explicit act — so it also clears the opt-out. */
+  const enable = useCallback(
     (mode: "replace" | "push") => {
+      writeFlag(OFF_KEY, false);
+      const cached = readCache();
+      if (cached) {
+        setPhase("active");
+        apply(cached, mode);
+        return;
+      }
       if (!("geolocation" in navigator)) {
         setPhase("unavailable");
         return;
@@ -108,7 +120,7 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
         },
         () => {
           // Denied, unavailable, or timed out — remember it and show nothing further.
-          setDeclined();
+          writeFlag(DENIED_KEY, true);
           setPhase("unavailable");
         },
         { enableHighAccuracy: false, timeout: 10_000, maximumAge: MAX_AGE_MS },
@@ -118,21 +130,33 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
   );
 
   useEffect(() => {
-    if (active || !isCleanBrowse) return;
+    if (active) return;
+    // A deliberate browse (search / filter / page 2+) is never overridden.
+    if (!isCleanBrowse) return;
+    // ORDER MATTERS. Coordinates already in the URL mean this visitor has been located and
+    // has since chosen an ordering (e.g. "Top rated") — re-applying `nearest` here would
+    // silently undo that choice on every render. Likewise, both opt-out flags must be read
+    // BEFORE the cached fix, or "Turn off" is instantly reversed by the cache below.
+    if (current.near) return;
+    if (readFlag(DENIED_KEY) || !("geolocation" in navigator)) {
+      setPhase("unavailable");
+      return;
+    }
+    if (readFlag(OFF_KEY)) {
+      // Switched off by the visitor: stay quiet, but keep the control available.
+      setPhase("idle");
+      return;
+    }
 
-    // 1) A cached fix applies immediately — no prompt, no waiting.
+    // A cached fix applies immediately — no prompt, no waiting.
     const cached = readCache();
     if (cached) {
       apply(cached, "replace");
       return;
     }
-    if (hasDeclined() || !("geolocation" in navigator)) {
-      setPhase("unavailable");
-      return;
-    }
 
-    // 2) Permission already granted in a previous session → fetch silently.
-    //    Otherwise surface a one-tap control instead of a cold, unexplained prompt.
+    // Permission already granted in a previous session → fetch silently. Otherwise surface
+    // a one-tap control instead of a cold, unexplained prompt.
     const permissions = navigator.permissions;
     if (!permissions?.query) {
       setPhase("idle");
@@ -143,7 +167,7 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
       .query({ name: "geolocation" as PermissionName })
       .then((status) => {
         if (cancelled) return;
-        if (status.state === "granted") request("replace");
+        if (status.state === "granted") enable("replace");
         else if (status.state === "denied") setPhase("unavailable");
         else setPhase("idle");
       })
@@ -153,7 +177,7 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
     return () => {
       cancelled = true;
     };
-  }, [active, isCleanBrowse, apply, request]);
+  }, [active, isCleanBrowse, current.near, apply, enable]);
 
   if (phase === "unavailable") return null;
 
@@ -169,7 +193,9 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
         <button
           type="button"
           onClick={() => {
-            setDeclined();
+            // Opt out (not "denied") — the control stays offered so it can be re-enabled.
+            writeFlag(OFF_KEY, true);
+            setPhase("idle");
             router.push(buildExploreHref(current, { near: undefined, sort: "rating", page: 1 }));
           }}
           className="underline-offset-4 transition-colors hover:text-magenta hover:underline"
@@ -192,7 +218,7 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
   return (
     <button
       type="button"
-      onClick={() => request("push")}
+      onClick={() => enable("push")}
       className="inline-flex items-center gap-2 rounded-full border border-ink/[.18] px-[15px] py-2 font-mono text-[10px] uppercase tracking-[.16em] text-ink transition-colors hover:border-magenta hover:text-magenta"
     >
       <LocateFixed className="h-3.5 w-3.5" aria-hidden />

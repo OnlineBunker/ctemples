@@ -104,6 +104,34 @@ server-side query contract (docs/05, docs/10) — no client-side filtering or so
    transform on an ancestor of a `view-transition-name` element corrupts the morph snapshot
    (docs/03 §5). Fine pointers only; fully inert under `prefers-reduced-motion`.
 
+## 0c. EXPLORE FOLLOW-UP FIXES (owner report, 2026-07-30)
+
+1. **"Turn off" for nearest-me now sticks.** Two bugs: the auto-apply effect read the cached
+   fix *before* the opt-out flag (so turning it off was instantly reversed), and any
+   filter-free URL counted as a "clean browse" (so hand-picking *Top rated* was overridden on
+   the next render). Fixed by ordering the guards — `current.near` present means the visitor has
+   already been located and has since chosen an ordering, so auto-apply bails — and by splitting
+   the single flag into `ctemples:geo-denied` (device can't report a position → render nothing)
+   and `ctemples:geo-off` (visitor switched it off → stay quiet but keep offering it, so it can
+   be re-enabled). Turning it on always clears the opt-out.
+2. **Map selection preserves scroll.** The App Router scrolls to the top of the document on
+   every navigation, so picking a state threw you back to the page header. Selecting a state
+   changes the results beside the map — not the page — so both `handleSelectState`
+   (`explore-map-view.tsx`) and the "Jump to state" select now pass `{ scroll: false }`.
+3. **Small states are reliably clickable.** `CALLOUT_STATE_SLUGS` is generated with an
+   `area < 122` threshold derived from "44px²", but WCAG 2.5.8's target is 44×44 px
+   (≈5400 viewBox-unit²) — so only four near-invisible UTs qualified and **Delhi (158), Goa
+   (356), Sikkim (768) and Tripura (1089) got nothing**. Both thresholds are now applied in
+   `india-map.tsx` from the exported `area` field (the generated artifact is not hand-edited):
+   `MARKER_AREA` (220) also draws a **visible disc**, and `EASY_TARGET_AREA` (1200) adds an
+   enlarged invisible hit circle rendered in a layer **above every polygon**, so a tiny state
+   always wins a click where it overlaps a large neighbour. Delhi's effective target went from
+   a ~35 px sliver to a 26-unit circle (verified: 6/6 sample points ±14 px hit Delhi).
+   Additionally, hovering or focusing a small state opens a **magnifier lens** — a clipped
+   circle drawing its own 4.5× copy of the geometry, so you can see what you're aiming at.
+   The lens is decorative (`pointer-events: none`) and **no polygon is ever transformed**, so
+   D17 and the "no zoom/pan GIS map" rule both hold.
+
 ## 0. Soul
 
 In temple architecture the arch is not ornament — it is the *dvara*, the doorway that
