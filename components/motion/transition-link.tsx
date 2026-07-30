@@ -20,6 +20,10 @@ export function TransitionLink({
   prefetch,
   onClick,
   "aria-label": ariaLabel,
+  id,
+  role,
+  tabIndex,
+  "aria-selected": ariaSelected,
 }: {
   href: string;
   type?: "nav-forward" | "nav-back";
@@ -30,6 +34,12 @@ export function TransitionLink({
   /** Optional side-effect (e.g. closing an overlay) — runs before the tagged navigation. */
   onClick?: () => void;
   "aria-label"?: string;
+  /** ARIA passthrough, for links that are also listbox options (the search overlay's rows):
+   *  the option must BE the anchor, not wrap one, or the listbox has interactive descendants. */
+  id?: string;
+  role?: string;
+  tabIndex?: number;
+  "aria-selected"?: boolean;
 }) {
   const router = useRouter();
 
@@ -55,6 +65,10 @@ export function TransitionLink({
       style={style}
       prefetch={prefetch}
       aria-label={ariaLabel}
+      id={id}
+      role={role}
+      tabIndex={tabIndex}
+      aria-selected={ariaSelected}
     >
       {children}
     </Link>

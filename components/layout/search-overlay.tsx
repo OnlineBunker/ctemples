@@ -322,11 +322,22 @@ export function SearchOverlay({ tone = "light" }: { tone?: "light" | "dark" }) {
                 ) : null}
                 {/* Clicking any result (a real TransitionLink underneath) always closes the
                     overlay — one delegated handler instead of one per row. */}
+                {/* The option IS the anchor. Previously each `role="option"` <li> WRAPPED a link,
+                    which put an interactive descendant inside an option (invalid ARIA) and added
+                    a tab stop per result — so Tab from the input walked into the list while
+                    `aria-activedescendant` assumed focus never left it, leaving arrow-selection
+                    and focus pointing at different rows. `tabIndex={-1}` takes the rows out of
+                    the tab order (the input's Arrow/Enter handling already navigates them) while
+                    keeping click, middle-click and the context menu intact. */}
                 <ul id={listId} role="listbox" aria-label="Search results" onClick={() => setOpen(false)}>
                   {suggestions.items.map((item, i) => (
-                    <li key={item.id} id={`${listId}-option-${i}`} role="option" aria-selected={i === activeIndex}>
+                    <li key={item.id} role="presentation">
                       <TransitionLink
                         href={`/temples/${item.id}`}
+                        id={`${listId}-option-${i}`}
+                        role="option"
+                        tabIndex={-1}
+                        aria-selected={i === activeIndex}
                         className={cn(
                           "flex items-center gap-[clamp(14px,3vw,28px)] border-b border-porcelain/10 py-[15px] transition-[padding-left] duration-300 ease-threshold",
                           i === activeIndex ? "pl-3.5 text-turmeric" : "text-porcelain hover:pl-3.5",

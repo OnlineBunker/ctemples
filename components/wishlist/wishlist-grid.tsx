@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { GopuramMark } from "@/components/brand/gopuram-mark";
 import { TempleCard, summaryToCard } from "@/components/ui/temple-card";
@@ -23,6 +23,19 @@ export function WishlistGrid() {
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const clearRef = useRef<HTMLButtonElement>(null);
+  // Carry focus across the confirm swap in both directions, so the keyboard path never lands on
+  // <body>. `first` skips the initial mount, where nothing should steal focus.
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) {
+      firstRun.current = false;
+      return;
+    }
+    if (confirmClear) confirmRef.current?.focus();
+    else clearRef.current?.focus();
+  }, [confirmClear]);
 
   useEffect(() => {
     if (!ready) return;
@@ -65,7 +78,11 @@ export function WishlistGrid() {
 
   // Before hydration we can't know what's saved — stay quiet rather than flash an empty state.
   if (!ready) {
-    return <p className="mt-14 font-mono text-[10.5px] uppercase tracking-[.2em] text-ink/40">Opening your doorways…</p>;
+    return (
+      <p role="status" className="mt-14 font-mono text-[10.5px] uppercase tracking-[.2em] text-ink/40">
+        Opening your doorways…
+      </p>
+    );
   }
 
   if (count === 0) {
@@ -110,38 +127,52 @@ export function WishlistGrid() {
       </div>
 
       {loading ? (
-        <p className="mt-8 font-mono text-[10.5px] uppercase tracking-[.2em] text-ink/40">Opening your doorways…</p>
+        <p role="status" className="mt-8 font-mono text-[10.5px] uppercase tracking-[.2em] text-ink/40">
+          Opening your doorways…
+        </p>
       ) : null}
 
-      <div className="mt-12 flex items-center gap-4 border-t border-ink/10 pt-6">
+      {/* The confirm step swaps the focused button out for two new ones. Without moving focus,
+          the focused element simply disappears — a keyboard user is dumped back to <body> at the
+          top of the document and a screen-reader user is told nothing (WCAG 3.2.2 / 4.1.3). The
+          group is a live region so the question is announced, and focus is driven to the
+          destructive action deliberately (see the effect above). All three controls are min-h-11:
+          they were ~14px-tall text, well under WCAG 2.5.8's target size. */}
+      <div
+        className="mt-12 flex flex-wrap items-center gap-3 border-t border-ink/10 pt-6"
+        role={confirmClear ? "group" : undefined}
+        aria-label={confirmClear ? "Confirm clearing your wishlist" : undefined}
+      >
         {confirmClear ? (
           <>
-            <span className="font-mono text-[10.5px] uppercase tracking-[.16em] text-ink/60">
+            <span role="status" className="font-mono text-[10.5px] uppercase tracking-[.16em] text-ink/60">
               Remove all {count}?
             </span>
             <button
+              ref={confirmRef}
               type="button"
               onClick={() => {
                 clear();
                 setConfirmClear(false);
               }}
-              className="font-mono text-[10.5px] uppercase tracking-[.16em] text-magenta underline-offset-4 hover:underline"
+              className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-magenta underline-offset-4 hover:underline"
             >
               Yes, clear
             </button>
             <button
               type="button"
               onClick={() => setConfirmClear(false)}
-              className="font-mono text-[10.5px] uppercase tracking-[.16em] text-ink/45 underline-offset-4 hover:underline"
+              className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-ink/45 underline-offset-4 hover:underline"
             >
               Keep them
             </button>
           </>
         ) : (
           <button
+            ref={clearRef}
             type="button"
             onClick={() => setConfirmClear(true)}
-            className="font-mono text-[10.5px] uppercase tracking-[.16em] text-ink/45 underline-offset-4 transition-colors hover:text-magenta hover:underline"
+            className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.16em] text-ink/45 underline-offset-4 transition-colors hover:text-magenta hover:underline"
           >
             Clear wishlist
           </button>

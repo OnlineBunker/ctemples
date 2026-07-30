@@ -463,6 +463,23 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
         </div>
       </div>
 
+      {/* Legibility floor for the headline. The H1 sits over the arch photograph, so its
+          contrast depended entirely on whichever image happened to load — a bright sky behind
+          "Where the gods" could drop near-white type close to unreadable, and a text-shadow
+          alone is not a contrast guarantee. This is a wide, very soft ink scrim confined to the
+          headline band: it lifts the floor without darkening the composition or reading as a
+          box. Decorative, sits under the type, above the arch. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 z-[3]"
+        style={{
+          bottom: 0,
+          height: "clamp(240px,42vh,460px)",
+          background:
+            "linear-gradient(0deg,rgba(28,12,26,.72) 0%,rgba(28,12,26,.52) 34%,rgba(28,12,26,.18) 68%,transparent 100%)",
+        }}
+      />
+
       {/* Headline — overlaps the arch, in front of the ghost tower. Each line splits apart
           + fades on scroll (§5#6); l1/l2 refs carry those transforms. */}
       <h1

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 /**
  * The wishlist ("saved temples") — a client-only store backed by `localStorage`, since this
@@ -91,12 +91,34 @@ function hydrate() {
 
 export function useWishlist() {
   useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  useEffect(hydrate, []);
-
-  const has = useCallback((id: string) => {
-    if (!hydrated || typeof window === "undefined") return false;
-    return ensure().has(id);
+  /**
+   * Per-component mount gate, NOT the shared `hydrated` flag alone.
+   *
+   * The module flag is flipped by whichever consumer mounts first — in practice the header's
+   * wishlist link, which lives in the root layout. On a streamed route (`/explore` is the one
+   * dynamic page) that happens *before* the temple cards further down finish hydrating, so those
+   * cards' first client render saw `hydrated === true`, read localStorage, and rendered "Saved"
+   * against server HTML that said "Save" — React #418, reproducible only on /explore and only
+   * with something already saved.
+   *
+   * Gating on this component's own mount makes every consumer's first render match the server
+   * regardless of the order others hydrate in.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    hydrate();
   }, []);
+
+  const ready = mounted && hydrated;
+
+  const has = useCallback(
+    (id: string) => {
+      if (!ready || typeof window === "undefined") return false;
+      return ensure().has(id);
+    },
+    [ready],
+  );
 
   const toggle = useCallback((id: string) => {
     hydrate();
@@ -114,7 +136,6 @@ export function useWishlist() {
     emit();
   }, []);
 
-  const ready = hydrated;
   // Newest first: the persisted array is oldest→newest (insertion order, preserved by both
   // `read()` and `Set`), so reversing puts the most recently saved temple at the top.
   const ids = ready && typeof window !== "undefined" ? [...ensure()].reverse() : [];

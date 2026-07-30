@@ -217,7 +217,9 @@ export function NearbyLocator({ current }: { current: ParsedExploreParams }) {
             setPhase("idle");
             router.push(buildExploreHref(current, { near: undefined, sort: "rating", page: 1 }));
           }}
-          className="underline-offset-4 transition-colors hover:text-magenta hover:underline"
+          // min-h-11: this was ~14px-tall inline text inside a <p>, under WCAG 2.5.8's target
+          // size — and it is the only way to switch distance ordering back off.
+          className="inline-flex min-h-11 items-center rounded-full px-2 underline-offset-4 transition-colors hover:text-magenta hover:underline"
         >
           Turn off
         </button>

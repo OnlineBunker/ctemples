@@ -7,9 +7,16 @@ import type { ReactNode } from "react";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
- * Scroll-triggered reveal: rises 16px + un-blurs (3px) as it enters the viewport,
- * matching the view-transition easing so page and scroll motion feel of a piece.
- * Under prefers-reduced-motion it becomes an instant, transform-free fade.
+ * Scroll-triggered reveal: rises 16px and fades in as it enters the viewport, matching the
+ * view-transition easing so page and scroll motion feel of a piece. Under
+ * prefers-reduced-motion it becomes an instant, transform-free fade.
+ *
+ * The 3px un-blur this used to animate has been REMOVED. `filter` is not a compositor-only
+ * property: animating it forces the whole wrapped subtree to re-rasterise every frame, and
+ * these wrappers hold entire page sections (the temple index is 15 rows with images). The
+ * blur's visual contribution across a 350ms fade was essentially invisible, so it was paying
+ * a real cost on low-end hardware for a detail nobody perceives. Opacity + transform are both
+ * compositor-driven, so the reveal is now effectively free.
  */
 export function Reveal({
   children,
@@ -24,11 +31,10 @@ export function Reveal({
 }) {
   const reduce = useReducedMotion();
   const variants: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : y, filter: reduce ? "blur(0px)" : "blur(3px)" },
+    hidden: { opacity: 0, y: reduce ? 0 : y },
     show: {
       opacity: 1,
       y: 0,
-      filter: "blur(0px)",
       transition: { duration: reduce ? 0.2 : 0.35, ease: EASE, delay },
     },
   };
@@ -92,12 +98,12 @@ export function RevealItem({
   y?: number;
 }) {
   const reduce = useReducedMotion();
+  // Same reasoning as Reveal above: no `filter` animation.
   const variants: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : y, filter: reduce ? "blur(0px)" : "blur(3px)" },
+    hidden: { opacity: 0, y: reduce ? 0 : y },
     show: {
       opacity: 1,
       y: 0,
-      filter: "blur(0px)",
       transition: { duration: reduce ? 0.2 : 0.35, ease: EASE },
     },
   };

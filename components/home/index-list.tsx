@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { TransitionLink } from "@/components/motion/transition-link";
@@ -28,8 +27,22 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef({ x: 0, y: 0 });
   const [enabled, setEnabled] = useState(false);
-  const [previewImg, setPreviewImg] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
+  // The preview's SOURCE is written straight to the DOM, like its transform already is. Holding
+  // it in React state meant every row's `onMouseEnter` committed a state change, re-rendering
+  // all 15 rows (each a TransitionLink with an image) just to swap one decorative <img src>.
+  // Sweeping the cursor down the list re-rendered the whole section repeatedly. `visible` stays
+  // in state because it only flips on entering/leaving the section, not per row.
+  const imgRef = useRef<HTMLImageElement>(null);
+  const shownSrc = useRef<string | null>(null);
+  const showPreview = (src: string) => {
+    if (!enabled || !src) return;
+    if (shownSrc.current !== src) {
+      shownSrc.current = src;
+      if (imgRef.current) imgRef.current.src = src;
+    }
+    setVisible(true);
+  };
 
   // Attach only on a fine pointer, and never under reduced motion. Recomputed if the
   // reduced-motion preference flips (framer resolves it post-hydration).
@@ -89,9 +102,11 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
             willChange: visible ? "transform" : undefined,
           }}
         >
-          {previewImg ? (
-            <Image src={previewImg} alt="" fill unoptimized sizes="288px" className="object-cover" />
-          ) : null}
+          {/* A plain <img>, not next/image: the src is assigned imperatively (above), the image
+              is purely decorative, and it was already `unoptimized`, so next/image added a
+              client component and a re-render for no benefit here. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img ref={imgRef} alt="" className="h-full w-full object-cover" />
         </div>
       ) : null}
 
@@ -123,8 +138,7 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
               onMouseEnter={(e) => {
                 if (!enabled) return;
                 targetRef.current = { x: e.clientX, y: e.clientY };
-                if (t.img) setPreviewImg(t.img);
-                setVisible(Boolean(t.img));
+                showPreview(t.img);
               }}
               onMouseMove={(e) => {
                 if (enabled) targetRef.current = { x: e.clientX, y: e.clientY };
@@ -146,7 +160,19 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
                 </span>
                 {t.img ? (
                   <span className="relative block h-[66px] w-[52px] shrink-0 overflow-hidden rounded-[26px_26px_9px_9px] sm:hidden">
-                    <Image src={t.img} alt="" fill sizes="52px" unoptimized className="object-cover" />
+                    {/* Decorative row thumbnail, mobile only, already `unoptimized` — a plain
+                        <img> with explicit dimensions carries no layout-shift risk and keeps
+                        next/image out of a list that renders one per record. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={t.img}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      width={52}
+                      height={66}
+                      className="h-full w-full object-cover"
+                    />
                   </span>
                 ) : null}
                 <span className="hidden shrink-0 font-mono text-[11px] uppercase tracking-[.14em] text-ink/50 sm:block">

@@ -188,12 +188,24 @@ function Sheet({
         </motion.div>
       ) : null}
 
+      {/* These are the ONLY snap control a reduced-motion user has (drag is disabled above), so
+          they must be real targets. They were ~16px-tall text with an 8px gap, failing WCAG 2.5.8
+          on both size and the spacing exception — on a 375px touch screen that is a mis-tap
+          generator for the one audience that cannot drag instead. */}
       {reduce && snap !== "peek" ? (
-        <div className="flex shrink-0 justify-center gap-2 border-t border-line py-2">
-          <button type="button" onClick={cycleDown} className="text-xs text-ink-muted hover:text-magenta">
+        <div className="flex shrink-0 justify-center gap-3 border-t border-line px-4 py-2">
+          <button
+            type="button"
+            onClick={cycleDown}
+            className="inline-flex min-h-11 items-center rounded-full px-4 text-xs font-medium text-ink-muted transition-colors hover:text-magenta"
+          >
             Collapse
           </button>
-          <button type="button" onClick={cycleUp} className="text-xs text-ink-muted hover:text-magenta">
+          <button
+            type="button"
+            onClick={cycleUp}
+            className="inline-flex min-h-11 items-center rounded-full px-4 text-xs font-medium text-ink-muted transition-colors hover:text-magenta"
+          >
             Expand
           </button>
         </div>
