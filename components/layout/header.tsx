@@ -7,12 +7,13 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { GopuramMark } from "@/components/brand/gopuram-mark";
 import { SearchOverlay } from "@/components/layout/search-overlay";
+import { WishlistLink } from "@/components/layout/wishlist-link";
 import { cn } from "@/lib/utils";
 
 /**
  * Site header — prototype fidelity (docs/15 §0a):
  * - Desktop nav: EXPLORE / ABOUT / METHODOLOGY / SUGGEST in Space Mono small caps;
- *   the active route is magenta with a 1.5px bottom border. A dark PARTNER pill at right.
+ *   the active route is magenta with a 1.5px bottom border. Search + wishlist pills at right.
  * - On the homepage the header floats fixed and transparent over the dark Threshold
  *   hero (cream text), gaining a blurred plum background after ~40px of scroll.
  *   Everywhere else: sticky, blurred cream, hairline bottom border.
@@ -32,7 +33,7 @@ const MENU = [
   { label: "About", href: "/about" },
   { label: "Methodology", href: "/methodology" },
   { label: "Suggest a temple", href: "/suggest" },
-  { label: "Partner with us", href: "/contact" },
+  { label: "Your wishlist", href: "/wishlist" },
 ];
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -218,17 +219,7 @@ export function Header() {
 
           <div className="flex items-center gap-2.5">
             <SearchOverlay tone={dark ? "dark" : "light"} />
-            <Link
-              href="/contact"
-              className={cn(
-                "hidden h-[38px] items-center rounded-full px-[17px] font-mono text-[10.5px] tracking-[.18em] transition-colors md:inline-flex",
-                dark
-                  ? "border border-porcelain/30 text-porcelain hover:border-turmeric hover:text-turmeric"
-                  : "bg-ink text-porcelain hover:bg-magenta",
-              )}
-            >
-              PARTNER
-            </Link>
+            <WishlistLink tone={dark ? "dark" : "light"} />
             <button
               ref={hamburgerRef}
               type="button"

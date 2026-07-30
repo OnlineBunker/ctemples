@@ -98,8 +98,8 @@ export default function AboutPage() {
           <Link href="/explore" className={ctaPrimary}>
             Explore temples
           </Link>
-          <Link href="/contact" className={ctaSecondary}>
-            Partner with us
+          <Link href="/suggest" className={ctaSecondary}>
+            Suggest a temple
           </Link>
         </div>
       </section>

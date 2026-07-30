@@ -74,13 +74,19 @@ function subscribe(onChange: () => void): () => void {
 const getSnapshot = () => version;
 const getServerSnapshot = () => 0;
 
-/** Adopt the persisted set once, after mount, then tell every subscriber to re-render. */
+/**
+ * Adopt the persisted set once, after mount, then tell every subscriber to re-render.
+ *
+ * This ALWAYS emits, even when nothing is saved: consumers derive `ready` from `hydrated`,
+ * so skipping the notification for an empty set left them stuck on their pre-hydration
+ * branch — the wishlist page sat on "Opening your doorways…" forever instead of showing its
+ * empty state.
+ */
 function hydrate() {
   if (hydrated) return;
   hydrated = true;
   ids = read();
-  // Nothing saved → nothing changed → skip the re-render entirely (the common case).
-  if (ids.size > 0) emit();
+  emit();
 }
 
 export function useWishlist() {
@@ -101,7 +107,20 @@ export function useWishlist() {
     emit();
   }, []);
 
-  const count = hydrated && typeof window !== "undefined" ? ensure().size : 0;
+  const clear = useCallback(() => {
+    hydrate();
+    ensure().clear();
+    persist();
+    emit();
+  }, []);
 
-  return { has, toggle, count };
+  const ready = hydrated;
+  // Newest first: the persisted array is oldest→newest (insertion order, preserved by both
+  // `read()` and `Set`), so reversing puts the most recently saved temple at the top.
+  const ids = ready && typeof window !== "undefined" ? [...ensure()].reverse() : [];
+  // A stable primitive for effect dependencies — `ids` is a fresh array every render, so
+  // depending on it directly would re-run an effect forever.
+  const key = ids.join(",");
+
+  return { has, toggle, clear, count: ids.length, ids, key, ready };
 }

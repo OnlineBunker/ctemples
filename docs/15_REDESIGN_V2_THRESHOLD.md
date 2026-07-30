@@ -132,6 +132,35 @@ server-side query contract (docs/05, docs/10) — no client-side filtering or so
    The lens is decorative (`pointer-events: none`) and **no polygon is ever transformed**, so
    D17 and the "no zoom/pan GIS map" rule both hold.
 
+## 0d. PARTNER → WISHLIST (owner directive, 2026-07-30)
+
+**`/contact` ("Partner with us") is retired and replaced by `/wishlist`.** Amends the docs/02
+route map for redesign-v2: temples could be saved from any card, but there was nowhere to see
+them — a dead end. A partnership enquiry form, by contrast, is a Stage-B/business surface with
+no backend behind it in this prototype, so it was the right thing to trade away.
+
+- **Deleted:** `app/contact/`, `components/contact/contact-form.tsx`, and the already-unmounted
+  `components/home/language-banner.tsx` (dead since the chrome port, and the last `/contact`
+  referrer). Footer *Contribute*, the mobile menu, and the `/about` secondary CTA now point at
+  the wishlist / suggest instead. The header's PARTNER pill becomes `WishlistLink` — a heart
+  with a live saved count, so the page is discoverable the moment anything is saved.
+- **Data path:** saves live in `localStorage`, so the grid must be a client component — but it
+  must not therefore ship the dataset down to filter locally (docs/11 §3). `getWishlistTemples`
+  (a server action over the new `getTempleSummariesByIds` seam function) returns *only* the
+  saved ids' card-weight summaries, in the given order, skipping ids whose record no longer
+  exists and capped at 200 so a tampered-with storage value can't request an unbounded
+  projection. Fetched records are cached client-side by id, so un-saving removes a card with no
+  server round-trip.
+- **Design:** the page reads as another room in the same building — Explore's page padding, a
+  Bricolage `Your doorways.` H1 with a Space Mono `NN SAVED` readout opposite, the same
+  arch-card grid, newest save first. Empty state is the atlas pattern (gopuram glyph, "No
+  doorways saved yet.", an ink `BROWSE THE ATLAS` pill). "Clear wishlist" is a two-step
+  confirm so a whole shortlist can't be lost to one stray click.
+- **Bug fixed en route:** the store skipped its post-mount notification when nothing was saved,
+  but consumers derive `ready` from that same flag — so a first visit with an empty wishlist sat
+  on "Opening your doorways…" forever instead of showing the empty state. `hydrate()` now
+  always emits.
+
 ## 0. Soul
 
 In temple architecture the arch is not ornament — it is the *dvara*, the doorway that

@@ -24,7 +24,7 @@ const SITE = [
 
 const CONTRIBUTE = [
   { label: "Suggest a temple", href: "/suggest" },
-  { label: "Partner with us", href: "/contact" },
+  { label: "Your wishlist", href: "/wishlist" },
 ];
 
 function FooterLink({ href, label }: { href: string; label: string }) {

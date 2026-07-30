@@ -217,6 +217,25 @@ export async function queryTemples(query: TempleQuery): Promise<PagedTemples> {
   };
 }
 
+/**
+ * Card-weight lookup for an explicit set of ids, in the order given — the wishlist's data
+ * path. Ids that no longer exist are skipped (a saved slug can outlive a record), so the
+ * caller never has to reconcile holes. Capped so a tampered-with `localStorage` value can't
+ * ask the server for an unbounded projection.
+ */
+export async function getTempleSummariesByIds(ids: string[]): Promise<TempleSummary[]> {
+  const byId = new Map(temples.map((t) => [t.id, t]));
+  const seen = new Set<string>();
+  const out: TempleSummary[] = [];
+  for (const id of ids.slice(0, 200)) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const temple = byId.get(id);
+    if (temple) out.push(toSummary(temple));
+  }
+  return out;
+}
+
 /** Global (unfiltered) facet snapshot — for surfaces that need counts without a query. */
 export const getFacetCounts = cache(async (): Promise<ExploreFacets> => {
   return runExploreQuery(temples, {}).facets;
