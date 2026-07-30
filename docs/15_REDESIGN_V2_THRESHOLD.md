@@ -257,16 +257,56 @@ deity and state are now links, feeding the D26 internal-link graph. Zero-result 
 only recovery path exactly when needed; it now offers the popular-search routes. A saved id whose
 record disappears no longer inflates the wishlist count forever.
 
-**Known remaining** (real, ranked, not yet done): text-only controls under the 24×24 px target in
-the Explore bottom sheet and wishlist confirm row; search results place interactive `<a>`s inside
-`role="option"`, conflicting with the `aria-activedescendant` model; the wishlist clear-confirm
-moves no focus; hero H1 contrast over unconstrained photography; design-consistency drift (three
-panel radii on the temple page, two control languages on Explore, unused `.section-y`/`body-xs`/
-`rounded-input` tokens, off-palette dark hues in the hero); and perf items (Reveal animating
-`filter: blur()` over large subtrees, seven blend layers in the hero, the hero photo decoded twice,
-`IndexList` hoisting hover state to the section root). Two audit lenses (motion, code-quality) and
-~12 verification passes were lost to a spend limit — the dead-code analysis was redone by hand,
-but the motion lens has **not** been covered.
+### Second pass — the "known remaining" list, closed
+
+**Accessibility.** Touch targets: the bottom sheet's Collapse/Expand were ~16px-tall text with an
+8px gap — and they are the *only* snap control a reduced-motion visitor has, since drag is disabled
+for them; the wishlist confirm row and the "Turn off" distance control were ~14px text. All
+`min-h-11` now. Search results had `role="option"` on an `<li>` *wrapping* a link, which put an
+interactive descendant inside an option and added a tab stop per result — so Tab walked into the
+list while `aria-activedescendant` assumed focus never left the input, leaving arrow-selection and
+focus on different rows; the option **is** the anchor now (`tabIndex={-1}`), so click/middle-click
+survive but the focus model is single. The wishlist clear-confirm replaced the focused button with
+two new ones and moved no focus, dumping keyboard users to `<body>` (WCAG 3.2.2 / 4.1.3) — focus
+now moves to "Yes, clear" and back on cancel, with the question as a status region. The hero H1's
+legibility no longer depends on which photograph loads (a soft ink scrim sets a contrast floor).
+
+**Performance.** `Reveal`/`RevealItem` no longer animate `filter: blur()` — `filter` is not
+compositor-only, so it re-rasterised the entire wrapped subtree every frame, and these wrap whole
+page sections (the index is 15 rows with images). The 3px blur was imperceptible across a 350ms
+fade. `IndexList`'s cursor preview writes its `<img src>` imperatively (as its transform already
+did) instead of through state, which had re-rendered all 15 rows on every row's `mouseenter`.
+
+**Motion (the lens the spend limit killed — audited by hand).** Reduced-motion coverage was already
+sound. The real finding: CSS animations don't stop when scrolled away, so **nine infinite
+animations** (two birds × drift+flap, the hero photo drift, the scroll cue, the finale marquee) ran
+for the whole session — the marquee animating below the fold from first paint. Added
+`PauseOffscreen` + an IntersectionObserver on the hero: measured **0 of 9 running while off-screen
+(was 6), resuming mid-cycle with no visual change**. This deliberately keeps the owner-directed
+Amendment B motion rather than removing it — the cost was the problem, not the intent. `!important`
+is required on the pause because the birds set the `animation` *shorthand* inline, which resets
+`animation-play-state: running` and beats a stylesheet rule (only 3 of ~7 paused without it).
+`.animate-cue` is now killed explicitly under reduced motion rather than relying on the blanket
+`iteration-count: 1` override: reduced motion now neutralises **9/9** (was 8/9). The one easing
+that departs from `cubic-bezier(0.22,1,0.36,1)` is the scroll cue's `(0.65,0,0.35,1)` — a justified
+exception, since ease-out-expo would bunch a continuous sweep at its start.
+
+**A second hydration bug, found while verifying.** The wishlist store gated its first read on a
+module-level flag, flipped by whichever consumer mounts first — the header link, in the root
+layout. On `/explore` (the one *streamed* dynamic route) that happened before the cards below
+finished hydrating, so their first client render read `localStorage` and produced "Saved" against
+server HTML saying "Save": React #418, reproducible **only** on `/explore` and **only** with
+something already saved. The gate is now per-component, so every consumer's first render matches
+the server regardless of mount order. Verified across 18 seeded/unseeded route combinations.
+
+**Still open** (honest list): design-consistency drift — three panel radii on the temple page, two
+control languages and three control heights on the Explore toolbar, `rounded-portal` used against
+its own written enforcement rule on `/deities/[key]`, six off-palette dark hues in the hero
+composition, and the defined-but-unused `.section-y` / `body-xs` / `rounded-input` / `rounded-chip`
+tokens. Also unverified rather than disproven: the hero LCP is a CSS `background-image` (so it
+cannot be `priority`-preloaded) and `unoptimized` is hardcoded at several `next/image` call sites,
+making their `sizes` props inert. The **code-quality** lens never ran; its dead-code half was
+redone by hand (17 files removed) but the duplication/naming half was not.
 
 ## 0. Soul
 

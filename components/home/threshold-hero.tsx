@@ -127,10 +127,31 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
   const l1Ref = useRef<HTMLSpanElement>(null);
   const l2Ref = useRef<HTMLSpanElement>(null);
 
+  const sectionRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     setMounted(true);
     const connection = (navigator as { connection?: { saveData?: boolean } }).connection;
     if (connection?.saveData) setSaveData(true);
+  }, []);
+
+  // Pause the looping decorations (two birds × drift+flap, the slow photo drift, the scroll cue)
+  // once the hero leaves the viewport. CSS animations don't stop on their own, so these five
+  // infinite animations otherwise ran for the entire session while nobody could see them —
+  // pure compositor and battery cost, worst on the weakest devices. Nothing visible changes:
+  // `animation-play-state` resumes mid-cycle (see globals.css).
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) el.removeAttribute("data-motion-paused");
+        else el.setAttribute("data-motion-paused", "");
+      },
+      { rootMargin: "120px 0px 120px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   // `mounted` guard keeps SSR and the first client render identical (both render no pause
@@ -222,6 +243,7 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
 
   return (
     <section
+      ref={sectionRef}
       className="relative overflow-hidden bg-ink text-porcelain"
       style={{ height: "100svh", minHeight: 620 }}
       aria-label="Featured temples"

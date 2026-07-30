@@ -366,7 +366,24 @@
   display: none;
 }
 
-/* ─────────────────────── Reduced motion ─────────────────────── */
+/* ───────────────── Off-screen pause (perf) ───────────────── */
+/* components/motion/pause-offscreen.tsx. CSS animations keep running when scrolled out of view,
+   so every looping decoration below was burning compositor time for the whole session — the
+   finale marquee in particular animates below the fold from first paint. Using
+   `animation-play-state` (not a class swap) means they resume mid-cycle, so returning is
+   seamless and nothing visibly restarts.
+
+   `!important` is required, not lazy: the birds set the full `animation` shorthand as an inline
+   style, and that shorthand resets `animation-play-state` to `running`. An inline declaration
+   beats a stylesheet rule, so without this the four bird animations never paused (measured: 3 of
+   ~7 pausing). Same tool the reduced-motion block below uses, for the same reason. */
+[data-motion-paused] .animate-bird,
+[data-motion-paused] .animate-hero-drift,
+[data-motion-paused] .animate-marquee,
+[data-motion-paused] .animate-cue {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -379,7 +396,11 @@
   .animate-dot-progress,
   .animate-bird,
   .animate-marquee,
-  .animate-hero-drift {
+  .animate-hero-drift,
+  /* `.animate-cue` is listed explicitly rather than left to the blanket override below: it is an
+     infinite loop, and relying on `iteration-count: 1` + a 0.001ms duration to dispose of it is
+     fragile — it depends on the sweep's end state happening to be off-screen. */
+  .animate-cue {
     animation: none !important;
   }
   /* Amendment B homepage motion (birds/marquee/hero-drift) is killed above; the hero

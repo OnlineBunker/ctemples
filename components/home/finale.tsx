@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
+import { PauseOffscreen } from "@/components/motion/pause-offscreen";
 
 /**
  * Finale (docs/15 §0a): ink band with the outlined-type strip of temple names, the
@@ -15,8 +16,11 @@ export function Finale({ names }: { names: string[] }) {
   const durationS = Math.max(40, Math.round(names.length * 4.5));
   return (
     <section className="overflow-hidden bg-surface-deep text-porcelain" style={{ paddingTop: "clamp(76px,11vh,130px)" }}>
-      <div aria-hidden className="overflow-hidden">
+      {/* The marquee sits below the fold, so without this it animated from first paint for the
+          entire session while never being seen. Pausing it off-screen changes nothing visible. */}
+      <PauseOffscreen className="overflow-hidden">
         <div
+          aria-hidden
           className="animate-marquee flex w-max items-center whitespace-nowrap"
           style={{ gap: "clamp(30px,4vw,60px)", animationDuration: `${durationS}s` }}
         >
@@ -33,7 +37,7 @@ export function Finale({ names }: { names: string[] }) {
             </span>
           ))}
         </div>
-      </div>
+      </PauseOffscreen>
       <div className="px-5 text-center" style={{ padding: "clamp(64px,10vh,120px) 20px" }}>
         <Reveal>
           <p className="mb-[18px] font-mono text-[10.5px] tracking-[.3em] text-porcelain/50">THE REST IS PILGRIMAGE</p>
