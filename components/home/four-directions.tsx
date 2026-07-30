@@ -50,7 +50,6 @@ export function FourDirections({ items }: { items: DirectionItem[] }) {
                   src={r.img}
                   alt=""
                   fill
-                  unoptimized
                   sizes="(max-width: 760px) 100vw, 40vw"
                   className="object-cover transition-transform duration-[1100ms] ease-threshold group-hover:scale-[1.06] motion-reduce:!transform-none"
                 />

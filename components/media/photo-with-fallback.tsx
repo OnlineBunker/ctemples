@@ -28,11 +28,19 @@ export function PhotoWithFallback({
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
-  // Placeholder photos are hotlinked from Wikimedia's CDN, which serves pre-sized
-  // thumbnails and is built for direct browser traffic. Serving them unoptimized
-  // (browser -> Wikimedia) avoids rate-limiting the Next image optimizer's proxy.
-  // Real, self-hosted images will flow through the optimizer normally.
-  const unoptimized = src.startsWith("https://upload.wikimedia.org");
+  /**
+   * Wikimedia images used to bypass the optimizer ("avoids rate-limiting the proxy"). Measured,
+   * that was the single worst performance decision in the app: Wikimedia serves ONE fixed width
+   * and returns HTTP 400 for any other (verified at 400/640/828/1080px), so every surface got the
+   * full 1280px file — index rows downloaded 1280x1109 JPEGs to render 52x66px thumbnails, and
+   * the homepage shipped **4.33 MB of images**, giving a 19.4 s LCP on a 4x-CPU / 1.6 Mbps
+   * profile.
+   *
+   * Through the optimizer the same source becomes 1,155 bytes of AVIF at w=64 and 72 KB at
+   * w=640 — 377x and 6x smaller. `next.config.mjs` already allowlists the host and prefers
+   * AVIF/WebP, and optimized results are cached, so the proxy concern is a cold-start cost paid
+   * once per size rather than on every visit by every visitor.
+   */
   if (failed) {
     return (
       <TempleScene
@@ -59,7 +67,6 @@ export function PhotoWithFallback({
       fetchPriority={priority ? "high" : undefined}
       placeholder="blur"
       blurDataURL={shimmer(24, 16)}
-      unoptimized={unoptimized}
       onError={() => setFailed(true)}
       className={cn("object-cover", className)}
     />

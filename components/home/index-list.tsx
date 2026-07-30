@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { TransitionLink } from "@/components/motion/transition-link";
@@ -105,8 +106,16 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
           {/* A plain <img>, not next/image: the src is assigned imperatively (above), the image
               is purely decorative, and it was already `unoptimized`, so next/image added a
               client component and a re-render for no benefit here. */}
+          {/* Starts on a 1x1 transparent GIF rather than no `src` at all: an <img> with no
+              source is a broken-image state (naturalWidth 0) for as long as nobody has hovered
+              a row. The real source is swapped in imperatively by showPreview(). */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img ref={imgRef} alt="" className="h-full w-full object-cover" />
+          <img
+            ref={imgRef}
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            alt=""
+            className="h-full w-full object-cover"
+          />
         </div>
       ) : null}
 
@@ -160,18 +169,18 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
                 </span>
                 {t.img ? (
                   <span className="relative block h-[66px] w-[52px] shrink-0 overflow-hidden rounded-[26px_26px_9px_9px] sm:hidden">
-                    {/* Decorative row thumbnail, mobile only, already `unoptimized` — a plain
-                        <img> with explicit dimensions carries no layout-shift risk and keeps
-                        next/image out of a list that renders one per record. */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    {/* Optimized, and that matters more here than anywhere: these render at
+                        52x66 CSS px but Wikimedia only serves one fixed width, so unoptimized
+                        they pulled a 1280x1109 / ~438 KB JPEG *each* — 15 of them, the bulk of
+                        the homepage's measured 4.33 MB. At `sizes="52px"` the optimizer returns
+                        roughly 1 KB of AVIF per row. */}
+                    <Image
                       src={t.img}
                       alt=""
+                      fill
                       loading="lazy"
-                      decoding="async"
-                      width={52}
-                      height={66}
-                      className="h-full w-full object-cover"
+                      sizes="52px"
+                      className="object-cover"
                     />
                   </span>
                 ) : null}

@@ -89,7 +89,7 @@ export function InFocus({ feat }: { feat: FocusData }) {
             }}
           >
             {feat.img ? (
-              <Image src={feat.img} alt={feat.name} fill unoptimized sizes="(max-width: 860px) 100vw, 430px" className="object-cover" />
+              <Image src={feat.img} alt={feat.name} fill sizes="(max-width: 860px) 100vw, 430px" className="object-cover" />
             ) : (
               <div className="absolute inset-0 bg-plum/20" />
             )}

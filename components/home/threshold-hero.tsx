@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Pause, Play } from "lucide-react";
@@ -50,7 +51,24 @@ const SKY_GLOWS = [
   "radial-gradient(ellipse 72% 56% at 62% 40%,rgba(230,70,130,.11),transparent 62%)",
 ];
 
-/** One crossfading image pair (background-size:cover divs, like the prototype). */
+/**
+ * One crossfading image pair.
+ *
+ * These were CSS `background-image` divs (as in the prototype), which made the homepage's LCP
+ * image invisible to the browser's preload scanner: a background URL is only discovered after
+ * CSS is parsed and the element is laid out, it can never carry `fetchpriority`, and it cannot be
+ * preloaded. Measured cost on a throttled mobile profile (4x CPU / 1.6 Mbps): **LCP 19.4 s**.
+ *
+ * They are real `<img>` elements now. The markup is in the HTML, so the preload scanner starts
+ * the fetch immediately, and the first slide carries `fetchpriority="high"` + `loading="eager"`.
+ * `object-fit: cover` / `object-position: center` reproduce `background-size: cover` /
+ * `background-position: center` exactly, and because the wrapper keeps the same absolute
+ * geometry the ghost-tower alignment (the -35.14% / 135.14% offsets) is unchanged.
+ *
+ * A responsive `srcset` is deliberately absent: `upload.wikimedia.org` returns HTTP 400 for any
+ * width other than the exact thumbnail already in the dataset (verified at 400/640/828/1080px),
+ * so derived widths would ship broken URLs. Real self-hosted imagery should add `srcset` here.
+ */
 function FadeLayers({
   slides,
   index,
@@ -87,15 +105,31 @@ function FadeLayers({
             style={{
               position: "absolute",
               ...pos,
-              backgroundImage: s.image ? `url("${s.image}")` : undefined,
               backgroundColor: s.image ? undefined : "#3D0A40",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
               opacity: isCurrent ? 1 : 0,
               transition: `opacity ${FADE_MS}ms ease`,
               zIndex: isCurrent ? 2 : 1,
             }}
-          />
+          >
+            {s.image ? (
+              <Image
+                src={s.image}
+                alt=""
+                fill
+                // The first slide IS the page's LCP element: `priority` emits a preload link and
+                // sets fetchpriority=high, so it no longer queues behind fonts and scripts.
+                priority={i === 0}
+                loading={i === 0 ? "eager" : "lazy"}
+                // Optimized (see photo-with-fallback.tsx): the arch renders at
+                // clamp(290px,36vw,560px), so this asks for ~that width in AVIF instead of the
+                // fixed 1280px JPEG Wikimedia serves.
+                sizes="(max-width: 760px) 70vw, 40vw"
+                draggable={false}
+                className="object-cover"
+                style={{ objectPosition: "center" }}
+              />
+            ) : null}
+          </div>
         );
       })}
     </>
@@ -167,9 +201,10 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
       setIndex((i) => {
         const ni = (i + 1) % count;
         // Preload before swapping so the crossfade never reveals a half-loaded image.
+        // `window.Image` explicitly: the `next/image` import shadows the global constructor.
         const next = slides[ni];
         if (next?.image) {
-          const img = new Image();
+          const img = new window.Image();
           img.src = next.image;
         }
         setPrev(i);
