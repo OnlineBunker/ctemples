@@ -12,7 +12,7 @@ const LABEL = "mb-2 block font-mono text-[0.66rem] uppercase tracking-label text
 const submitButton =
   "inline-flex items-center justify-center gap-2 rounded-full bg-magenta px-6 py-3 font-mono text-[0.72rem] uppercase tracking-label text-canvas transition-colors hover:bg-magenta-deep";
 
-export function SuggestForm() {
+export function SuggestForm({ defaultLocation = "" }: { defaultLocation?: string }) {
   const [templeName, setTempleName] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -58,11 +58,17 @@ export function SuggestForm() {
           <label htmlFor="location" className={LABEL}>
             City / State
           </label>
+          {/* Prefilled when the visitor arrived from a state with nothing documented yet, so
+              they don't retype the place they just came from. `key` forces React to adopt a new
+              default if the prop changes between renders (an uncontrolled input otherwise keeps
+              its first value forever). */}
           <input
+            key={defaultLocation}
             id="location"
             name="location"
             type="text"
             required
+            defaultValue={defaultLocation}
             className={FIELD}
             placeholder="e.g. Rameswaram, Tamil Nadu"
           />

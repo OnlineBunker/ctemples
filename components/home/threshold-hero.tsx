@@ -39,6 +39,37 @@ export interface ThresholdSlide {
 const DWELL_MS = 7000;
 const FADE_MS = 1500;
 
+/**
+ * The nocturnal scene's own darks.
+ *
+ * These six values are NOT brand colours and are deliberately not added to the Tailwind palette:
+ * promoting them would imply the identity gained six new tokens, when they only ever describe one
+ * composition — a night sky receding into a horizon. They are all shades of the locked `plum`
+ * (#3D0A40) / `ink` (#241021) family, carried over from the design prototype.
+ *
+ * What they were before: six bare hex literals scattered through the gradients and SVG fills of
+ * this file, which is what made them read as drift. Named and declared once, the scene's palette
+ * is inspectable and adjustable in a single place, and it is obvious at a glance that nothing here
+ * escapes the plum/ink range.
+ */
+const NIGHT = {
+  /** Sky gradient, top — the darkest point overhead. */
+  skyTop: "#1C0C1A",
+  /** Sky gradient, lower band — warms very slightly toward the horizon. */
+  skyLow: "#2B1127",
+  /** Warm radial bloom behind the arch, the scene's only light source. */
+  glow: "#43132F",
+  /** Far mountain ridge. */
+  ridgeFar: "#2A0E2D",
+  /** Near mountain ridge — darker, so the ranges read as depth. */
+  ridgeNear: "#1D0C1F",
+  /** Gopuram silhouettes on the horizon — the deepest value in the frame. */
+  silhouette: "#150818",
+  /** The locked `ink` token, repeated here only so the gradient reads as one declaration
+   *  rather than mixing named values with a bare literal mid-string. */
+  ink: "#241021",
+} as const;
+
 /** Subtle, on-brand warm glows that crossfade with each slide (docs/08 §5#8). Kept low-alpha
  *  and screen-blended so the plum identity holds — a shift in light, not a repaint. */
 const SKY_GLOWS = [
@@ -288,7 +319,7 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 62% 42%,#43132F 0%,rgba(67,19,47,0) 60%),linear-gradient(180deg,#1C0C1A 0%,#241021 34%,#2B1127 72%,#241021 100%)",
+            `radial-gradient(ellipse 80% 60% at 62% 42%,${NIGHT.glow} 0%,rgba(67,19,47,0) 60%),linear-gradient(180deg,${NIGHT.skyTop} 0%,${NIGHT.ink} 34%,${NIGHT.skyLow} 72%,${NIGHT.ink} 100%)`,
         }}
       />
       {/* Per-slide sky shift (§5#8) — one warm glow per slide, only the current is visible;
@@ -328,12 +359,12 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
       >
         <path
           d="M0 240 L0 170 L160 96 L300 168 L430 120 L560 186 L720 108 L880 178 L1010 132 L1160 188 L1300 140 L1440 182 L1440 240 Z"
-          fill="#2A0E2D"
+          fill={NIGHT.ridgeFar}
           opacity=".55"
         />
         <path
           d="M0 240 L0 200 L120 156 L260 204 L420 158 L600 212 L760 168 L940 214 L1100 176 L1260 216 L1440 184 L1440 240 Z"
-          fill="#1D0C1F"
+          fill={NIGHT.ridgeNear}
           opacity=".85"
         />
       </svg>
@@ -346,7 +377,7 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
         className="absolute left-0 right-0 w-full"
         style={{ bottom: "clamp(46px,8vh,100px)", height: "24%", willChange: "transform" }}
       >
-        <g fill="#150818">
+        <g fill={NIGHT.silhouette}>
           <path
             d="M80 200 L80 128 L96 128 L100 96 L116 96 L120 66 L134 66 L138 88 L127 88 L127 42 L131 30 L135 42 L135 88 L152 96 L156 96 L160 128 L176 128 L176 200 Z"
             opacity=".9"
@@ -434,10 +465,15 @@ export function ThresholdHero({ slides, templeCount }: { slides: ThresholdSlide[
           పవిత్ర దేవాలయాలు
         </p>
       </div>
-      {/* Vertical side line (data-derived count — never hardcoded) */}
+      {/* Vertical side line (data-derived count — never hardcoded).
+          Gated on viewport HEIGHT, not just width, and set `whitespace-nowrap`: in vertical-rl a
+          string longer than the available height wraps into a second column, and at ordinary
+          laptop heights (measured 760–860px) this rendered as two ragged parallel runs of text
+          reading as an accident rather than a caption. One clean column when there's room for it,
+          nothing when there isn't — it is decorative, so absence beats a broken version. */}
       <p
         ref={vertRef}
-        className="absolute z-[6] hidden font-mono text-[10px] tracking-[.32em] text-porcelain/40 md:block"
+        className="absolute z-[6] hidden whitespace-nowrap font-mono text-[10px] tracking-[.32em] text-porcelain/40 md:[@media(min-height:940px)]:block"
         style={{
           right: "clamp(16px,4vw,60px)",
           top: "50%",

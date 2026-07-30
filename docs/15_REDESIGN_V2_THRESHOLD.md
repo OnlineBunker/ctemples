@@ -333,15 +333,38 @@ function**. Consolidated onto `padCount()` in `lib/format.ts` — where the proj
 tests its formatters — with unit tests for padding, no-truncation above 99, and negative/fractional
 input.
 
-**Still open, honestly.** Six off-palette dark hues in the hero composition (they build the
-nocturnal sky gradient; they are not in the locked palette and should either be tokenised as
-"sky" values or justified in the spec). Seven full-viewport `mix-blend-mode: screen` layers plus
-two large runtime blurs in the hero — still a real paint cost on weak GPUs, now partly mitigated by
-the off-screen pause but not reduced. The hero photo is still decoded twice (arch + ghost tower
-render the same source at two sizes). CTA styling is hand-rolled in several places while
-`ButtonLink` exists and is used once — a consolidation worth doing but with real visual risk.
-`/suggest?state=<slug>` still promises context and delivers an empty form. And the naming half of
-the code-quality lens was never run at all.
+### Fourth pass — the remainder
+
+**`/suggest?state=` now delivers on its promise.** The "help us document {state} →" link from an
+empty state page led to a blank form, so the visitor retyped the state they had just come from. The
+page resolves the slug back to its real display name (via the `STATE_REGION` registry, so a crafted
+or unknown slug resolves to nothing and is never echoed into the page — verified with an injected
+value), retitles to "Know a temple in {state}?", and prefills Location.
+
+**The six off-palette hero hues are declared, not promoted.** They are now one documented `NIGHT`
+constant in the hero file. Deliberately NOT added to the Tailwind palette: promoting them would
+imply the identity gained six tokens, when they only ever describe one composition — a night sky
+receding to a horizon, entirely within the locked plum/ink range. Naming them once makes the scene
+inspectable and makes it obvious nothing escapes that range. Zero visual change (verified).
+
+**The hero paint-cost concern was measured and refuted.** Scrolling through the hero at 4× CPU
+throttle on a 390px viewport: **average frame 8.0 ms, p95 9.7 ms, worst 12.2 ms, and 0 of 69 frames
+over the 16.7 ms budget.** The ten blend/filter layers are static and GPU-composited, so they cost
+essentially nothing per frame; the earlier worry assumed per-frame filter work that does not happen.
+Left exactly as authored — changing working code on a theory would have been the wrong call.
+
+**Fixed a defect the screenshots surfaced.** The hero's vertical side caption wrapped into two
+ragged parallel columns at ordinary laptop heights (measured 30px wide — two columns — at 760–860px
+viewport height, one clean column only at ≥1000px), because `writing-mode: vertical-rl` wraps a
+string longer than the available height. It is now `whitespace-nowrap` and gated on viewport
+*height*, so it renders as one column when there is room and not at all when there isn't.
+
+**Still open.** CTA styling is hand-rolled in several places while `ButtonLink` exists and is used
+once — worth consolidating, but it carries real visual risk across the 404/error/about/suggest
+surfaces and deserves its own pass. The hero photo is still decoded twice (the arch frame and the
+ghost tower render the same source at two sizes) — correct as authored, since the ghost tower needs
+its own masked copy, but a single shared decode would be cheaper. The **naming** half of the
+code-quality lens has still never been run.
 
 ## 0. Soul
 
