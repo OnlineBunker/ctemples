@@ -2,7 +2,7 @@ import type { Temple, Region } from "./types";
 import { REGION_ORDER } from "./regions";
 import { slugify } from "./utils";
 import { DEITY_ORDER, DEITY_META, matchesDeity, countByDeity, type DeityKey } from "./deities";
-import { haversineKm } from "./distance";
+import { haversineKm, type LatLng } from "./distance";
 import { sortTemples, type SortKey } from "./filter";
 import { searchTemples } from "./search";
 import { resolveAliasLabel } from "./search-aliases";
@@ -191,6 +191,8 @@ export interface ExploreQuery {
   /** 1-based. */
   page?: number;
   perPage?: number;
+  /** The visitor's own coordinates — required for `sort: "nearest"`, ignored otherwise. */
+  near?: LatLng;
 }
 
 export interface ExploreFacets {
@@ -263,6 +265,7 @@ export function runExploreQuery(list: Temple[], query: ExploreQuery): ExploreRes
     sort = "rating",
     page = 1,
     perPage = 24,
+    near,
   } = query;
 
   const byState = (arr: Temple[]) =>
@@ -294,6 +297,14 @@ export function runExploreQuery(list: Temple[], query: ExploreQuery): ExploreRes
     const outcome = searchTemples(matched, trimmedQ, { disableAliases: exact });
     matched = outcome.results;
     matchedAliases = outcome.matchedAliases;
+  } else if (sort === "nearest" && near) {
+    // True great-circle distance from the visitor, nearest first. Distances are computed
+    // once into a map rather than inside the comparator, which would recompute Haversine
+    // O(n log n) times per request.
+    const byId = new Map(matched.map((t) => [t.id, haversineKm(near, t.coordinates)]));
+    matched = [...matched].sort(
+      (a, b) => (byId.get(a.id) ?? Infinity) - (byId.get(b.id) ?? Infinity) || a.name.localeCompare(b.name),
+    );
   } else {
     matched = sortTemples(matched, sort);
   }

@@ -2,7 +2,9 @@ import { TransitionLink } from "@/components/motion/transition-link";
 import { ViewTransition } from "@/components/motion/view-transition";
 import { TempleImage } from "@/components/media/temple-image";
 import { Rating } from "@/components/ui/rating";
-import { formatRating, cheapestBudget } from "@/lib/format";
+import { WishlistButton } from "@/components/ui/wishlist-button";
+import { CardRepel } from "@/components/ui/card-repel";
+import { formatRating, formatRelativeDistance, cheapestBudget } from "@/lib/format";
 import { getHero } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import type { Temple, Region } from "@/lib/types";
@@ -30,6 +32,8 @@ export interface TempleCardData {
   tags?: string[];
   hero?: { url: string; alt: string } | null;
   cheapestBudget?: number | null;
+  /** Great-circle km from the visitor — present only when they've allowed geolocation. */
+  distanceKm?: number;
 }
 
 /** Adapt a full Temple record to the card view-model. */
@@ -62,12 +66,15 @@ export function summaryToCard(s: TempleSummary): TempleCardData {
     tags: s.tags,
     hero: s.hero ? { url: s.hero.url, alt: s.hero.alt } : null,
     cheapestBudget: s.cheapestBudget,
+    distanceKm: s.distanceKm,
   };
 }
 
 function ariaLabel(t: TempleCardData): string {
   const ratingPart = typeof t.rating === "number" ? `, rated ${formatRating(t.rating)} out of 5` : "";
-  return `${t.name}, ${t.city}${ratingPart} — view details`;
+  const distancePart =
+    typeof t.distanceKm === "number" ? `, ${formatRelativeDistance(t.distanceKm)}` : "";
+  return `${t.name}, ${t.city}${ratingPart}${distancePart} — view details`;
 }
 
 /**
@@ -123,52 +130,70 @@ export function TempleCard({
   // The prototype atlas card (docs/15 §0a): a 4:5 arch-top image (170px crown), a
   // centered translucent region pill overlapping the top edge, and name / location / ★
   // set directly on the page — no card box, no border, no floating white pills.
+  //
+  // Structure note: the link and the wishlist heart are SIBLINGS inside CardRepel, not
+  // nested — a <button> inside an <a> is invalid HTML and breaks keyboard/SR use of both.
   return (
-    <TransitionLink
-      href={`/temples/${temple.id}`}
-      className={cn("group block outline-none", className)}
-      aria-label={ariaLabel(temple)}
-    >
-      <article aria-hidden="true">
-        <div
-          className="relative overflow-hidden bg-surface-recess"
-          style={{ aspectRatio: "4/5", borderRadius: "170px 170px 18px 18px" }}
-        >
-          <ViewTransition name={`temple-${temple.id}`} share="morph">
-            <div className="absolute inset-0 transition-transform duration-[800ms] ease-threshold group-hover:scale-[1.06] motion-reduce:!transform-none">
-              <TempleImage
-                src={heroUrl}
-                alt={heroAlt}
-                region={temple.region}
-                seed={temple.id}
-                priority={priority}
-                sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
-              />
-            </div>
-          </ViewTransition>
-          <span className="absolute left-1/2 top-3.5 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink/50 px-[11px] py-[5px] font-mono text-[9px] tracking-[.18em] text-porcelain backdrop-blur-[6px]">
-            {temple.region.toUpperCase()} INDIA
-          </span>
-        </div>
-        <div className="px-1.5 pt-3.5">
-          <h3
-            className="text-balance font-display font-semibold leading-[1.2] tracking-[-.01em] text-ink transition-colors duration-300 group-hover:text-magenta"
-            style={{ fontSize: 19 }}
+    <CardRepel className={cn("group/card", className)}>
+      <TransitionLink
+        href={`/temples/${temple.id}`}
+        className="group block outline-none"
+        aria-label={ariaLabel(temple)}
+      >
+        <article aria-hidden="true">
+          <div
+            className="relative overflow-hidden bg-surface-recess"
+            style={{ aspectRatio: "4/5", borderRadius: "170px 170px 18px 18px" }}
           >
-            {temple.name}
-          </h3>
-          <div className="mt-[5px] flex items-baseline justify-between gap-2.5">
-            <p className="truncate font-mono text-[10px] uppercase tracking-[.14em] text-ink/50">
-              {temple.city} · {temple.state}
-            </p>
-            {typeof temple.rating === "number" ? (
-              <p className="shrink-0 font-mono text-[10.5px] text-ink">
-                <span className="text-turmeric">★</span> {formatRating(temple.rating)}
-              </p>
-            ) : null}
+            <ViewTransition name={`temple-${temple.id}`} share="morph">
+              <div className="absolute inset-0 transition-transform duration-[800ms] ease-threshold group-hover:scale-[1.06] motion-reduce:!transform-none">
+                <TempleImage
+                  src={heroUrl}
+                  alt={heroAlt}
+                  region={temple.region}
+                  seed={temple.id}
+                  priority={priority}
+                  sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
+                />
+              </div>
+            </ViewTransition>
+            <span className="absolute left-1/2 top-3.5 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink/50 px-[11px] py-[5px] font-mono text-[9px] tracking-[.18em] text-porcelain backdrop-blur-[6px]">
+              {temple.region.toUpperCase()} INDIA
+            </span>
           </div>
-        </div>
-      </article>
-    </TransitionLink>
+          <div className="px-1.5 pt-3.5">
+            <h3
+              className="text-balance font-display font-semibold leading-[1.2] tracking-[-.01em] text-ink transition-colors duration-300 group-hover:text-magenta"
+              style={{ fontSize: 19 }}
+            >
+              {temple.name}
+            </h3>
+            <div className="mt-[5px] flex items-baseline justify-between gap-2.5">
+              <p className="truncate font-mono text-[10px] uppercase tracking-[.14em] text-ink/50">
+                {temple.city} · {temple.state}
+              </p>
+              {typeof temple.rating === "number" ? (
+                <p className="shrink-0 font-mono text-[10.5px] text-ink">
+                  <span className="text-turmeric">★</span> {formatRating(temple.rating)}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        </article>
+      </TransitionLink>
+
+      {/* Beneath the card: real distance when the visitor shared their location, and the
+          wishlist heart — a sibling button, never nested inside the link above. */}
+      <div className="mt-2 flex items-center justify-between gap-3 px-1.5">
+        {typeof temple.distanceKm === "number" ? (
+          <p className="truncate font-mono text-[9.5px] uppercase tracking-[.16em] text-magenta-deep">
+            {formatRelativeDistance(temple.distanceKm)}
+          </p>
+        ) : (
+          <span />
+        )}
+        <WishlistButton id={temple.id} name={temple.name} />
+      </div>
+    </CardRepel>
   );
 }

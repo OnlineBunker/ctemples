@@ -20,6 +20,7 @@ import { countByDeity, pickByDeityKey, matchesDeity, DEITY_ORDER, type DeityKey 
 import type { SortKey } from "./filter";
 import { getHero } from "./media";
 import { cheapestBudget } from "./format";
+import { haversineKm, type LatLng } from "./distance";
 
 /**
  * Data-bound public API — the ONLY module pages import for data (CLAUDE.md "the data
@@ -129,9 +130,12 @@ export interface TempleSummary {
   tier: 1;
   featured: boolean;
   cheapestBudget: number | null;
+  /** Great-circle km from the visitor's own coordinates — set only when the query carried
+   *  `near` (i.e. they allowed geolocation). Drives the "N km away" card caption. */
+  distanceKm?: number;
 }
 
-function toSummary(t: Temple): TempleSummary {
+function toSummary(t: Temple, near?: LatLng): TempleSummary {
   return {
     id: t.id,
     uid: t.id,
@@ -148,6 +152,7 @@ function toSummary(t: Temple): TempleSummary {
     tier: 1,
     featured: t.featured,
     cheapestBudget: cheapestBudget(t.costEstimates),
+    distanceKm: near ? haversineKm(near, t.coordinates) : undefined,
   };
 }
 
@@ -165,6 +170,9 @@ export interface TempleQuery {
   sort?: SortKey;
   page?: number;
   perPage?: number;
+  /** The visitor's own coordinates (Geolocation API) — enables `sort: "nearest"` and the
+   *  per-card distance caption. */
+  near?: LatLng;
 }
 
 export interface PagedTemples {
@@ -194,10 +202,11 @@ export async function queryTemples(query: TempleQuery): Promise<PagedTemples> {
     sort: query.sort,
     page: query.page,
     perPage: query.perPage,
+    near: query.near,
   };
   const result = runExploreQuery(temples, internalQuery);
   return {
-    items: result.items.map(toSummary),
+    items: result.items.map((t) => toSummary(t, query.near)),
     total: result.total,
     page: result.page,
     perPage: result.perPage,

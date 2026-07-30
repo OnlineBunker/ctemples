@@ -70,6 +70,40 @@ tamed evolution of it. Binding consequences:
   line animation is admitted as a standard affordance (killed under reduced motion). Machine
   counts may use the prototype's "DOORWAYS" unit, but always data-derived — never hardcoded.
 
+## 0b. EXPLORE BEHAVIOUR AMENDMENT (owner directive, 2026-07-30)
+
+Five behavioural corrections to Explore. All are **binding**; each keeps the existing
+server-side query contract (docs/05, docs/10) — no client-side filtering or sorting was added.
+
+1. **List and map never share filters.** `?state=` is both the map's selection and the list's
+   state facet, so carrying params across modes meant picking a state on the map silently
+   pre-filtered the list. `buildViewHref()` (`lib/explore-url.ts`) now starts a fresh browse on
+   every mode switch: `q`/`exact`/`state`/`deity`/`tag`/`sort`/`page` are all dropped. Only the
+   visitor's coordinates survive — see (2), a personalisation rather than a filter.
+2. **Real "nearest me" ordering.** New `?near=<lat>,<lng>` param (`LatLng`, written at 3dp
+   ≈110 m so a shared URL can't pinpoint a home) plus a `nearest` `SortKey`. `runExploreQuery`
+   orders by true Haversine distance (distances precomputed into a map, not recomputed inside
+   the comparator); `TempleSummary.distanceKm` carries the value so each card states "N km
+   away". `nearest` without coordinates is unsatisfiable and coerces back to `rating` on both
+   the parse and build side. A search query still wins over sort (existing relevance law).
+3. **The manual state picker is gone.** `YourStatePill` ("Pick your state for local results")
+   duplicated the State facet and only ever approximated proximity. Replaced by
+   `NearbyLocator`, which uses the Geolocation API: a cached fix (7 days) or an
+   already-granted permission applies automatically via `router.replace` (Back still leaves
+   Explore); otherwise one labelled control requests it. Auto-apply is skipped over any
+   deliberate query/filter/page. If the visitor declines or the device can't report a
+   position, **nothing renders** — no dead control, and never a guessed location.
+4. **Wishlist.** `lib/wishlist.ts` — a `localStorage`-backed store (`ctemples:saves`, the key
+   docs/09 already reserved) shared by every mounted heart via `useSyncExternalStore`, synced
+   across tabs by the `storage` event. Saves are client-only, so the store stays un-hydrated
+   until the first post-mount effect: reading storage during the first client render would
+   contradict the server HTML (React #418). `WishlistButton` renders **beneath** the card as a
+   sibling of its link — a `<button>` inside an `<a>` is invalid and breaks both controls.
+5. **Cursor-repel card hover.** `CardRepel` drifts a card a few px *away* from the pointer
+   (rAF lerp, capped at 10 px, listeners dropped once settled). **2D `translate` only** — a 3D
+   transform on an ancestor of a `view-transition-name` element corrupts the morph snapshot
+   (docs/03 §5). Fine pointers only; fully inert under `prefers-reduced-motion`.
+
 ## 0. Soul
 
 In temple architecture the arch is not ornament — it is the *dvara*, the doorway that

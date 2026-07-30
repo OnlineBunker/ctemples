@@ -40,7 +40,10 @@ export function ActiveFilterChips({
       href: buildExploreHref(current, { tags: current.tags.filter((t) => t !== slug), page: 1 }),
     });
   }
-  if (current.sort !== "rating") {
+  // `nearest` is deliberately NOT a chip: distance ordering belongs to the visitor's own
+  // location, which the "Nearest you · Turn off" control already owns. A second, removable
+  // copy of the same state would be redundant and could contradict it.
+  if (current.sort !== "rating" && current.sort !== "nearest") {
     chips.push({
       key: "sort",
       label: `Sort: ${PUBLIC_SORT_OPTIONS.find((o) => o.key === current.sort)?.label ?? current.sort}`,
@@ -56,13 +59,15 @@ export function ActiveFilterChips({
         <Link
           key={chip.key}
           href={chip.href}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line-strong bg-canvas px-3 py-1.5 text-sm text-ink transition-colors hover:border-magenta hover:text-magenta"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/[.18] bg-white/70 px-[15px] font-mono text-[10.5px] uppercase tracking-[.14em] text-ink transition-colors hover:border-magenta hover:text-magenta"
         >
           {chip.label}
           <X className="h-3.5 w-3.5" aria-hidden />
         </Link>
       ))}
       <Link
+        // Clears every filter but keeps the visitor's own location ordering, matching the
+        // mode-switch rule (location is a personalisation, not a filter).
         href={buildExploreHref(current, {
           view: "list",
           q: "",
@@ -70,10 +75,10 @@ export function ActiveFilterChips({
           state: undefined,
           deity: undefined,
           tags: [],
-          sort: "rating",
+          sort: current.near ? "nearest" : "rating",
           page: 1,
         })}
-        className="inline-flex min-h-11 items-center rounded-full px-3 py-1.5 text-sm font-medium text-magenta-deep hover:bg-magenta-soft"
+        className="inline-flex min-h-11 items-center rounded-full px-3 font-mono text-[10.5px] uppercase tracking-[.14em] text-magenta-deep transition-colors hover:text-magenta"
       >
         Reset all
       </Link>

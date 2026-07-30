@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { parseExploreParams, buildExploreHref, withQuery, type ParsedExploreParams } from "./explore-url";
+import {
+  parseExploreParams,
+  buildExploreHref,
+  buildViewHref,
+  withQuery,
+  type ParsedExploreParams,
+} from "./explore-url";
 
 const BASE: ParsedExploreParams = {
   view: "list",
@@ -108,5 +114,62 @@ describe("withQuery", () => {
   it("clears exact when q becomes empty", () => {
     const cleared = withQuery({ ...BASE, q: "shiva", exact: true }, "");
     expect(cleared).toMatchObject({ q: "", exact: false });
+  });
+});
+
+describe("near (geolocation) + nearest sort", () => {
+  it("parses a valid near pair", () => {
+    expect(parseExploreParams({ near: "12.972,77.594" }).near).toEqual({ lat: 12.972, lng: 77.594 });
+    expect(parseExploreParams({ near: "-33.87,151.21" }).near).toEqual({ lat: -33.87, lng: 151.21 });
+  });
+
+  it("rejects malformed or out-of-range coordinates", () => {
+    for (const bad of ["", "12.972", "a,b", "12,34,56", "91,0", "0,181", "NaN,5"]) {
+      expect(parseExploreParams({ near: bad }).near).toBeUndefined();
+    }
+  });
+
+  it("keeps sort=nearest only when coordinates are present", () => {
+    expect(parseExploreParams({ sort: "nearest", near: "12.9,77.6" }).sort).toBe("nearest");
+    // Unsatisfiable without a reference point — falls back to the default ordering.
+    expect(parseExploreParams({ sort: "nearest" }).sort).toBe("rating");
+  });
+
+  it("round-trips near through build -> parse at 3dp", () => {
+    const href = buildExploreHref(BASE, { near: { lat: 12.97159, lng: 77.59457 }, sort: "nearest" });
+    expect(href).toContain("near=12.972%2C77.595");
+    const sp = Object.fromEntries(new URLSearchParams(href.split("?")[1]));
+    const parsed = parseExploreParams(sp);
+    expect(parsed.sort).toBe("nearest");
+    expect(parsed.near).toEqual({ lat: 12.972, lng: 77.595 });
+  });
+
+  it("never writes sort=nearest without coordinates", () => {
+    expect(buildExploreHref(BASE, { sort: "nearest" })).toBe("/explore");
+  });
+});
+
+describe("buildViewHref", () => {
+  const FILTERED: ParsedExploreParams = {
+    ...BASE,
+    q: "shiva",
+    exact: true,
+    state: "tamil-nadu",
+    deity: "shiva",
+    tags: ["pilgrimage"],
+    sort: "name",
+    page: 4,
+  };
+
+  it("drops every filter when switching view (list and map never share filters)", () => {
+    expect(buildViewHref(FILTERED, "map")).toBe("/explore?view=map");
+    expect(buildViewHref({ ...FILTERED, view: "map" }, "list")).toBe("/explore");
+  });
+
+  it("carries the visitor's location across, since it is a personalisation not a filter", () => {
+    const near = { lat: 12.972, lng: 77.595 };
+    expect(buildViewHref({ ...FILTERED, near }, "list")).toBe("/explore?sort=nearest&near=12.972%2C77.595");
+    // Map mode is state-driven, so it does not adopt the distance ordering.
+    expect(buildViewHref({ ...FILTERED, near }, "map")).toBe("/explore?view=map&near=12.972%2C77.595");
   });
 });

@@ -8,7 +8,12 @@ import { buildExploreHref, type ParsedExploreParams } from "@/lib/explore-url";
 
 export function SortFilter({ current }: { current: ParsedExploreParams }) {
   const router = useRouter();
-  const currentLabel = PUBLIC_SORT_OPTIONS.find((o) => o.key === current.sort)?.label ?? "Top rated";
+  // "Nearest me" is only offered once the visitor's coordinates exist (they allowed
+  // geolocation) — a distance sort with nothing to measure from would be a dead option.
+  const options = current.near
+    ? [{ key: "nearest" as SortKey, label: "Nearest me" }, ...PUBLIC_SORT_OPTIONS]
+    : PUBLIC_SORT_OPTIONS;
+  const currentLabel = options.find((o) => o.key === current.sort)?.label ?? "Top rated";
   const suppressedBySearch = current.q.length > 0;
 
   function select(sort: SortKey) {
@@ -24,7 +29,7 @@ export function SortFilter({ current }: { current: ParsedExploreParams }) {
       ) : null}
       {/* Plain semantic list — see state-filter.tsx for why this isn't role="listbox". */}
       <ul className="space-y-0.5">
-        {PUBLIC_SORT_OPTIONS.map((o) => (
+        {options.map((o) => (
           <li key={o.key}>
             <button
               type="button"

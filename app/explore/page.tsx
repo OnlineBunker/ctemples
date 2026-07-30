@@ -13,7 +13,7 @@ import { SmartMatchBanner } from "@/components/explore/smart-match-banner";
 import { ResultGrid } from "@/components/explore/result-grid";
 import { Pagination } from "@/components/explore/pagination";
 import { ModeToggle } from "@/components/explore/mode-toggle";
-import { YourStatePill } from "@/components/explore/your-state-pill";
+import { NearbyLocator } from "@/components/explore/nearby-locator";
 import { EmptyState } from "@/components/explore/empty-state";
 // The map bundle (IndiaMap geometry + region pills + Framer Motion sheet) loads only under
 // ?view=map (docs/05 §6's last bullet) — list mode never pays for it. The client-side
@@ -66,6 +66,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
       tags: parsed.tags,
       sort: parsed.sort,
       page: parsed.page,
+      near: parsed.near,
     }),
     getStateCounts(),
     getTempleCount(),
@@ -104,12 +105,9 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <ModeToggle current={parsed} />
+        {/* Location is a list-mode ordering; map mode is driven by the state you pick. */}
+        {parsed.view === "list" ? <NearbyLocator current={parsed} /> : null}
       </div>
-
-      <YourStatePill
-        current={parsed}
-        stateOptions={allStates.map((s) => ({ state: s.state, slug: s.slug }))}
-      />
 
       {parsed.view === "map" ? (
         <>

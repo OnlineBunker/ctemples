@@ -294,3 +294,45 @@ describe("runExploreQuery", () => {
     expect(result.matchedAliases).toEqual([]);
   });
 });
+
+describe("runExploreQuery — nearest sort", () => {
+  // Three temples at known, increasing distances from a Bengaluru reference point.
+  const ref = { lat: 12.9716, lng: 77.5946 };
+  const near = makeTemple({ id: "near", name: "Near", rating: 4.0, coordinates: { lat: 13.0, lng: 77.6 } });
+  const mid = makeTemple({ id: "mid", name: "Mid", rating: 4.9, coordinates: { lat: 13.6, lng: 77.6 } });
+  const far = makeTemple({ id: "far", name: "Far", rating: 5.0, coordinates: { lat: 19.0, lng: 72.9 } });
+  const list = [far, mid, near];
+
+  it("orders by true distance, overriding rating", () => {
+    const result = runExploreQuery(list, { sort: "nearest", near: ref });
+    expect(result.items.map((t) => t.id)).toEqual(["near", "mid", "far"]);
+  });
+
+  it("falls back to the default ordering when no coordinates are supplied", () => {
+    const result = runExploreQuery(list, { sort: "nearest" });
+    // Rating order (the "rating" default), i.e. NOT distance order.
+    expect(result.items.map((t) => t.id)).toEqual(["far", "mid", "near"]);
+  });
+
+  it("still applies facet filters before ordering by distance", () => {
+    // A tag only this record carries — the far-away one, so a passing result proves the
+    // filter ran and wasn't simply reordered away by distance.
+    const tagged = makeTemple({
+      id: "tagged",
+      name: "Tagged",
+      tags: ["Rath Yatra"],
+      coordinates: { lat: 20.0, lng: 73.0 },
+    });
+    const result = runExploreQuery([...list, tagged], {
+      sort: "nearest",
+      near: ref,
+      tagSlugs: ["rath-yatra"],
+    });
+    expect(result.items.map((t) => t.id)).toEqual(["tagged"]);
+  });
+
+  it("keeps relevance order when a search query is present", () => {
+    const result = runExploreQuery(list, { sort: "nearest", near: ref, q: "Far" });
+    expect(result.items.map((t) => t.id)).toEqual(["far"]);
+  });
+});

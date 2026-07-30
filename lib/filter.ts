@@ -7,7 +7,13 @@ import { parseRupeeRange } from "./format";
  * Unit-tested — see filter.test.ts.
  */
 
-export type SortKey = "featured" | "rating" | "name" | "cost" | "popularity";
+/**
+ * `nearest` is a *contextual* sort: it is only meaningful alongside a `near` coordinate
+ * (the visitor's own location) and is therefore never offered in the static option list —
+ * `runExploreQuery` handles it directly, and the Explore sort control only surfaces it once
+ * coordinates exist. Everything else sorts purely from the record.
+ */
+export type SortKey = "featured" | "rating" | "name" | "cost" | "popularity" | "nearest";
 
 // Kept for backward compatibility with the pre-redesign Explore page
 // (app/explore/page.tsx's VALID_SORT), which still reads all 5 keys. New (Phase 3)
