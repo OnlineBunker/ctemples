@@ -29,18 +29,30 @@ export function PhotoWithFallback({
 }) {
   const [failed, setFailed] = useState(false);
   /**
-   * Wikimedia images used to bypass the optimizer ("avoids rate-limiting the proxy"). Measured,
-   * that was the single worst performance decision in the app: Wikimedia serves ONE fixed width
-   * and returns HTTP 400 for any other (verified at 400/640/828/1080px), so every surface got the
-   * full 1280px file — index rows downloaded 1280x1109 JPEGs to render 52x66px thumbnails, and
-   * the homepage shipped **4.33 MB of images**, giving a 19.4 s LCP on a 4x-CPU / 1.6 Mbps
-   * profile.
+   * Placeholder photos are hotlinked from Wikimedia's CDN, which serves pre-sized thumbnails and
+   * is built for direct browser traffic. Serving them unoptimized (browser -> Wikimedia) avoids
+   * rate-limiting the Next image optimizer's proxy. Real, self-hosted images will flow through
+   * the optimizer normally.
    *
-   * Through the optimizer the same source becomes 1,155 bytes of AVIF at w=64 and 72 KB at
-   * w=640 — 377x and 6x smaller. `next.config.mjs` already allowlists the host and prefers
-   * AVIF/WebP, and optimized results are cached, so the proxy concern is a cold-start cost paid
-   * once per size rather than on every visit by every visitor.
+   * DO NOT REMOVE THIS WITHOUT REPLACING THE SOURCE URLS FIRST. An audit pass deleted this line
+   * on the strength of a *warm-cache* measurement (homepage 4.33MB -> 0.28MB, LCP 19.4s -> 1.5s)
+   * and it made the live site unusable — first paint went from seconds to minutes. The warm number
+   * was real but it measured the wrong thing:
+   *   - Routing a remote image through the optimizer means Next must fetch the full-size original
+   *     from Wikimedia and AVIF-encode it, per width, on demand. AVIF encoding is CPU-seconds per
+   *     image; a page with a dozen photos serializes into minutes of first-request latency.
+   *   - That cost is NOT paid once. The optimizer cache lives under `.next`, so every rebuild and
+   *     every fresh deploy discards it and the next visitor pays the whole bill again.
+   *   - Wikimedia throttles server-side hotlinking far more aggressively than browser traffic,
+   *     which is the *original* reason this bypass exists.
+   * It is also a decision already recorded in PROJECT_CONTEXT.md ("the deliberate
+   * rate-limit-avoidance decision") — reversing it was a product call, not a perf fix.
+   *
+   * The bandwidth win is genuine and still worth having, but the correct route is to size the
+   * SOURCE urls (Wikimedia's /thumb/<file>/<N>px- path serves arbitrary widths) so the browser
+   * fetches a small file directly, with no proxy in the path. Until that lands, unoptimized wins.
    */
+  const unoptimized = src.startsWith("https://upload.wikimedia.org");
   if (failed) {
     return (
       <TempleScene
@@ -67,6 +79,7 @@ export function PhotoWithFallback({
       fetchPriority={priority ? "high" : undefined}
       placeholder="blur"
       blurDataURL={shimmer(24, 16)}
+      unoptimized={unoptimized}
       onError={() => setFailed(true)}
       className={cn("object-cover", className)}
     />

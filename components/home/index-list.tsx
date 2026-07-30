@@ -169,17 +169,20 @@ export function IndexList({ rows }: { rows: IndexRow[] }) {
                 </span>
                 {t.img ? (
                   <span className="relative block h-[66px] w-[52px] shrink-0 overflow-hidden rounded-[26px_26px_9px_9px] sm:hidden">
-                    {/* Optimized, and that matters more here than anywhere: these render at
-                        52x66 CSS px but Wikimedia only serves one fixed width, so unoptimized
-                        they pulled a 1280x1109 / ~438 KB JPEG *each* — 15 of them, the bulk of
-                        the homepage's measured 4.33 MB. At `sizes="52px"` the optimizer returns
-                        roughly 1 KB of AVIF per row. */}
+                    {/* `unoptimized` (see components/media/photo-with-fallback.tsx for the full
+                        reasoning). These are hotlinked Wikimedia sources, and routing 15 of them
+                        through the image optimizer meant 15 server-side fetches + AVIF encodes
+                        before the homepage could paint — seconds became minutes. The bandwidth
+                        win from optimizing is real but it is not worth an unusable page; the fix
+                        is to size the source URL, not to proxy it. `loading="lazy"` still keeps
+                        these off the critical path. */}
                     <Image
                       src={t.img}
                       alt=""
                       fill
                       loading="lazy"
                       sizes="52px"
+                      unoptimized
                       className="object-cover"
                     />
                   </span>

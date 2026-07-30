@@ -162,6 +162,12 @@ function FadeLayers({
                 priority={i === 0}
                 loading={i === 0 ? "eager" : "lazy"}
                 sizes={sizes}
+                // `unoptimized`: hotlinked Wikimedia source (see photo-with-fallback.tsx). This
+                // is the LCP element, so it is the WORST possible place to put a server-side
+                // fetch + AVIF encode in front of first paint — that is what turned homepage
+                // load from seconds into minutes. `sizes` is retained because it costs nothing
+                // and becomes live again the moment the sources are self-hosted.
+                unoptimized
                 draggable={false}
                 className="object-cover"
                 style={{ objectPosition: "center" }}

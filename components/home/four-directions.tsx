@@ -51,6 +51,8 @@ export function FourDirections({ items }: { items: DirectionItem[] }) {
                   alt=""
                   fill
                   sizes="(max-width: 760px) 100vw, 40vw"
+                  // `unoptimized`: hotlinked Wikimedia source — see photo-with-fallback.tsx.
+                  unoptimized
                   className="object-cover transition-transform duration-[1100ms] ease-threshold group-hover:scale-[1.06] motion-reduce:!transform-none"
                 />
               ) : null}
