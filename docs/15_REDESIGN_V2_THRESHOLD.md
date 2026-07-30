@@ -299,14 +299,49 @@ server HTML saying "Save": React #418, reproducible **only** on `/explore` and *
 something already saved. The gate is now per-component, so every consumer's first render matches
 the server regardless of mount order. Verified across 18 seeded/unseeded route combinations.
 
-**Still open** (honest list): design-consistency drift — three panel radii on the temple page, two
-control languages and three control heights on the Explore toolbar, `rounded-portal` used against
-its own written enforcement rule on `/deities/[key]`, six off-palette dark hues in the hero
-composition, and the defined-but-unused `.section-y` / `body-xs` / `rounded-input` / `rounded-chip`
-tokens. Also unverified rather than disproven: the hero LCP is a CSS `background-image` (so it
-cannot be `priority`-preloaded) and `unoptimized` is hardcoded at several `next/image` call sites,
-making their `sizes` props inert. The **code-quality** lens never ran; its dead-code half was
-redone by hand (17 files removed) but the duplication/naming half was not.
+### Third pass — images, drift, duplication
+
+**Images — the worst measured problem in the app.** The two "unverified" image findings were both
+real, and together far outweighed everything else. On a 4×-CPU / 1.6 Mbps mobile profile the
+homepage LCP was **19,412 ms** (Google's "good" bar is 2,500 ms) while shipping **4.33 MB of
+images**. Root cause: Wikimedia images deliberately bypassed the Next optimizer on the reasoning
+that Wikimedia "serves pre-sized thumbnails" — it does not. It serves exactly ONE width and
+returns HTTP 400 for any other (verified at 400/640/828/1080px), so a responsive `srcset` is
+impossible *and* every surface received the full 1280px JPEG: index rows were downloading
+1280×1109 / ~438 KB files to render **52×66 px** thumbnails, fifteen of them.
+
+Fixes: removed the `unoptimized` bypass and the two hardcoded `unoptimized` props that were making
+their `sizes` inert; converted the hero slides from CSS `background-image` divs (invisible to the
+preload scanner, unable to carry `fetchpriority`, impossible to preload) to `next/image` with
+`priority` on the first slide; gave index thumbnails `sizes="52px"`. Also removed Konark's hero,
+which was a **1,296 KB raw original duplicated by its own 1280px thumbnail** — the same defect
+fixed earlier on Kashi Vishwanath. **Result: mobile LCP 19,412 → 1,492 ms (13×), desktop 1,248 →
+992 ms, homepage images 4.33 MB → 0.28 MB (15×) all in AVIF, CLS 0.0007.**
+
+**Design drift.** `rounded-portal` was framing the deity *icon* on `/deities/[key]`, against §2A's
+own enforcement rule (the arch is for imagery-you-enter and passages, never chrome or a glyph) —
+now a circular medallion. The temple entry rendered three panel radii (`rounded-card` plus one-off
+26px and 22px) — unified on the token. Explore's toolbar was misaligned: the mode toggle measured
+46px against 44px filter pills, with 36px segments; re-sized so the outer control is exactly 44px
+and segments are 40px. Removed three dead tokens (`body-xs`, `rounded-input`, `rounded-chip`, zero
+uses each) — they were added for a "missing small radius" the fidelity pass never needed, and dead
+tokens invite drift because the next person must guess which of two answers is current.
+
+**Duplication (the code-quality lens's DRY half, also done by hand).** The signature two-digit
+numeral appeared in **ten places, five of them separate local definitions of the identical arrow
+function**. Consolidated onto `padCount()` in `lib/format.ts` — where the project already keeps and
+tests its formatters — with unit tests for padding, no-truncation above 99, and negative/fractional
+input.
+
+**Still open, honestly.** Six off-palette dark hues in the hero composition (they build the
+nocturnal sky gradient; they are not in the locked palette and should either be tokenised as
+"sky" values or justified in the spec). Seven full-viewport `mix-blend-mode: screen` layers plus
+two large runtime blurs in the hero — still a real paint cost on weak GPUs, now partly mitigated by
+the off-screen pause but not reduced. The hero photo is still decoded twice (arch + ghost tower
+render the same source at two sizes). CTA styling is hand-rolled in several places while
+`ButtonLink` exists and is used once — a consolidation worth doing but with real visual risk.
+`/suggest?state=<slug>` still promises context and delivers an empty form. And the naming half of
+the code-quality lens was never run at all.
 
 ## 0. Soul
 
