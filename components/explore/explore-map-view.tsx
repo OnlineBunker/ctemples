@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { IndiaMap } from "./india-map";
 import { RegionPills } from "./region-pills";
@@ -31,6 +31,7 @@ export function ExploreMapView({
   stateLabel: string | null;
 }) {
   const router = useRouter();
+  const [, startTransition] = useTransition();
   const [activeRegion, setActiveRegion] = useState<Region | "all">("all");
   // When the mobile sheet is at half/full it is an aria-modal dialog (docs/03 §6.8), so
   // the map + region pills behind it must be inert — otherwise pointer and SR
@@ -44,11 +45,29 @@ export function ExploreMapView({
 
   function handleSelectState(slug: string) {
     const next = current.state === slug ? undefined : slug;
-    // `scroll: false` — the App Router scrolls to the top of the document on every
-    // navigation by default, which threw you back to the page header the instant you
-    // picked a state on the map. Selecting a state changes the results beside the map;
-    // it is not a new page, so the scroll position must be preserved.
-    router.push(buildExploreHref(current, { state: next, page: 1 }), { scroll: false });
+    // Selecting a state changes the results beside the map; it is not a new page, so the
+    // scroll position must survive.
+    //
+    // `scroll: false` stops the App Router's default scroll-to-top, but on its own it is NOT
+    // enough here, and this took a measurement to establish. `/explore` is a dynamic route, so
+    // a searchParams change re-suspends the segment; while an `app/explore/loading.tsx`
+    // existed, rendering that Suspense fallback scrolled to top regardless of the flag.
+    // Measured, clicking a state from scrollY 700:
+    //   loading.tsx present, `scroll: false`                     -> 0    (bug)
+    //   loading.tsx present, `scroll: false` + startTransition   -> 0    (bug — did NOT help)
+    //   loading.tsx removed, `scroll: false`                     -> 700  (correct)
+    // So the fix is that `app/explore/loading.tsx` is deliberately absent. DO NOT reintroduce a
+    // loading.tsx for this route without re-testing this interaction — a route-level skeleton
+    // here trades a cold-entry nicety for a scroll bug on every single state selection.
+    //
+    // The transition is kept because it keeps the current results interactive while the new
+    // ones stream in, not because it affects scroll (measured above: it does not).
+    //
+    // Regression history: docs/15 §0c fixed this once; the audit's loading.tsx reintroduced it
+    // and the owner reported it a second time (docs/15 §0h).
+    startTransition(() => {
+      router.push(buildExploreHref(current, { state: next, page: 1 }), { scroll: false });
+    });
   }
 
   const peekLabel = current.state

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { INDIA_STATES } from "@/lib/india-geo";
 import { buildExploreHref, type ParsedExploreParams } from "@/lib/explore-url";
@@ -19,6 +20,7 @@ export function MapStateSelect({
   counts: Record<string, number>;
 }) {
   const router = useRouter();
+  const [, startTransition] = useTransition();
   return (
     <div className="flex items-center gap-2">
       <label
@@ -32,8 +34,11 @@ export function MapStateSelect({
         value={current.state ?? ""}
         onChange={(e) => {
           const slug = e.target.value || undefined;
-          // Preserve scroll — see explore-map-view.tsx's handleSelectState.
-          router.push(buildExploreHref(current, { state: slug, page: 1 }), { scroll: false });
+          // Preserve scroll — needs BOTH `scroll: false` and the transition; see
+          // explore-map-view.tsx's handleSelectState for why the flag alone fails.
+          startTransition(() => {
+            router.push(buildExploreHref(current, { state: slug, page: 1 }), { scroll: false });
+          });
         }}
         className="min-w-0 flex-1 rounded-full border border-line-strong bg-canvas px-3 py-2 text-sm text-ink focus-visible:border-magenta focus-visible:outline-none"
       >

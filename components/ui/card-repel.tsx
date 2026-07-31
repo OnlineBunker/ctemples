@@ -15,11 +15,19 @@ import { useReducedMotion } from "framer-motion";
  *  • Movement is capped at `max` px and eased via a rAF lerp, so it reads as weight, not jitter.
  *  • Fine pointers only, and fully inert under `prefers-reduced-motion` (no listeners, no rAF,
  *    no transform) — the card then behaves exactly as it does at rest.
+ *  • **It holds still over interactive controls.** Anything marked `data-repel-freeze` (the
+ *    wishlist heart) parks the drift at rest while the pointer is on it. This is a usability
+ *    fix, not a nicety: the card moves AWAY from the cursor, so without it, aiming at a button
+ *    inside the card pushes that button away — the owner reported the save heart as genuinely
+ *    hard to hit. Freezing makes it a stationary target the moment you reach for it.
+ *  • Amplitude is deliberately small (owner directive: "make the temple card motion minimal").
+ *    The point is a hint of weight, not a dodge; at the earlier 10px/0.06 the card visibly
+ *    fled the pointer.
  */
 export function CardRepel({
   children,
-  strength = 0.06,
-  max = 10,
+  strength = 0.028,
+  max = 4,
   className,
 }: {
   children: ReactNode;
@@ -70,6 +78,15 @@ export function CardRepel({
     };
 
     const onMove = (e: PointerEvent) => {
+      // Over an interactive control, settle to rest instead of following the pointer, so the
+      // control stops retreating from the cursor that is aiming at it.
+      const t = e.target as Element | null;
+      if (t?.closest?.("[data-repel-freeze]")) {
+        targetX = 0;
+        targetY = 0;
+        start();
+        return;
+      }
       const r = el.getBoundingClientRect();
       // Offset from the card's centre, inverted → the card moves away from the cursor.
       targetX = clamp(-(e.clientX - (r.left + r.width / 2)) * strength);

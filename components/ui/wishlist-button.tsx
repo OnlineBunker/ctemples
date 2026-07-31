@@ -35,6 +35,10 @@ export function WishlistButton({
         onClick={() => toggle(id)}
         aria-pressed={saved}
         aria-label={label}
+        // Holds the CardRepel drift still while the pointer is on this control (see
+        // components/ui/card-repel.tsx). Without it the heart is a retreating target:
+        // the card moves AWAY from the cursor, so aiming at the heart pushes it away.
+        data-repel-freeze
         className={cn(
           "inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors",
           saved
@@ -54,8 +58,16 @@ export function WishlistButton({
       onClick={() => toggle(id)}
       aria-pressed={saved}
       aria-label={label}
+      // Holds the CardRepel drift still while the pointer is on this control (see
+      // components/ui/card-repel.tsx). This is the variant the Explore cards use, and it is
+      // where the owner hit the problem: the card drifts AWAY from the cursor, so aiming at
+      // the heart pushed it away. Freezing makes it a stationary target.
+      data-repel-freeze
+      // The hit area was also genuinely small for a primary action. `py-1 pr-2` gave roughly
+      // 13x13 of icon plus a sliver of padding; this brings it to the 44px WCAG 2.5.8 floor
+      // without changing the visual, via a negative-margin bleed that keeps the layout intact.
       className={cn(
-        "group/save inline-flex items-center gap-1.5 rounded-full py-1 pr-2 font-mono text-[9.5px] uppercase tracking-[.16em] transition-colors",
+        "group/save -my-2 -ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-full py-1 pl-2 pr-2 font-mono text-[9.5px] uppercase tracking-[.16em] transition-colors",
         saved ? "text-magenta" : "text-ink-muted hover:text-magenta",
         className,
       )}

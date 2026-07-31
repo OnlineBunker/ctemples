@@ -199,6 +199,50 @@ Also in this pass:
 - **Quick-facts values no longer truncate.** `truncate` clipped the actual facts ("Completed
   around 1…" hid the century); they now wrap with `break-words`.
 
+## 0h. CARD MOTION + MAP SCROLL (owner report, 2026-07-31)
+
+**Owner directive:** *"make sure the temple card motion is minimal because right now its hard to save
+a temple directly from the explore page, and also the map is buggy, when I scroll down and select a
+state it takes me to the top of the page again, the same problem as before."*
+
+**1. `CardRepel` amplitude cut, and it now holds still over controls.** `strength` 0.06 → **0.028**,
+`max` 10px → **4px**. The bigger problem was not the amount but the direction: the card drifts *away*
+from the pointer, and the wishlist heart is a child of the drifting wrapper, so aiming at the heart
+pushed it away — a retreating target. Anything marked `data-repel-freeze` now parks the drift at rest
+while the pointer is on it. Measured: card drift **4.1px** crossing the body, **0.0px** once the
+pointer is on the heart. The heart's hit area was also genuinely too small for a primary action
+(~13px icon plus a sliver of padding); a negative-margin bleed brings it to the WCAG 2.5.8 44px floor
+with no visual change — now **64×44** desktop, **72×44** mobile. Verified end to end at both
+viewports: `aria-pressed false → true`, `localStorage ctemples:saves = ["brihadeeswarar-temple"]`, and
+the page does not navigate (the heart is a sibling of the card link, never nested).
+
+**2. The map scroll reset was `app/explore/loading.tsx`, and `scroll: false` could not fix it.**
+`/explore` is a dynamic route, so a searchParams change re-suspends the segment; rendering that
+route-level Suspense fallback scrolls to top regardless of the router flag. Measured, clicking a
+state from scrollY 700:
+
+| configuration | resulting scrollY |
+|---|---|
+| `loading.tsx` present, `scroll: false` | **0** (bug) |
+| `loading.tsx` present, `scroll: false` + `startTransition` | **0** (bug — the transition did NOT help) |
+| `loading.tsx` removed, `scroll: false` | **700** (correct) |
+
+The middle row matters: marking the navigation as a transition was the obvious fix and it measurably
+did not work, so the comment in `explore-map-view.tsx` records the disproof rather than the guess.
+**`app/explore/loading.tsx` is therefore deliberately absent — do not reintroduce a route-level
+loading skeleton for `/explore` without re-testing state selection.** It trades a cold-entry nicety
+for a scroll reset on every state click. The `startTransition` wrapper is kept (both the SVG map and
+the "Jump to state" select) because it keeps the current results interactive while new ones stream,
+not because it affects scroll.
+
+**Regression history:** docs/15 §0c fixed this once; the §0f audit added `loading.tsx` (commit
+`a9a79b6`) and silently reintroduced it, which is why the owner reported it as "the same problem as
+before". Both reports were correct.
+
+Gate: typecheck · 305 tests · lint · `lint:tokens` · build 71/71 · axe **0 violations** across 26
+page runs · hero-drift + 6 birds + cue `running`, marquee `paused` off-screen → `running` when
+scrolled to.
+
 ## 0g. IMAGE-OPTIMIZER REGRESSION — the audit broke the site (owner report, 2026-07-31)
 
 **BINDING RULE: hotlinked Wikimedia sources are served `unoptimized`. Do not route them through
