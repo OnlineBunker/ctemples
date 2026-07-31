@@ -199,6 +199,71 @@ Also in this pass:
 - **Quick-facts values no longer truncate.** `truncate` clipped the actual facts ("Completed
   around 1…" hid the century); they now wrap with `break-words`.
 
+## 0g. IMAGE-OPTIMIZER REGRESSION — the audit broke the site (owner report, 2026-07-31)
+
+**BINDING RULE: hotlinked Wikimedia sources are served `unoptimized`. Do not route them through
+the Next image optimizer. This decision has now been made, reversed, and re-made once — treat any
+future "let's optimize the Wikimedia images" proposal as already-answered unless the sources have
+first been self-hosted or the URLs pre-sized.**
+
+The §0f audit's `perf(images)` pass (358681f) stripped `unoptimized` from all five hotlinked call
+sites (`photo-with-fallback.tsx`, `threshold-hero.tsx`, `index-list.tsx`, `in-focus.tsx`,
+`four-directions.tsx`). Owner report: *"the site is loading in minutes instead of seconds, the maps
+is not working, the scroll animations are buggy, the temple cards don't have that opposing effect
+anymore."* **One root cause, four symptoms** — page JS waits on the main thread, so a starved
+hydration presents as dead hover, a dead map, and janky scroll, not as "slow images".
+
+**Why the audit's measurement was wrong.** It reported homepage images 4.33MB → 0.28MB and mobile
+LCP 19.4s → 1.5s. Both numbers were real and both measured the wrong thing: they were taken against
+a **warm** optimizer cache. Measured per image:
+
+| request | status | time | bytes |
+|---|---|---|---|
+| cold (first) | 200 | **1.989 s** | 5,843 B |
+| warm (second) | 200 | **0.0018 s** | 5,843 B |
+
+A **1,100×** gap. Optimizing a *remote* image means Next fetches the full original from Wikimedia
+and AVIF-encodes it, per width, on demand — CPU-seconds each. Against ~20 images and the
+optimizer's limited transcode concurrency, first paint becomes minutes. The cost is **not** paid
+once: the cache lives under `.next`, so every rebuild and deploy discards it.
+
+**Two independent confirmations that the bypass is correct, gathered while fixing this:**
+
+1. **Wikimedia rate-limits hard.** Probing thumbnail widths at 12-way parallelism from one IP
+   returned **HTTP 429** after ~30 requests. A server-side optimizer is exactly that access
+   pattern — one IP fetching every image — so it would 429 in production. This is the original
+   "deliberate rate-limit-avoidance decision" in `PROJECT_CONTEXT.md`, empirically re-derived.
+2. **Wikimedia serves only an allowlisted set of widths, and the set varies per file.** Verified:
+   `/thumb/.../<N>px-` returns **400 "Use thumbnail sizes listed on https://w.wiki/GHai"** for
+   arbitrary widths. One file allowed `120 / 250 / 330 / 500 / 1280`; another allowed only
+   `120 / 500 / 1280`. So the audit's premise ("Wikimedia serves ONE fixed width") was directionally
+   right but imprecise — there are a few, not one, and they are not uniform.
+
+**Accepted tradeoff.** Unoptimized costs bandwidth: `/explore` ships ~3.3MB of images. That is worse
+than 0.28MB and better than an unusable page, so it stands until the sources change.
+
+**Follow-up (NOT done — do not mark complete without per-URL verification).** Pre-size the *source*
+URLs to each file's own allowlist so the browser fetches a small file directly: no proxy, no
+transcode, no rate-limit exposure. Indicative wins on the 52×66 index thumbs: 120px = 5KB vs the
+current 1280px = 425KB (**85×**); explore cards at 500px = 72KB (**6×**). This was deliberately not
+shipped in the fix commit because the allowlist is per-file, verifying all 103 dataset sources needs
+slow serial probing to avoid 429, and any unverified miss silently degrades that photo to the
+generated `TempleScene` fallback. Restoring a working site took priority over the bytes.
+
+**Also audited: no live animation or effect was lost by §0f.** `animate-kenburns` and
+`animate-dot-progress` belonged to the old split hero, which `app/page.tsx` had already stopped
+importing *before* the audit (verified against `ada6e1c` — dead code, so deleting it removed nothing
+that rendered). All seven surviving files that changed kept their `transition-colors`. Verified live
+on the fixed build: card repel `none → translate(6.9px,-0.6px)`, map state-click routes to
+`?state=…&view=map`, `animate-hero-drift`/`animate-bird`×6/`animate-cue` all `running`, and the
+finale marquee correctly `paused` off-screen then `running` once scrolled to.
+
+**Process notes worth keeping.** (a) A warm-cache measurement is not a performance result — state
+the cache state or the number is meaningless. (b) Concurrent `next build` runs corrupt `.next` (it
+lost `BUILD_ID` and `static/` mid-session, which produced chunk 400s and a *false* "the JS is
+broken" reading); `npm run lint` also clears `BUILD_ID`, so rebuild before `next start`. Both were
+harness artifacts, not app bugs, and were nearly reported as app bugs.
+
 ## 0f. PRODUCTION-READINESS AUDIT (2026-07-30)
 
 A nine-lens audit (product, design, motion, UX, a11y, perf, security, architecture) run against
